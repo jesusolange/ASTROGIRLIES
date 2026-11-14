@@ -47,7 +47,8 @@ Your task spec lists the paths you own. Anything else: ask first.
   Keys start with `astromed-`. Never call `localStorage` directly.
 - **Navigation:** a new section registers itself, it does not edit the navigation code:
   `window.AstroMedNav.register({ id, label, icon, render, before })` inside a `DOMContentLoaded` handler.
-  `render(pageElement)` runs every time the section opens. `window.AstroMedNav.show(id)` opens any section.
+  `render(pageElement)` runs every time the section opens. `window.AstroMedNav.show(id)` opens any section;
+  `window.AstroMedNav.has(id)` says whether a section exists (other sections may register after yours).
 - **Start-up:** modules load through `src/scripts/main.js` and run before `DOMContentLoaded`. Do your DOM work in a
   `DOMContentLoaded` handler. Do not branch on `document.readyState`.
 - **Risk model:** `import { currentMission, rankedRisks, areaWeights, MISSION_TYPES } from "./risks.js"`.
@@ -63,7 +64,9 @@ Your task spec lists the paths you own. Anything else: ask first.
 - Stay inside your worktree. Scratch files go in `.tmp/` inside it.
 - Never use `git stash`. Use a WIP commit.
 - Your dev server port is given in your task (`PORT=<n> pnpm dev`). Never use another port. Never kill a process you
-  did not start. Never run a server in the foreground: start it detached with output to `.tmp/<name>.log`.
+  did not start. Never run a server in the foreground. Start it fully detached, as its own
+  command: `PORT=<n> nohup pnpm dev < /dev/null > .tmp/dev.log 2>&1 & disown`, then read `.tmp/dev.log` in a separate
+  command. A background process that inherits the shell output blocks your turn forever.
 - Evidence for any visible change: `node tools/shot.mjs --url http://127.0.0.1:<port>/ --out docs/evidence/<task>/<name>.png`
   (it also prints console errors and failed requests; `--eval "<js>"` clicks through the app first).
   Open your own screenshots and check they show what you claim.
