@@ -9,7 +9,7 @@
   const KEY = "astromed-immune";
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const rd = (k, fb) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; } };
+  const rd = (k, fb) => window.AstroMedStore.store.get(k, fb);
   const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const LV = { ok: 100, review: 55, alert: 15 };
   const ageDays = (iso) => (Date.now() - new Date(iso).getTime()) / 864e5;
@@ -20,7 +20,7 @@
     ["rash", "Skin rash or itching"], ["sores", "Cold sores or mouth sores"], ["tired", "Very tired, more than usual"], ["heal", "Cuts or sores heal slowly"]
   ];
   const imm = () => { const v = rd(KEY, {}); return { log: v.log || {} }; };
-  const saveImm = (v) => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { console.error(e); } };
+  const saveImm = (v) => window.AstroMedStore.store.set(KEY, v);
 
   function riskFactors() {
     const r = [];

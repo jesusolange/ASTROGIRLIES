@@ -18,13 +18,8 @@ function astromedSectionsInit() {
     reports: "astromed-reports"
   };
 
-  const load = (k, fb) => {
-    try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; }
-    catch { return fb; }
-  };
-  const store = (k, v) => {
-    try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { console.error(e); }
-  };
+  const load = (k, fb) => window.AstroMedStore.store.get(k, fb);
+  const store = (k, v) => window.AstroMedStore.store.set(k, v);
   const esc = s => String(s).replace(/[&<>"']/g, c =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const fmt = iso => new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });

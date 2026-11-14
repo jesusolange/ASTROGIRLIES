@@ -316,9 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
         try {
   
-          const saved = JSON.parse(
-            localStorage.getItem(storageKey) || "[]"
-          );
+          const saved = window.AstroMedStore.store.get(storageKey, []);
   
           const sessions = Array.isArray(saved)
             ? saved
@@ -326,10 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
           sessions.unshift(session);
   
-          localStorage.setItem(
-            storageKey,
-            JSON.stringify(sessions.slice(0, 500))
-          );
+          if (!window.AstroMedStore.store.set(storageKey, sessions.slice(0, 500))) throw new Error("Could not save to browser storage");
   
         } catch (error) {
   

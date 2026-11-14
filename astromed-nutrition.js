@@ -13,8 +13,8 @@
   const KEY = "astromed-nutrition";
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const blank = () => ({ entries: [], eva: {}, af: 1.11, lib: [] });
-  const read = () => { try { const v = JSON.parse(localStorage.getItem(KEY)); return v ? { ...blank(), ...v, lib: v.lib || [] } : blank(); } catch { return blank(); } };
-  const write = (v) => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { console.error(e); } };
+  const read = () => { const v = window.AstroMedStore.store.get(KEY, null); return v ? { ...blank(), ...v, lib: v.lib || [] } : blank(); };
+  const write = (v) => window.AstroMedStore.store.set(KEY, v);
   const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const parseIso = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const r0 = (n) => Math.round(n);

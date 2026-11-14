@@ -10,8 +10,8 @@
   const KEY = "astromed-profile";
   const DAY = 86400000;
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } };
-  const write = (v) => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { console.error(e); } };
+  const read = () => window.AstroMedStore.store.get(KEY, null) || null;
+  const write = (v) => window.AstroMedStore.store.set(KEY, v);
 
   // Local calendar day number (avoids DST problems)
   const dayNum = (d) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY);

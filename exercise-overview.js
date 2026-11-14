@@ -489,9 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
       try {
   
-        const data = JSON.parse(
-          localStorage.getItem(storageKey) || "[]"
-        );
+        const data = window.AstroMedStore.store.get(storageKey, []);
   
         if (!Array.isArray(data)) {
           return [];

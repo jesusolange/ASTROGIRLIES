@@ -74,3 +74,22 @@ test("migrations run for older versions", () => {
   assert.equal(s.get("astromed-added"), true);
   assert.equal(Store.VERSION, orig);
 });
+
+test("memoryStorage works as a fallback backend", () => {
+  const s = Store.create(Store.memoryStorage());
+  s.set("astromed-x", { a: 1 });
+  assert.deepEqual(s.get("astromed-x"), { a: 1 });
+  assert.deepEqual(s.appKeys(), ["astromed-x"]);
+});
+
+test("a failed import write keeps the previous data", () => {
+  const st = fake({ "astromed-keep": "1" });
+  const realSet = st.setItem;
+  st.setItem = (k, v) => { if (k === "astromed-new") throw new Error("quota"); realSet(k, v); };
+  const s = Store.create(st);
+  const origError = console.error; console.error = () => {};
+  try {
+    assert.throws(() => s.importAll(JSON.stringify({ app: "astromed", version: Store.VERSION, data: { "astromed-new": 1 } })), /previous data/);
+  } finally { console.error = origError; }
+  assert.equal(st.getItem("astromed-keep"), "1");
+});

@@ -11,8 +11,8 @@
   const KEY = "astromed-env";
   const LOG = "astromed-env-log";
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const read = (k, fb) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; } };
-  const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { console.error(e); } };
+  const read = (k, fb) => window.AstroMedStore.store.get(k, fb);
+  const write = (k, v) => window.AstroMedStore.store.set(k, v);
   const fmt = (iso) => new Date(iso).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
   /* ---------- places ---------- */

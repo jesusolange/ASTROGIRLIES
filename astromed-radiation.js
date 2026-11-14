@@ -16,8 +16,8 @@
   const LIMIT = 600; // mSv, career effective dose (NASA-STD-3001 V1 4030)
   const SPE_LIMIT = 250; // mSv, short-term (solar particle event) limit
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const rd = (k, fb) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? fb; } catch { return fb; } };
-  const wr = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { console.error(e); } };
+  const rd = (k, fb) => window.AstroMedStore.store.get(k, fb);
+  const wr = (k, v) => window.AstroMedStore.store.set(k, v);
   const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const parseIso = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const addDays = (iso, n) => { const d = parseIso(iso); d.setDate(d.getDate() + n); return isoDay(d); };

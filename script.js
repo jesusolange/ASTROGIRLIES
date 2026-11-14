@@ -376,9 +376,7 @@ fields: [
 
   function loadRecords() {
     try {
-      const saved = JSON.parse(
-        localStorage.getItem(storageKey) || "[]"
-      );
+      const saved = window.AstroMedStore.store.get(storageKey, []);
 
       if (Array.isArray(saved)) {
         records = saved
@@ -398,10 +396,7 @@ fields: [
 
   function persistRecords() {
     try {
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify(records)
-      );
+      if (!window.AstroMedStore.store.set(storageKey, records)) throw new Error("Could not save to browser storage");
 
       return true;
     } catch (error) {

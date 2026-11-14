@@ -59,10 +59,23 @@
     return { get, set, appKeys, exportAll, importAll };
   }
 
-  const api = { VERSION, create };
+  function memoryStorage() {
+    const m = new Map();
+    return {
+      get length() { return m.size; },
+      key: (i) => [...m.keys()][i] ?? null,
+      getItem: (k) => (m.has(k) ? m.get(k) : null),
+      setItem: (k, v) => { m.set(k, String(v)); },
+      removeItem: (k) => { m.delete(k); },
+    };
+  }
+
+  const api = { VERSION, create, memoryStorage };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else {
-    try { api.store = create(root.localStorage, { migrations: {} }); } catch { api.store = null; }
+    let backend;
+    try { backend = root.localStorage; backend.getItem("astromed-probe"); } catch { backend = memoryStorage(); }
+    api.store = create(backend, { migrations: {} });
     root.AstroMedStore = api;
   }
 })(typeof window !== "undefined" ? window : globalThis);
