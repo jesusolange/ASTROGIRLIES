@@ -17,5 +17,8 @@
 
 | # | Item |
 |---|---|
+| O3 | Medic review of `src/data/emergencies.js`: every situation, and first the five marked as design choice (vision change, headache or confusion, flank pain, thoughts of self-harm, cabin air). The chest pain steps say not to take aspirin unprompted, which is more cautious than the cited NHS page. |
+| O4 | Medic review of the urgent wording in `SUICIDAL_RESPONSE` (`src/scripts/mental.js`); the depression and stress score bands are carried over from the old app and labelled as design choices. |
+| O5 | Radiation: the ISS rate is now about 0.7 mSv/day (731 µSv/day, DOSIS 3D, as quoted in Zhang et al. 2020) instead of 0.2 to 0.5; the worker could not open the two Science papers (paywall) to re-read 1.84 and 0.64 mSv/day. Someone with access should confirm the three figures. |
 | O1 | Confirm the Sketchfab URLs and licences for the brain and heart models (README credits). |
 | O2 | In Cloudflare Pages, change the build settings before the next deploy (see D4). |
