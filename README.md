@@ -63,7 +63,7 @@ Without the `DB` binding the sign-in section shows an error and everything else 
 pnpm test
 ```
 
-`node tools/shot.mjs --url http://localhost:4321/ --out shot.png` loads a page in headless Chrome, saves a screenshot and lists console errors and failed requests.
+`node tools/shot.mjs --serve dist --out shot.png` (after `pnpm build`) loads the built site in headless Chrome, saves a screenshot and lists console errors and failed requests.
 
 Data is stored in your browser (`localStorage`) and stays on the device unless you choose to sign in. Use **Settings > Export / Import my data** to back up or move a record.
 

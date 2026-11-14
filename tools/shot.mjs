@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Headless Chrome screenshot and console check, no dependencies.
 //
-//   node tools/shot.mjs --url http://127.0.0.1:4321/ --out .tmp/home.png
+//   pnpm build
+//   node tools/shot.mjs --serve dist --out .tmp/home.png
+//     --serve <dir>        serve a built site from <dir> for the duration of the shot (no dev server needed)
+//     [--path /]           path to open when --serve is used
+//     [--url <url>]        open an already running site instead of --serve
 //     [--eval "<js>"]...   run in the page after load, in order (each followed by --wait)
 //     [--wait 1500]        milliseconds to wait after load and after each --eval
 //     [--size 1440x900]
@@ -9,15 +13,18 @@
 //
 // Prints console errors, uncaught exceptions and failed requests, then the result of the last --eval.
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, extname, join, resolve, sep } from "node:path";
 
 const args = process.argv.slice(2);
-const opt = { evals: [], wait: 1500, size: "1440x900", strict: false };
+const opt = { evals: [], wait: 1500, size: "1440x900", strict: false, path: "/" };
 for (let i = 0; i < args.length; i++) {
   const a = args[i];
   if (a === "--url") opt.url = args[++i];
+  else if (a === "--serve") opt.serve = args[++i];
+  else if (a === "--path") opt.path = args[++i];
   else if (a === "--out") opt.out = args[++i];
   else if (a === "--eval") opt.evals.push(args[++i]);
   else if (a === "--wait") opt.wait = Number(args[++i]);
@@ -25,7 +32,24 @@ for (let i = 0; i < args.length; i++) {
   else if (a === "--strict") opt.strict = true;
   else { console.error(`unknown argument ${a}`); process.exit(2); }
 }
-if (!opt.url) { console.error("--url is required"); process.exit(2); }
+if (!opt.url && !opt.serve) { console.error("--serve <dir> or --url <url> is required"); process.exit(2); }
+
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".ico": "image/x-icon", ".glb": "model/gltf-binary", ".woff2": "font/woff2", ".wasm": "application/wasm", ".webmanifest": "application/manifest+json" };
+let server = null;
+if (opt.serve) {
+  const root = resolve(opt.serve);
+  if (!existsSync(join(root, "index.html"))) { console.error(`${root} has no index.html; run pnpm build first`); process.exit(2); }
+  server = createServer((req, res) => {
+    let file = resolve(join(root, decodeURIComponent(new URL(req.url, "http://x").pathname)));
+    if (file !== root && !file.startsWith(root + sep)) { res.writeHead(403).end(); return; }
+    if (existsSync(file) && statSync(file).isDirectory()) file = join(file, "index.html");
+    if (!existsSync(file)) { res.writeHead(404).end("not found"); return; }
+    res.writeHead(200, { "Content-Type": TYPES[extname(file).toLowerCase()] || "application/octet-stream", "Cache-Control": "no-store" });
+    res.end(readFileSync(file));
+  });
+  await new Promise((ok) => server.listen(0, "127.0.0.1", ok));
+  opt.url = `http://127.0.0.1:${server.address().port}${opt.path}`;
+}
 
 const candidates = [
   process.env.CHROME_PATH,
@@ -115,6 +139,7 @@ try {
   exitCode = 2;
 } finally {
   chrome.kill();
+  if (server) server.close();
   await sleep(300);
   try { rmSync(profile, { recursive: true, force: true }); } catch { /* Chrome may still hold the profile */ }
 }

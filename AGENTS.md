@@ -63,13 +63,13 @@ Your task spec lists the paths you own. Anything else: ask first.
 
 - Stay inside your worktree. Scratch files go in `.tmp/` inside it.
 - Never use `git stash`. Use a WIP commit.
-- Your dev server port is given in your task (`PORT=<n> pnpm dev`). Never use another port. Never kill a process you
-  did not start. Never run a server in the foreground. Start it fully detached, as its own
-  command: `PORT=<n> nohup pnpm dev < /dev/null > .tmp/dev.log 2>&1 & disown`, then read `.tmp/dev.log` in a separate
-  command. A background process that inherits the shell output blocks your turn forever.
-- Evidence for any visible change: `node tools/shot.mjs --url http://127.0.0.1:<port>/ --out docs/evidence/<task>/<name>.png`
-  (it also prints console errors and failed requests; `--eval "<js>"` clicks through the app first).
-  Open your own screenshots and check they show what you claim.
+- Do not start a dev server or any other background process: on this machine a background process blocks your
+  shell for good, whatever redirection you use. To look at the app, build it and let the screenshot tool serve it:
+  `pnpm build` then `node tools/shot.mjs --serve dist --out docs/evidence/<task>/<name>.png`
+  (`--eval "<js>"` clicks through the app first and prints the result; it also prints console errors and failed
+  requests; `--size 390x800` for a phone). Never kill a process you did not start.
+- Evidence for any visible change is a screenshot taken that way. Open your own screenshots and check they show
+  what you claim.
 - Files under 400 lines. No task IDs, history or narrating comments in code. Reuse existing helpers.
 - New dependency: allowed only if your task names it, and it must be bundled (no CDN). Report name, licence, size.
 - Every image, model or font you add: one line in `docs/references.md` (title, author, URL, licence).
@@ -77,7 +77,7 @@ Your task spec lists the paths you own. Anything else: ask first.
 ## 5. Definition of done
 
 1. `pnpm test` and `pnpm build` pass.
-2. `node tools/shot.mjs --url <your dev or preview URL> --strict` shows no new console error or failed request.
+2. `node tools/shot.mjs --serve dist --strict` (after `pnpm build`) shows no new console error or failed request.
 3. The "Done when" of your task is true when you use the app as the astronaut, from the cover page.
 4. Screenshots of every changed screen are in `docs/evidence/<task>/`.
 5. Work is committed on your branch as `T##: Imperative sentence`, with `name15` merged in.
