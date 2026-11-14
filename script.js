@@ -1342,6 +1342,8 @@ fields: [
       content.appendChild(dataBox);
     }
 
+    if (window.AstroMedSync) window.AstroMedSync.renderAccount(content);
+
     openModal(
       "Prototype settings",
       content

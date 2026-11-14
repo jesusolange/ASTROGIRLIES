@@ -1,5 +1,5 @@
 {
   "name": "astromed",
   "private": true,
-  "scripts": { "test": "node --test test/astromed-storage.test.js" }
+  "scripts": { "test": "node --test test/astromed-storage.test.js test/server-core.test.js test/sync-decide.test.js" }
 }

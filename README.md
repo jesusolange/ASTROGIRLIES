@@ -30,6 +30,23 @@ python -m http.server 8000
 
 Create a Pages project from this repo (private repos work). Framework preset: none. Build command: empty. Build output directory: `/`. Then open the `*.pages.dev` URL in a private window to confirm it loads with no login.
 
+### Optional accounts and sync
+
+The app works without a server. If you add one, people can sign in with an email magic link (no password) and keep a copy of their data on the server. It is local-first: the app keeps working offline, changes made offline upload when the connection returns, and if two devices edited the same data the newest edit wins. The public demo link never requires a login.
+
+Server code lives in `functions/` (Cloudflare Pages Functions) and stores data in Cloudflare D1. Setup:
+
+```bash
+npx wrangler d1 create astromed
+npx wrangler d1 execute astromed --file=schema.sql --remote
+```
+
+1. Put the database id from the first command in `wrangler.toml`.
+2. In the Pages project settings, bind the D1 database as `DB`.
+3. Set `SITE_URL` (your public URL, no trailing slash), `MAIL_FROM` (a sender verified at [Resend](https://resend.com)) and the secret `RESEND_API_KEY`.
+
+Without the `DB` binding the sign-in section shows an error and everything else works as before. This is health data: connections use HTTPS, but treat the demo as a prototype, not a medical record system.
+
 ### Tests
 
 ```bash
