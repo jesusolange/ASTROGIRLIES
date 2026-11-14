@@ -1,8 +1,11 @@
 /* ==============================================
-   ASTROMED — MENTAL HEALTH · OVERVIEW · PROTOCOLS
+   ASTROMED — OVERVIEW · PROTOCOLS
    Educational prototype — not a medical device.
    Load AFTER script.js, exercise.js, health-indicators.js
 ============================================== */
+
+import { analyzeMental, protocolRows } from "./mental.js";
+import { initMental } from "./mental-page.js";
 
 function astromedSectionsInit() {
 
@@ -14,12 +17,10 @@ function astromedSectionsInit() {
   const KEYS = {
     mental: "astromed-mental",
     records: "astrotwin-gui-v2-records",
-    exercise: "astrotwin-exercise-sessions",
-    reports: "astromed-reports"
+    exercise: "astrotwin-exercise-sessions"
   };
 
   const load = (k, fb) => window.AstroMedStore.store.get(k, fb);
-  const store = (k, v) => window.AstroMedStore.store.set(k, v);
   const esc = s => String(s).replace(/[&<>"']/g, c =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const fmt = iso => new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
@@ -29,179 +30,13 @@ function astromedSectionsInit() {
   if (!main || !footer) return;
 
   /* ==========================================
-     QUESTIONNAIRE DATA
-  ========================================== */
-
-  const DEP_OPTS = ["Not at all", "On certain days", "More than half the time", "Almost every day"];
-
-  const DEP_Q = [
-    "Decreased interest in everyday activities and/or no fulfilment",
-    "Despondency or helplessness",
-    "Problems falling asleep, insufficient sleep or sleeping more",
-    "Tiredness or a feeling of fatigue",
-    "Loss of appetite or increased need to eat",
-    "Negative thoughts about yourself: feeling like a failure or like you disappoint your family",
-    "Hard time concentrating, for example when reading or watching TV",
-    "Your speech has become slower and others have commented on it, or the opposite: you speak very fast",
-    "Have you wished you were dead or had suicidal thoughts"
-  ];
-
-  const DEP_TIPS = {
-    0: "Plan one small activity you enjoy every day (music, a hobby, photographing Earth, a call home).",
-    1: "Share how you feel with a crewmate or ground support. Feeling helpless is common on long missions and it can be worked on.",
-    2: "Keep a fixed sleep schedule, dim the lights and avoid screens and caffeine in the hour before sleep.",
-    3: "Review your workload, sleep and nutrition together, and schedule real rest blocks.",
-    4: "Keep regular meals, track what you eat and report unintended weight changes.",
-    5: "Write down three things you did well today and talk with someone you trust about these thoughts.",
-    6: "Work in short, focused blocks with breaks and avoid multitasking.",
-    7: "Ask a crewmate if they notice the change too, and mention it at your next medical conference."
-  };
-
-  const STRESS_OPTS = ["None", "Slight", "Strong"];
-
-  const CATS = {
-    body: "Body signs",
-    emotional: "Emotional signs",
-    cognitive: "Cognitive signals",
-    behavioural: "Behavioural signs"
-  };
-
-  const STRESS_Q = [
-    ["Heart pounding", "body"], ["Tightness in the chest", "body"], ["Breathing problems", "body"],
-    ["Problems falling asleep", "body"], ["Chronic fatigue", "body"], ["Digestion problems", "body"],
-    ["Stomach pain", "body"], ["Loss of appetite", "body"], ["Muscle tightness", "body"],
-    ["Back pain", "body"], ["Cold hands/feet", "body"], ["Strong sweating", "body"],
-
-    ["Nervousness", "emotional"], ["Irritability or anger issues", "emotional"], ["Fear", "emotional"],
-    ["Dissatisfaction", "emotional"], ["Loss of interest", "emotional"], ["Inner emptiness", "emotional"],
-    ["Nightmares", "emotional"],
-
-    ["Constantly circling thoughts", "cognitive"], ["Difficulty concentrating", "cognitive"],
-    ["Feeling mentally blank/blackout", "cognitive"], ["Daydreaming", "cognitive"],
-    ["Reduced performance/frequent mistakes", "cognitive"],
-
-    ["Aggression towards others", "behavioural"],
-    ["Drumming fingers, shuffling feet, trembling, grinding teeth", "behavioural"],
-    ["Speaking rapidly or stuttering", "behavioural"],
-    ["Interrupting others, inability to listen", "behavioural"],
-    ["Eating irregularly", "behavioural"],
-    ["Consuming alcohol (or medication) to calm down", "behavioural"],
-    ["Neglecting personal relationships", "behavioural"],
-    ["Smoking more than desired", "behavioural"],
-    ["Getting less exercise or physical activity than desired", "behavioural"]
-  ];
-
-  const ALCOHOL_IDX = STRESS_Q.findIndex(q => q[0].startsWith("Consuming alcohol"));
-
-  const STRESS_CAT_TIPS = {
-    body: "Try slow breathing (4 seconds in, 6 out) and progressive muscle relaxation for 10 minutes. Exercise sessions also release tension.",
-    emotional: "Name the emotion, talk it through with a crewmate or ground support, and protect some private, quiet time.",
-    cognitive: "Write your circling thoughts down, then pick one task and finish it. Use short breaks to reset your focus.",
-    behavioural: "Pick one habit to adjust this week. Keep contact with family and crew, and keep your exercise routine."
-  };
-
-  const MOODS = [
-    ["😄", "Great", "great"], ["🙂", "Okay", "okay"], ["😰", "Stressed", "stressed"],
-    ["😔", "Down", "down"], ["😶", "Not sure", "unsure"]
-  ];
-
-  /* ==========================================
-     RESULT BANDS
-  ========================================== */
-
-  function depLevel(s) {
-    if (s < 5) return ["Healthy", "ok"];
-    if (s < 10) return ["No suspicion", "ok"];
-    if (s < 15) return ["Mild depression symptoms", "review"];
-    if (s < 20) return ["Moderate depression symptoms", "review"];
-    return ["Severe depression symptoms", "alert"];
-  }
-
-  function stressBand(s) {
-    if (s <= 10) return {
-      level: "ok", label: "Stable",
-      text: "You can be glad about your relatively good stability. Relaxation training will mainly have a preventive effect."
-    };
-    if (s <= 20) return {
-      level: "review", label: "Stress reactions have started",
-      text: "The chain reaction of physical and emotional stress responses is already happening. You should start soon to expand your stress-coping skills."
-    };
-    return {
-      level: "alert", label: "High stress load",
-      text: "You are already deep in the vicious circle of tension, emotional strain and health problems. You should definitely do something about your stress, and for more calm, rest and performance."
-    };
-  }
-
-  /* ==========================================
      INJECT PAGES
   ========================================== */
 
-  const depForm = DEP_Q.map((q, i) => `
-    <div class="am-q">
-      <p>${esc(q)}</p>
-      <div class="am-opts am-opts-4">
-        ${DEP_OPTS.map((o, v) => `
-          <label><input type="radio" name="d${i}" value="${v}" required><span>${o}</span></label>`).join("")}
-      </div>
-    </div>`).join("");
+  const pages = ["mental", "environment", "nutrition", "missions", "radiation", "readiness", "progress", "doctor", "protocols"];
+  footer.insertAdjacentHTML("beforebegin", pages.map(id => `<section id="${id}Page" class="am-page" hidden></section>`).join(""));
 
-  const stressForm = Object.keys(CATS).map(cat => `
-    <h4 class="am-cat">${CATS[cat]}</h4>
-    ${STRESS_Q.map((q, i) => q[1] !== cat ? "" : `
-      <div class="am-q am-q-row">
-        <p>${esc(q[0])}</p>
-        <div class="am-opts am-opts-3">
-          ${STRESS_OPTS.map((o, v) => `
-            <label><input type="radio" name="s${i}" value="${v}" ${v === 0 ? "checked" : ""}><span>${o}</span></label>`).join("")}
-        </div>
-      </div>`).join("")}`).join("");
-
-  footer.insertAdjacentHTML("beforebegin", `
-    <section id="mentalPage" class="am-page" hidden>
-      <div class="am-heading">
-        <h2>Mental Health</h2>
-        <p>Isolation and confinement are one of the five NASA human-spaceflight hazards. A quick check-in helps you spot changes early.</p>
-      </div>
-
-      <div class="am-panel">
-        <h3>How are you feeling?</h3>
-        <div class="am-moods">
-          ${MOODS.map(m => `<button type="button" class="am-mood" data-mood="${m[2]}"><span>${m[0]}</span>${m[1]}</button>`).join("")}
-        </div>
-        <p id="moodReply" class="am-reply" role="status" aria-live="polite"></p>
-      </div>
-
-      <div class="am-tabs" role="tablist">
-        <button type="button" class="am-tab active" data-tab="dep" role="tab">Isolation &amp; depression</button>
-        <button type="button" class="am-tab" data-tab="stress" role="tab">Stress &amp; burn-out</button>
-      </div>
-
-      <div id="tabDep" class="am-panel">
-        <h3>How often have you experienced any of the following symptoms?</h3>
-        <form id="depForm">${depForm}
-          <button class="am-btn" type="submit">See my result</button>
-        </form>
-        <div id="depResult"></div>
-      </div>
-
-      <div id="tabStress" class="am-panel" hidden>
-        <h3>How strongly do you notice these signs?</h3>
-        <form id="stressForm">${stressForm}
-          <button class="am-btn" type="submit">See my result</button>
-        </form>
-        <div id="stressResult"></div>
-      </div>
-    </section>
-
-    <section id="environmentPage" class="am-page" hidden></section>
-    <section id="nutritionPage" class="am-page" hidden></section>
-    <section id="missionsPage" class="am-page" hidden></section>
-    <section id="radiationPage" class="am-page" hidden></section>
-    <section id="readinessPage" class="am-page" hidden></section>
-    <section id="progressPage" class="am-page" hidden></section>
-    <section id="doctorPage" class="am-page" hidden></section>
-    <section id="protocolsPage" class="am-page" hidden></section>
-  `);
+  initMental();
 
   /* ==========================================
      NAVIGATION
@@ -325,84 +160,6 @@ function astromedSectionsInit() {
     return out;
   }
 
-  /* ==========================================
-     MENTAL HEALTH LOGIC
-  ========================================== */
-
-  const moodReplies = {
-    great: ["dep", "Great to hear! A short check-in now and then still helps you notice trends. Choose either test."],
-    okay: ["dep", "Thanks for sharing. Take the depression and isolation check-in, or switch to the stress test."],
-    stressed: ["stress", "That sounds heavy. I opened the stress and burn-out test for you."],
-    down: ["dep", "I'm sorry you feel that way, and I'm glad you're checking in. I opened the isolation and depression test for you."],
-    unsure: ["dep", "That's fine. Start with this test, and try the stress one afterwards. Together they give a clearer picture."]
-  };
-
-  function setTab(tab) {
-    $$(".am-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
-    $("#tabDep").hidden = tab !== "dep";
-    $("#tabStress").hidden = tab !== "stress";
-  }
-
-  $$(".am-tab").forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
-
-  $$(".am-mood").forEach(b => b.addEventListener("click", () => {
-    $$(".am-mood").forEach(x => x.classList.toggle("selected", x === b));
-    const [tab, text] = moodReplies[b.dataset.mood];
-    $("#moodReply").textContent = text;
-    setTab(tab);
-    const m = load(KEYS.mental, {});
-    m.mood = { value: b.dataset.mood, date: new Date().toISOString() };
-    store(KEYS.mental, m);
-  }));
-
-  $("#depForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const f = e.target;
-    if (!f.reportValidity()) return;
-    const answers = DEP_Q.map((_, i) => Number(f.elements["d" + i].value));
-    const score = answers.reduce((a, b) => a + b, 0);
-    const [label, level] = depLevel(score);
-
-    const m = load(KEYS.mental, {});
-    m.depression = { score, label, level, answers, date: new Date().toISOString() };
-    store(KEYS.mental, m);
-
-    $("#depResult").innerHTML = `
-      <div class="am-result am-${level}">
-        <strong>${score} / 27 · ${label}</strong>
-        <p>Bands: healthy under 5, no suspicion under 10, mild 10–14, moderate 15–19, severe 20–27. This is a screening, not a diagnosis.</p>
-        ${answers[8] > 0 ? `<p class="am-urgent"><b>You answered that you wished you were dead or had suicidal thoughts.</b>
-          Please tell your flight surgeon or crew support right now, or a crewmate you trust. You deserve support and you are not alone.
-          If you are in immediate danger, use your emergency procedures.</p>` : ""}
-        <button type="button" class="am-btn am-btn-soft" data-go="doctor">See my Overview</button>
-      </div>`;
-    $("#depResult").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
-
-  $("#stressForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const f = e.target;
-    const answers = STRESS_Q.map((_, i) => Number(f.elements["s" + i].value));
-    const sub = {};
-    Object.keys(CATS).forEach(c => sub[c] = { score: 0, max: 0 });
-    STRESS_Q.forEach((q, i) => { sub[q[1]].score += answers[i]; sub[q[1]].max += 2; });
-    const score = answers.reduce((a, b) => a + b, 0);
-    const band = stressBand(score);
-
-    const m = load(KEYS.mental, {});
-    m.stress = { score, label: band.label, level: band.level, answers, sub, date: new Date().toISOString() };
-    store(KEYS.mental, m);
-
-    $("#stressResult").innerHTML = `
-      <div class="am-result am-${band.level}">
-        <strong>${score} / ${STRESS_Q.length * 2} · ${band.label}</strong>
-        <p>${band.text}</p>
-        <p class="am-small">${Object.keys(CATS).map(c => `${CATS[c]}: ${sub[c].score}/${sub[c].max}`).join(" · ")}</p>
-        <button type="button" class="am-btn am-btn-soft" data-go="doctor">See my Overview</button>
-      </div>`;
-    $("#stressResult").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
-
   document.addEventListener("click", e => {
     const b = e.target.closest("[data-go]");
     if (b) show(b.dataset.go);
@@ -458,80 +215,16 @@ function astromedSectionsInit() {
 
   const GENERIC = R("info", "Value saved.", "Compare it with your personal baseline and trend over the next days.");
 
-  const RANK = { ok: 0, review: 1, alert: 2 };
-
   function analyze() {
-    const m = load(KEYS.mental, {});
     const checkups = getCheckups();
     const sessions = load(KEYS.exercise, []);
     const out = { urgent: [], mental: [], checkup: [], exercise: [], hasData: false };
 
-    /* ---- Depression ---- */
-    if (m.depression) {
-      out.hasData = true;
-      const d = m.depression;
-      const base = {
-        ok: "Keep your routine: regular sleep, daily exercise and regular contact with family and friends.",
-        review: "Plan a private conversation with ground behavioral-health support in the coming days, and keep routines for sleep, exercise and social contact.",
-        alert: "Please contact your flight surgeon or behavioral-health support today. Severe symptoms deserve professional help."
-      }[d.level];
-      out.mental.push({
-        level: d.level,
-        title: "Isolation & depression check-in",
-        saw: `Score ${d.score}/27: ${d.label}.`,
-        todo: base
-      });
-
-      const tips = d.answers.slice(0, 8)
-        .map((a, i) => a >= 2 ? DEP_TIPS[i] : null).filter(Boolean);
-      if (tips.length) out.mental.push({
-        level: "review",
-        title: "Symptoms that appear often",
-        saw: "You marked some symptoms for more than half of the days.",
-        todo: tips.join(" ")
-      });
-
-      if (d.answers[8] > 0) out.urgent.push({
-        level: "alert",
-        title: "Thoughts of death or suicide",
-        saw: "You answered that you wished you were dead or had suicidal thoughts.",
-        todo: "Please contact your flight surgeon or crew support right now, or tell a crewmate. You are not alone and help is available. If you are in immediate danger, use your emergency procedures."
-      });
-    }
-
-    /* ---- Stress ---- */
-    if (m.stress) {
-      out.hasData = true;
-      const s = m.stress;
-      const b = stressBand(s.score);
-      out.mental.push({
-        level: b.level,
-        title: "Stress & burn-out check-in",
-        saw: `Score ${s.score}/${STRESS_Q.length * 2}: ${b.label}. ${b.text}`,
-        todo: {
-          ok: "Use relaxation training as prevention. Even 10 minutes a day helps.",
-          review: "Start building stress-coping skills now: relaxation training, short breaks and a talk with ground support.",
-          alert: "Make stress relief a priority this week and ask for a conversation with behavioral-health support."
-        }[b.level]
-      });
-
-      Object.keys(CATS).forEach(c => {
-        const x = s.sub[c];
-        if (x.score / x.max >= 0.4) out.mental.push({
-          level: "review",
-          title: CATS[c],
-          saw: `${x.score}/${x.max} points, so this area carries much of your stress.`,
-          todo: STRESS_CAT_TIPS[c]
-        });
-      });
-
-      if (ALCOHOL_IDX >= 0 && s.answers[ALCOHOL_IDX] > 0) out.mental.push({
-        level: "alert",
-        title: "Using alcohol or medication to calm down",
-        saw: "You marked using alcohol or medication to calm down.",
-        todo: "Please do not self-medicate. Talk with your flight surgeon about safe ways to relax and sleep."
-      });
-    }
+    /* ---- Mental health ---- */
+    const mental = analyzeMental();
+    if (mental.hasData) out.hasData = true;
+    out.mental.push(...mental.mental);
+    out.urgent.push(...mental.urgent);
 
     /* ---- Daily checkup ---- */
     Object.values(checkups).forEach(c => {
@@ -656,21 +349,21 @@ function astromedSectionsInit() {
         <div class="ov-chips">${good.map((x) => `<span class="ov-chip">✓ ${esc(x.title)}</span>`).join("")}</div>` : ""}
 
       <div class="am-panel">
-        <p>Need a human doctor? I can prepare your report in Protocols.</p>
+        <p>Your saved results and the medical report are in Protocols.</p>
         <button type="button" class="am-btn" data-go="protocols">Open Protocols</button>
       </div>`;
   }
 
   /* ==========================================
-     PROTOCOLS — saved results + doctor report
+     PROTOCOLS — saved results + medical report
   ========================================== */
 
   let lastReport = null;
 
   function renderProtocols() {
-    const m = load(KEYS.mental, {});
     const checkups = getCheckups();
     const sessions = load(KEYS.exercise, []);
+    const rows = protocolRows();
     const li = (name, value) => `<li><span>${name}</span><b>${value}</b></li>`;
 
     $("#protocolsPage").innerHTML = `
@@ -682,17 +375,15 @@ function astromedSectionsInit() {
       <div class="am-panel">
         <h3>Saved results</h3>
         <ul class="am-saved">
-          ${li("Mood check", m.mood ? `${esc(m.mood.value)} · ${fmt(m.mood.date)}` : "Not saved yet")}
-          ${li("Isolation & depression", m.depression ? `${m.depression.score}/27 · ${esc(m.depression.label)}` : "Not saved yet")}
-          ${li("Stress & burn-out", m.stress ? `${m.stress.score}/${STRESS_Q.length * 2} · ${esc(m.stress.label)}` : "Not saved yet")}
+          ${rows.map((r) => li(r.name, r.value ? esc(r.value) : "Not saved yet")).join("")}
           ${li("Daily checkup systems", Object.keys(checkups).length ? Object.values(checkups).map((c) => esc(c.title)).join(", ") : "Not saved yet")}
           ${li("Exercise sessions", sessions.length)}
         </ul>
       </div>
 
       <div class="am-panel am-consult">
-        <h3>Would you like a consultation with a real doctor?</h3>
-        <p>I will generate a PDF report so they can assist you more efficiently. You don’t need to worry about anything else.</p>
+        <h3>Prepare a medical report for the ground team</h3>
+        <p>I will generate a PDF report from your saved results. It stays on this device until you download it and share it with the ground medical team.</p>
         <button type="button" class="am-btn" id="genReport">${lastReport ? "Update my report" : "Yes, generate my report"}</button>
       </div>
 
