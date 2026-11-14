@@ -3,7 +3,7 @@ import Sections from "../components/Sections.astro";
 import "../styles/tokens.css";
 import "../styles/style.css";
 import "../styles/sections.css";
-import "../styles/dark.css";
+import "../styles/theme.css";
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +11,20 @@ import "../styles/dark.css";
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#050d24">
+
+  <script is:inline>
+    try {
+      var theme = JSON.parse(localStorage.getItem("astromed-theme"));
+      if (theme !== "light" && theme !== "dark") {
+        theme = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+      document.documentElement.dataset.theme = theme;
+    } catch (error) {
+      document.documentElement.dataset.theme = "dark";
+    }
+  </script>
 
   <title>AstroMed · Space Medical Assistant</title>
 
@@ -76,6 +89,20 @@ import "../styles/dark.css";
       <symbol id="ic-setting" viewBox="0 0 24 24">
         <path d="M10 2h4l1 3 3 1 3-1 2 4-2 2v-3L1 9l2-4 3 1 3-1z"/>
         <circle cx="12" cy="12" r="3"/>
+      </symbol>
+
+      <symbol id="ic-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+      </symbol>
+
+      <symbol id="ic-moon" viewBox="0 0 24 24">
+        <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>
+      </symbol>
+
+      <symbol id="ic-user" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 21a8 8 0 0 1 16 0"/>
       </symbol>
 
     </defs>
@@ -248,6 +275,54 @@ import "../styles/dark.css";
     ====================================== -->
 
     <main class="content">
+
+      <header class="app-header">
+        <div class="app-header-title">
+          <svg class="icon" aria-hidden="true">
+            <use href="#ic-twin"/>
+          </svg>
+          <div>
+            <strong>AstroMed</strong>
+            <small>Health self-monitoring · saved on this device</small>
+          </div>
+        </div>
+
+        <div class="app-header-actions">
+          <button
+            type="button"
+            class="theme-toggle"
+            data-theme-toggle
+            aria-label="Switch to light theme"
+            aria-pressed="false"
+          >
+            <svg class="icon theme-icon-dark" aria-hidden="true">
+              <use href="#ic-moon"/>
+            </svg>
+            <svg class="icon theme-icon-light" aria-hidden="true">
+              <use href="#ic-sun"/>
+            </svg>
+            <span data-theme-label>Dark</span>
+          </button>
+
+          <button
+            type="button"
+            class="profile-chip"
+            data-profile-open
+            aria-label="Account and sync status"
+          >
+            <span class="profile-avatar" aria-hidden="true">
+              <svg class="icon">
+                <use href="#ic-user"/>
+              </svg>
+            </span>
+            <span class="profile-copy">
+              <strong data-profile-name>Guest</strong>
+              <small data-profile-state>Not signed in · saved here</small>
+            </span>
+            <span class="profile-dot" data-profile-state-dot data-state="guest" aria-hidden="true"></span>
+          </button>
+        </div>
+      </header>
 
 
       <!-- =====================================
