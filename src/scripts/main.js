@@ -22,3 +22,4 @@ import "./today.js";
 import "./vision.js";
 import "./emergencies.js";
 import "./astronaut3d/index.js";
+import "./offline.js";
