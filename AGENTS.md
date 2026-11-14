@@ -59,6 +59,30 @@ Your task spec lists the paths you own. Anything else: ask first.
 - **Modules talk through imports** where the other side is already a module with exports; `window.AstroMed*`
   globals remain for the older modules. Do not add new globals except the one public object of your section.
 
+## 3a. Sections are Astro components
+
+Markup belongs in `.astro` files, not in JavaScript strings. This is what lets a developer (and Astro's dev tools)
+find the source of an element.
+
+- Each section has one component, `src/components/sections/<Name>.astro`, whose root is
+  `<section id="<id>Page" class="am-page" hidden>`. It is listed once in `src/components/Sections.astro`
+  (coordinator-owned; stubs exist for Emergencies, Today, RiskMap, Vision, Immune; ask for a new line).
+  `AstroMedNav.register` picks up that element instead of creating one.
+- Split a large section into child components under `src/components/<section>/`. Keep each file under 200 lines.
+- Content known at build time is rendered by Astro: import the data in the component frontmatter and loop in the
+  template (risk table, emergency cards, questionnaire items, reference tables, static help text, SVG diagrams).
+- Content that depends on what the astronaut stored is filled in by the section's module at run time. Put the shape
+  of each repeated item in a `<template id="...">` inside the component and clone it
+  (`template.content.cloneNode(true)`), setting text with `textContent`. Do not build HTML in strings, and do not
+  use `innerHTML` with stored or typed values.
+- Styles go in the component's `<style>` block (scoped; cloned `<template>` content is covered). Shared rules stay
+  in `src/styles/`. Colours only through the `--am-*` tokens.
+- Behaviour stays in `src/scripts/<section>.js` as functions that take the page element; the component ends with
+  `<script>import { init } from "../../scripts/<section>.js"; init();</script>` or the module keeps its
+  `DOMContentLoaded` handler. Pure logic (scoring, comparison, ranking) stays free of DOM code and keeps its tests.
+- A module that still builds a section from strings is legacy: when you touch such a section, move its markup into
+  a component as part of the task.
+
 ## 4. Process rules
 
 - Stay inside your worktree. Scratch files go in `.tmp/` inside it.

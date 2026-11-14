@@ -78,17 +78,19 @@ function astromedSectionsInit() {
   }
 
   // Sections added by their own module: AstroMedNav.register({ id, label, icon, render, before }).
-  // Creates the page (<section id="<id>Page" class="am-page">) and its sidebar button; render(pageElement)
-  // runs each time the section opens. `before` is the data-action of the sidebar button to insert in front of.
+  // Uses the page element <section id="<id>Page" class="am-page"> from the section's .astro component when it
+  // exists, otherwise creates it; same for the sidebar button. render(pageElement) runs each time the section opens. `before` is the data-action of the sidebar button to insert in front of.
   // Pass nav: false for a page that is opened only through AstroMedNav.show(id).
   const REGISTERED = {};
   function register({ id, label, icon = "ic-report", render, before, nav = true }) {
     if (PAGES[id]) return;
     PAGES[id] = `${id}Page`;
     REGISTERED[id] = render || (() => {});
-    const anchor = document.getElementById("protocolsPage");
-    anchor.insertAdjacentHTML("afterend", `<section id="${id}Page" class="am-page" hidden></section>`);
-    if (!nav) return;
+    if (!document.getElementById(`${id}Page`)) {
+      const anchor = document.getElementById("protocolsPage");
+      anchor.insertAdjacentHTML("afterend", `<section id="${id}Page" class="am-page" hidden></section>`);
+    }
+    if (!nav || $(`.nav button[data-action="${id}"]`)) return;
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.action = id;
