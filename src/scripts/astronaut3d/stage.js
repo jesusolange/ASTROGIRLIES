@@ -93,7 +93,7 @@ export function createStage(container, { onSelect } = {}) {
     parts: PART_ORDER,
     onPick: (id) => selectPart(id, true),
     onRestart: reset,
-    onOverview: () => document.querySelector('.nav button[data-action="doctor"]')?.click(),
+    onOverview: () => window.AstroMedNav && window.AstroMedNav.show("today"),
   });
 
   const picking = createPicking(

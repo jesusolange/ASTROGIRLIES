@@ -1,174 +1,220 @@
-/* ==============================================
-   ASTROMED — READINESS SCORE + IMMUNE WATCH
-   Combines all modules into one 0-100 score.
-   Weights and bands are design choices of this prototype (not NASA values).
-   Load AFTER the other astromed-* modules, BEFORE astromed-pro.js
-============================================== */
-(function () {
-  "use strict";
-  const KEY = "astromed-immune";
-  const $ = (s, r = document) => r.querySelector(s);
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const rd = (k, fb) => window.AstroMedStore.store.get(k, fb);
-  const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  const LV = { ok: 100, review: 55, alert: 15 };
-  const ageDays = (iso) => (Date.now() - new Date(iso).getTime()) / 864e5;
+// Readiness from the NASA risk map. Each monitored area carries the weight of its highest in-mission
+// NASA rating for the chosen mission; the app's own data turns each area into a 0-100 result.
+// The NASA ratings are NASA's. The coverage rule, the formula and the bands are our design choice.
+import { currentMission, areaWeights, rankedRisks, SOURCE } from "./risks.js";
 
-  /* ---------- immune watch ---------- */
-  const SYMPTOMS = [
-    ["fever", "Fever or chills"], ["throat", "Sore throat"], ["cough", "Cough or runny nose"],
-    ["rash", "Skin rash or itching"], ["sores", "Cold sores or mouth sores"], ["tired", "Very tired, more than usual"], ["heal", "Cuts or sores heal slowly"]
-  ];
-  const imm = () => { const v = rd(KEY, {}); return { log: v.log || {} }; };
-  const saveImm = (v) => window.AstroMedStore.store.set(KEY, v);
+export const COVERAGE_MIN = 0.5; // design choice: less recent weight than this means no score
+export const RECENT_DAYS = 7; // design choice: daily data is "recent" for a week
+export const MENTAL_DAYS = 14;
+export const SCORE_LEVEL = { ok: 100, review: 55, alert: 15 };
+export const BANDS = [
+  { min: 80, key: "ready", title: "Ready", advice: "You are in good shape for today's work." },
+  { min: 60, key: "almost", title: "Almost ready", advice: "Fine for normal work. Work on the lowest checks below." },
+  { min: 40, key: "easy", title: "Take it easy", advice: "Keep tasks light and work on the lowest checks below." },
+  { min: 0, key: "rest", title: "Rest today", advice: "Rest today and keep your tasks light." }
+];
+const REFERENCE_AREAS = new Set(["emergencies"]);
 
-  function riskFactors() {
-    const r = [];
-    const m = rd("astromed-mental", {});
-    if (m.stress && ageDays(m.stress.date) < 14 && m.stress.level !== "ok") r.push("High stress");
-    const recs = rd("astrotwin-gui-v2-records", []);
-    const br = (Array.isArray(recs) ? recs : []).find((x) => x && x.part === "brain" && x.values && Number.isFinite(Number(x.values.sleep)) && ageDays(x.time) < 4);
-    if (br && Number(br.values.sleep) < 6) r.push("Little sleep");
-    const R = window.AstroMedRadiation && window.AstroMedRadiation.status();
-    if (R && R.hasData && R.level !== "ok") r.push("High radiation dose");
-    const N = window.AstroMedNutrition && window.AstroMedNutrition.summary();
-    if (N && N.ratio < 0.8) r.push("Eating too little");
-    const ex = rd("astrotwin-exercise-sessions", []).filter((s) => ageDays(s.date) < 7).length;
-    if (ex < 2) r.push("Little exercise");
-    return r;
-  }
-  function immuneStatus() {
-    const today = isoDay(new Date()), log = imm().log;
-    const sym = log[today] || [];
-    const risks = riskFactors();
-    let level = "ok";
-    if (sym.includes("fever") || sym.length >= 3) level = "alert";
-    else if (sym.length >= 1 || risks.length >= 3) level = "review";
-    return { sym, risks, level, saved: today in log };
-  }
-  function immuneFindings() {
-    const s = immuneStatus(); if (s.level === "ok" && !s.saved) return [];
-    const T = {
-      ok: "No signs today. Keep sleeping, eating and training well to support your defenses.",
-      review: "Rest more, drink water and watch for changes. If symptoms last more than 2 days, tell your flight surgeon.",
-      alert: "Please contact your flight surgeon today. Fever or several symptoms need a medical check."
-    };
-    const saw = s.sym.length ? `Today you marked: ${s.sym.map((id) => SYMPTOMS.find((x) => x[0] === id)[1].toLowerCase()).join(", ")}.` : `Risk factors now: ${s.risks.join(", ")}.`;
-    return [{ level: s.level, title: "Immune system watch", saw: s.sym.length || s.risks.length ? saw : "No symptoms today.", todo: T[s.level] }];
-  }
+const DAY = 864e5;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const ageDays = (iso) => (Date.now() - new Date(iso).getTime()) / DAY;
+const avg = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : null);
 
-  /* ---------- readiness ---------- */
-  const PARTS = [
-    { id: "checkup", w: 25, n: "Body checkup", i: "🫀", tip: "Do your daily checkup. Tap each body part." },
-    { id: "mental", w: 20, n: "Mind & stress", i: "🧠", tip: "Do a short mental check-in. It takes 2 minutes." },
-    { id: "exercise", w: 15, n: "Exercise", i: "🏋️", tip: "Train today. Aim for about 4 sessions a week." },
-    { id: "nutrition", w: 15, n: "Food", i: "🍽️", tip: "Log your meals and reach your calorie goal." },
-    { id: "radiation", w: 10, n: "Radiation", i: "☢️", tip: "Log your dose to see how much of your limit is used." },
-    { id: "env", w: 5, n: "Environment", i: "🛰️", tip: "Save the air readings of your location." },
-    { id: "immune", w: 10, n: "Immune system", i: "🛡️", tip: "Answer the symptom list below." }
-  ];
+/* ---------- pure scoring ---------- */
 
-  function score(id) {
-    try {
-      if (id === "checkup") {
-        const cs = window.AstroMedData ? Object.values(window.AstroMedData.getCheckups()) : [];
-        const lv = [];
-        cs.filter((c) => ageDays(c.date) < 3).forEach((c) => Object.entries(c.values).forEach(([k, o]) => {
-          const r = window.AstroMedData.rule(k, o.value); if (r && LV[r.level] != null) lv.push(LV[r.level]);
-        }));
-        return lv.length ? { s: lv.reduce((a, b) => a + b, 0) / lv.length, note: `${lv.length} readings in the last 3 days` } : null;
-      }
-      if (id === "mental") {
-        const m = rd("astromed-mental", {}), lv = [];
-        ["depression", "stress"].forEach((k) => { if (m[k] && ageDays(m[k].date) < 14 && LV[m[k].level] != null) lv.push(LV[m[k].level]); });
-        return lv.length ? { s: lv.reduce((a, b) => a + b, 0) / lv.length, note: "check-ins of the last 14 days" } : null;
-      }
-      if (id === "exercise") {
-        const ss = rd("astrotwin-exercise-sessions", []);
-        if (!ss.length) return null;
-        const n = ss.filter((x) => ageDays(x.date) < 7).length;
-        return { s: Math.min(100, (n / 4) * 100), note: `${n} sessions in 7 days` };
-      }
-      if (id === "nutrition") {
-        const N = window.AstroMedNutrition && window.AstroMedNutrition.summary(); if (!N) return null;
-        const dev = Math.max(0, Math.abs(N.ratio - 1) - 0.1);
-        return { s: Math.max(0, 100 - (dev / 0.4) * 100), note: `${Math.round(N.ratio * 100)}% of calorie goal` };
-      }
-      if (id === "radiation") {
-        const R = window.AstroMedRadiation && window.AstroMedRadiation.status(); if (!R || !R.hasData) return null;
-        return { s: LV[R.level], note: `${R.pct.toFixed(1)}% of career limit` };
-      }
-      if (id === "env") {
-        const e = rd("astromed-env", null); if (!e || !e.readings) return null;
-        const f = window.AstroMedEnv.findings();
-        const s = 100 - f.filter((x) => x.level === "alert").length * 25 - f.filter((x) => x.level === "review").length * 10;
-        return { s: Math.max(0, s), note: f.length ? `${f.length} reading(s) to review` : "all readings fine" };
-      }
-      if (id === "immune") {
-        const st = immuneStatus(); if (!st.saved && st.risks.length === 0) return null;
-        return { s: LV[st.level], note: st.sym.length ? `${st.sym.length} symptom(s) today` : `${st.risks.length} risk factor(s)` };
-      }
-    } catch (e) { console.error("readiness", id, e); }
-    return null;
-  }
+export function coverageOf(weights, scores) {
+  const total = weights.reduce((sum, w) => sum + w.weight, 0);
+  if (!total) return 0;
+  const covered = weights.reduce((sum, w) => sum + (scores[w.key] ? w.weight : 0), 0);
+  return covered / total;
+}
 
-  function compute() {
-    const parts = PARTS.map((p) => ({ ...p, r: score(p.id) }));
-    const have = parts.filter((p) => p.r);
-    const wsum = have.reduce((a, p) => a + p.w, 0);
-    const total = wsum ? have.reduce((a, p) => a + p.r.s * p.w, 0) / wsum : null;
-    return { parts, total, coverage: wsum };
-  }
-  const band = (v) => v >= 80 ? { t: "Ready", c: "#35d49a", e: "🚀", d: "You are in good shape for today's work." }
-    : v >= 60 ? { t: "Almost ready", c: "#6fe3ff", e: "🙂", d: "Fine for normal work. Fix the lowest items below." }
-    : v >= 40 ? { t: "Take it easy", c: "#ffc857", e: "😮‍💨", d: "Keep tasks light and work on the items below." }
-    : { t: "Rest and call ground", c: "#ff6b6b", e: "🛑", d: "Rest today and talk with your flight surgeon." };
+export function weightedScore(weights, scores) {
+  const covered = weights.filter((w) => scores[w.key]);
+  const weight = covered.reduce((sum, w) => sum + w.weight, 0);
+  if (!weight) return null;
+  return covered.reduce((sum, w) => sum + scores[w.key].score * w.weight, 0) / weight;
+}
 
-  function findings() {
-    const c = compute(); if (c.total == null) return [];
-    const b = band(c.total);
-    const level = c.total >= 80 ? "ok" : c.total >= 50 ? "review" : "alert";
-    const low = c.parts.filter((p) => p.r && p.r.s < 60).map((p) => p.n.toLowerCase());
-    return [{ level, title: `Readiness score: ${Math.round(c.total)}/100 (${b.t})`, saw: `Based on ${c.parts.filter((p) => p.r).length} of ${PARTS.length} areas${low.length ? `. Lowest: ${low.join(", ")}` : ""}.`, todo: b.d }];
-  }
+export function bandFor(value) {
+  return BANDS.find((b) => value >= b.min) || BANDS[BANDS.length - 1];
+}
 
-  /* ---------- page ---------- */
-  function ring(v, col) {
-    const R = 78, C = 2 * Math.PI * R, o = C * (1 - v / 100);
-    return `<svg viewBox="0 0 200 200" width="220" height="220" role="img" aria-label="Readiness ${Math.round(v)} of 100">
-      <circle cx="100" cy="100" r="${R}" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="16"/>
-      <circle cx="100" cy="100" r="${R}" fill="none" stroke="${col}" stroke-width="16" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${o}" transform="rotate(-90 100 100)" style="filter:drop-shadow(0 0 8px ${col});transition:stroke-dashoffset 1s"/>
-      <text x="100" y="108" text-anchor="middle" font-size="52" font-weight="800" fill="#e9f2ff">${Math.round(v)}</text>
-      <text x="100" y="132" text-anchor="middle" font-size="14" fill="#9fb8da">of 100</text></svg>`;
+// weights: [{ key, weight, ... }], scores: { [key]: { score, note } }.
+// Missing areas are pulled toward the middle by the share of weight covered, so missing checks
+// cannot look healthy. Below the coverage share there is no score at all.
+export function evaluateReadiness(weights, scores, options = {}) {
+  const minCoverage = options.minCoverage ?? COVERAGE_MIN;
+  const coverage = coverageOf(weights, scores);
+  const missing = weights.filter((w) => !scores[w.key] && !REFERENCE_AREAS.has(w.key));
+  const reference = weights.filter((w) => REFERENCE_AREAS.has(w.key));
+  if (!weights.length || coverage + 1e-9 < minCoverage) {
+    return { status: "insufficient", coverage, missing, reference, raw: null, total: null, band: null };
   }
-  function render() {
-    const page = $("#readinessPage"); if (!page) return;
-    const c = compute(), im = immuneStatus();
-    const b = c.total != null ? band(c.total) : null;
-    const colOf = (s) => (s >= 80 ? "#35d49a" : s >= 60 ? "#6fe3ff" : s >= 40 ? "#ffc857" : "#ff6b6b");
-    const todo = c.parts.slice().sort((a, b2) => (a.r ? a.r.s : 50) - (b2.r ? b2.r.s : 50)).filter((p) => !p.r || p.r.s < 80).slice(0, 3);
-    page.innerHTML = `
-      <div class="am-heading"><h2>Readiness</h2><p>One number for how ready you are today. It joins your checkup, mind, exercise, food, radiation, air and immune watch.</p></div>
-      <div class="am-panel rdy-top">
-        <div class="rdy-ring">${c.total != null ? ring(c.total, b.c) : `<div class="rdy-empty">?</div>`}</div>
-        <div class="rdy-txt">${c.total != null ? `<h3 style="color:${b.c}">${b.e} ${b.t}</h3><p>${b.d}</p><small>Uses ${c.parts.filter((p) => p.r).length} of ${PARTS.length} areas (${c.coverage}% of the score). Areas with no data are left out, not counted as zero.</small>` : `<h3>No data yet</h3><p>Do a checkup or log a meal and your score will appear here.</p>`}</div>
-      </div>
-      ${todo.length ? `<div class="am-panel"><h3>Do this to raise your score</h3><div class="rdy-todo">${todo.map((p) => `<div><span>${p.i}</span><b>${p.n}</b><p>${esc(p.tip)}</p></div>`).join("")}</div></div>` : ""}
-      <div class="am-panel"><h3>What makes the score</h3><div class="rdy-bars">${c.parts.map((p) => `<div class="rdy-bar"><span class="rdy-i">${p.i}</span><div><div class="rdy-l"><b>${p.n}</b><small>${p.r ? esc(p.r.note) : "no data yet"} · weight ${p.w}%</small></div><div class="rdy-t"><i style="width:${p.r ? Math.round(p.r.s) : 0}%;background:${p.r ? colOf(p.r.s) : "transparent"}"></i></div></div><em>${p.r ? Math.round(p.r.s) : "–"}</em></div>`).join("")}</div>
-        <p class="am-small">Weights and colors are a design choice of this prototype to help you see the big picture. They are not a medical or NASA score.</p></div>
-      <div class="am-panel"><h3>🛡️ Immune system watch</h3>
-        <p class="am-small">Space travel changes the immune system and can wake up dormant viruses (Crucian et al., 2018, Frontiers in Immunology). Tick what you feel today.</p>
-        <div class="rdy-sym">${SYMPTOMS.map(([id, l]) => `<label class="rdy-chip ${im.sym.includes(id) ? "on" : ""}"><input type="checkbox" data-sym="${id}" ${im.sym.includes(id) ? "checked" : ""}> ${l}</label>`).join("")}</div>
-        <div class="rdy-imm rdy-${im.level}"><b>${{ ok: "No warning signs", review: "Keep watching", alert: "Call your flight surgeon" }[im.level]}</b>
-          <span>${im.risks.length ? `Risk factors now: ${im.risks.join(", ")}.` : "No risk factors found from your other data."}</span></div>
-        <div class="am-actions"><button class="am-btn" id="rdyImmSave">Save today</button></div>
-      </div>`;
-    $("#rdyImmSave", page).addEventListener("click", () => {
-      const sym = [...page.querySelectorAll("[data-sym]:checked")].map((x) => x.dataset.sym);
-      const v = imm(); v.log[isoDay(new Date())] = sym; saveImm(v); render();
-    });
-    page.querySelectorAll("[data-sym]").forEach((x) => x.addEventListener("change", () => x.parentElement.classList.toggle("on", x.checked)));
-  }
+  const raw = weightedScore(weights, scores);
+  const total = Math.round(clamp(50 + (raw - 50) * coverage, 0, 100));
+  return { status: "scored", coverage, missing, reference, raw: Math.round(raw), total, band: bandFor(total) };
+}
 
-  window.AstroMedReadiness = { render, compute, findings, immuneFindings };
-})();
+/* ---------- reading the app's data ---------- */
+
+const read = (key, fallback) => {
+  const store = typeof window !== "undefined" && window.AstroMedStore && window.AstroMedStore.store;
+  return store ? store.get(key, fallback) : fallback;
+};
+
+function navHas(section) {
+  if (typeof window === "undefined") return false;
+  if (window.AstroMedNav && typeof window.AstroMedNav.has === "function") return window.AstroMedNav.has(section);
+  return Boolean(section);
+}
+
+function levelList(entries) {
+  return entries.map((r) => (r && SCORE_LEVEL[r.level] != null ? SCORE_LEVEL[r.level] : null)).filter((v) => v != null);
+}
+
+function checkupScore(part) {
+  const data = typeof window !== "undefined" ? window.AstroMedData : null;
+  if (!data || typeof data.getCheckups !== "function") return null;
+  const checkup = data.getCheckups()[part];
+  if (!checkup || ageDays(checkup.date) > RECENT_DAYS) return null;
+  const values = Object.entries(checkup.values).map(([key, o]) => data.rule(key, o.value));
+  const scores = levelList(values);
+  if (!scores.length) return null;
+  return { score: avg(scores), note: `${scores.length} reading${scores.length === 1 ? "" : "s"} in the last ${RECENT_DAYS} days` };
+}
+
+function nutritionScore() {
+  const N = typeof window !== "undefined" && window.AstroMedNutrition ? window.AstroMedNutrition.summary() : null;
+  if (!N || !Number.isFinite(N.ratio)) return null;
+  const deviation = Math.max(0, Math.abs(N.ratio - 1) - 0.1);
+  return {
+    score: clamp(100 - (deviation / 0.4) * 100, 0, 100),
+    note: `${Math.round(N.ratio * 100)}% of the calorie goal, last logged days`
+  };
+}
+
+function exerciseScore() {
+  const sessions = read("astrotwin-exercise-sessions", []);
+  const recent = (Array.isArray(sessions) ? sessions : []).filter((s) => s && ageDays(s.date) < RECENT_DAYS).length;
+  if (!recent) return null;
+  return { score: clamp((recent / 4) * 100, 0, 100), note: `${recent} session${recent === 1 ? "" : "s"} in ${RECENT_DAYS} days` };
+}
+
+function mentalScore() {
+  const m = read("astromed-mental", {}) || {};
+  const scores = levelList(["depression", "stress"].map((k) => (m[k] && ageDays(m[k].date) < MENTAL_DAYS ? m[k] : null)));
+  if (!scores.length) return null;
+  return { score: avg(scores), note: `check-ins in the last ${MENTAL_DAYS} days` };
+}
+
+function environmentScore() {
+  const state = read("astromed-env", null);
+  if (!state || !state.readings || !window.AstroMedEnv) return null;
+  const findings = window.AstroMedEnv.findings();
+  const alerts = findings.filter((f) => f.level === "alert").length;
+  const reviews = findings.filter((f) => f.level === "review").length;
+  return { score: clamp(100 - alerts * 25 - reviews * 10, 0, 100), note: findings.length ? `${findings.length} reading(s) to review` : "all cabin readings fine" };
+}
+
+function immuneScore() {
+  const immune = typeof window !== "undefined" ? window.AstroMedImmune : null;
+  if (!immune || typeof immune.status !== "function") return null;
+  const status = immune.status();
+  if (!status.saved) return null;
+  return {
+    score: SCORE_LEVEL[status.level] ?? null,
+    note: status.sym.length ? `${status.sym.length} symptom(s) today` : `${status.risks.length} risk factor(s)`
+  };
+}
+
+function radiationScore() {
+  const R = typeof window !== "undefined" && window.AstroMedRadiation ? window.AstroMedRadiation.status() : null;
+  if (!R || !R.hasData) return null;
+  return { score: SCORE_LEVEL[R.level] ?? null, note: `${R.pct.toFixed(1)}% of the career limit` };
+}
+
+function visionScore() {
+  const V = typeof window !== "undefined" ? window.AstroMedVision : null;
+  if (!V) return null;
+  if (typeof V.score === "function") {
+    const value = Number(V.score());
+    if (Number.isFinite(value)) return { score: clamp(value, 0, 100), note: "latest vision self-check" };
+  }
+  if (typeof V.latest === "function") {
+    const latest = V.latest();
+    if (latest && Number.isFinite(Number(latest.score))) return { score: clamp(Number(latest.score), 0, 100), note: "latest vision self-check" };
+  }
+  return null;
+}
+
+export function scoreArea(key) {
+  if (key.startsWith("overview:")) return checkupScore(key.slice("overview:".length));
+  switch (key) {
+    case "nutrition": return nutritionScore();
+    case "twin": return exerciseScore();
+    case "mental": return mentalScore();
+    case "environment": return environmentScore();
+    case "immune": return immuneScore();
+    case "radiation": return radiationScore();
+    case "vision": return visionScore();
+    default: return null;
+  }
+}
+
+export function collectScores(areas) {
+  const scores = {};
+  areas.forEach((area) => {
+    if (!navHas(area.section)) { scores[area.key] = null; return; }
+    scores[area.key] = scoreArea(area.key);
+  });
+  return scores;
+}
+
+/* ---------- public computation ---------- */
+
+export function compute() {
+  const mission = currentMission();
+  const weights = areaWeights(mission.id);
+  const byId = new Map(rankedRisks(mission.id).map((r) => [r.id, r]));
+  const areas = weights.map((w) => ({ ...w, risk: byId.get(w.riskId) || null }));
+  const scores = collectScores(areas);
+  const result = evaluateReadiness(areas, scores);
+  return {
+    mission,
+    areas: areas.map((a) => ({ ...a, data: scores[a.key] || null, reference: REFERENCE_AREAS.has(a.key) })),
+    ...result,
+    coveragePct: Math.round(result.coverage * 100)
+  };
+}
+
+export function findings() {
+  const r = compute();
+  if (r.status !== "scored") {
+    const names = r.missing.map((a) => a.area).join(", ");
+    return [{
+      level: "info",
+      title: "Readiness · not enough data",
+      saw: `Recent data covers ${r.coveragePct}% of the risk-weighted checks for this mission.`,
+      todo: names ? `Do these checks next: ${names}.` : "Do your daily checks so a score can be shown."
+    }];
+  }
+  const level = r.total >= 80 ? "ok" : r.total >= 60 ? "review" : "alert";
+  return [{
+    level,
+    title: `Readiness score: ${r.total}/100 (${r.band.title})`,
+    saw: `Based on ${r.areas.length - r.missing.length - r.reference.length} of ${r.areas.length} monitored areas, covering ${r.coveragePct}% of the risk weight.`,
+    todo: r.band.advice
+  }];
+}
+
+export function immuneFindings() {
+  const immune = typeof window !== "undefined" ? window.AstroMedImmune : null;
+  return immune && typeof immune.findings === "function" ? immune.findings() : [];
+}
+
+export { SOURCE };
+
+if (typeof window !== "undefined") {
+  window.AstroMedReadiness = { compute, findings, immuneFindings, evaluateReadiness, coverageOf, COVERAGE_MIN, SOURCE };
+}

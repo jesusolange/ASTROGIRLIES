@@ -48,7 +48,7 @@ export function createGuide(container, { parts, onPick, onRestart, onOverview })
       text.textContent = "Log complete \u2713 All 7 body systems are saved.";
       const overview = document.createElement("button");
       overview.type = "button";
-      overview.textContent = "See my Overview";
+      overview.textContent = "Open Today";
       overview.addEventListener("click", onOverview);
       const restart = document.createElement("button");
       restart.type = "button";

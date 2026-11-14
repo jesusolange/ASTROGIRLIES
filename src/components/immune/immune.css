@@ -1,0 +1,26 @@
+/* Immune watch. Colours come only from the --am-* tokens. Shared td-* rules live in today.css. */
+
+.im-sub { margin: 18px 0 6px; color: var(--am-heading); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+
+.im-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.im-pill {
+  padding: 8px 14px;
+  color: var(--am-text-muted);
+  background: var(--am-field-bg);
+  border: 1px solid var(--am-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.im-pill:hover, .im-pill:focus-visible { border-color: var(--am-border-strong); color: var(--am-text); outline: none; }
+.im-pill[aria-pressed="true"] { color: var(--am-on-accent); background: var(--am-accent); border-color: var(--am-accent); font-weight: 700; }
+
+.im-status { display: grid; gap: 3px; margin: 10px 0; padding: 12px 14px; border-left: 4px solid var(--im-tone, var(--am-border)); background: var(--am-field-bg); border-radius: var(--am-radius-small); }
+.im-status b { color: var(--im-tone, var(--am-text)); }
+.im-status span { color: var(--am-text-muted); font-size: 12px; }
+.im-ok { --im-tone: var(--am-ok); }
+.im-review { --im-tone: var(--am-warn); }
+.im-alert { --im-tone: var(--am-danger); }
+
+.im-actions { margin: 10px 0; padding-left: 20px; color: var(--am-text-muted); font-size: 13px; line-height: 1.65; }

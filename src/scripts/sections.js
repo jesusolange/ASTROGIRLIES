@@ -32,7 +32,7 @@ function astromedSectionsInit() {
      INJECT PAGES
   ========================================== */
 
-  const pages = ["environment", "nutrition", "missions", "radiation", "readiness", "progress", "doctor", "protocols"];
+  const pages = ["environment", "nutrition", "radiation", "progress", "protocols"];
   footer.insertAdjacentHTML("beforebegin", pages.map(id => `<section id="${id}Page" class="am-page" hidden></section>`).join(""));
 
 
@@ -46,10 +46,7 @@ function astromedSectionsInit() {
     twin: "exercisePage",
     nutrition: "nutritionPage",
     radiation: "radiationPage",
-    readiness: "readinessPage",
-    missions: "missionsPage",
     mental: "mentalPage",
-    doctor: "doctorPage",
     progress: "progressPage",
     protocols: "protocolsPage"
   };
@@ -63,13 +60,10 @@ function astromedSectionsInit() {
     });
     $$(".nav button").forEach(b =>
       b.classList.toggle("active", b.dataset.action === action));
-    if (action === "doctor") renderDoctor();
     if (action === "protocols") renderProtocols();
     if (action === "environment" && window.AstroMedEnv) window.AstroMedEnv.render();
     if (action === "nutrition" && window.AstroMedNutrition) window.AstroMedNutrition.render();
-    if (action === "missions" && window.AstroMedMissions) window.AstroMedMissions.render();
     if (action === "radiation" && window.AstroMedRadiation) window.AstroMedRadiation.render();
-    if (action === "readiness" && window.AstroMedReadiness) window.AstroMedReadiness.render();
     if (action === "progress" && window.AstroMedProgress) window.AstroMedProgress.render();
     if (REGISTERED[action]) REGISTERED[action](document.getElementById(PAGES[action]));
     window.scrollTo({ top: 0 });
@@ -99,15 +93,10 @@ function astromedSectionsInit() {
   }
   window.AstroMedNav = { register, show, has: (id) => Boolean(PAGES[id]), current: () => current };
 
-  document.addEventListener("click", e => {
-    const b = e.target.closest(".ov-ready");
-    if (b) show("readiness");
-  });
-
   // New sections: take over the click before script.js sees it.
   document.addEventListener("click", e => {
     const b = e.target.closest(".nav button[data-action]");
-    if (!b || !(["environment", "mental", "doctor", "protocols", "progress", "nutrition", "missions", "radiation", "readiness"].includes(b.dataset.action) || REGISTERED[b.dataset.action])) return;
+    if (!b || !(["environment", "mental", "protocols", "progress", "nutrition", "radiation"].includes(b.dataset.action) || REGISTERED[b.dataset.action])) return;
     e.stopImmediatePropagation();
     e.preventDefault();
     show(b.dataset.action);
@@ -291,75 +280,7 @@ function astromedSectionsInit() {
     return out;
   }
 
-  /* ==========================================
-     OVERVIEW — "the little doctor"
-  ========================================== */
-
   window.AstroMedData = { getCheckups, SYSTEM_META, rule: (k, v) => (window.AstroMedEnv && window.AstroMedEnv.rule(k, v)) || (METRIC_RULES[k] || (() => GENERIC))(v), analyze, KEYS, load };
-
-  const firstSentence = (t) => String(t).split(/(?<=\.)\s/)[0];
-  const ICON = { ok: "✓", review: "!", alert: "!" };
-
-  function cardHtml(x, open) {
-    return `
-      <details class="ov-card ${x.level}" ${open ? "open" : ""}>
-        <summary>
-          <span class="ov-ico">${ICON[x.level]}</span>
-          <span class="ov-title">${esc(x.title)}</span>
-          <span class="ov-act">${esc(firstSentence(x.todo))}</span>
-        </summary>
-        <div class="ov-body">
-          <p><b>What I noticed:</b> ${esc(x.saw)}</p>
-          <p><b>What we should do:</b> ${esc(x.todo)}</p>
-        </div>
-      </details>`;
-  }
-
-  function renderDoctor() {
-    const a = analyze();
-    const rest = [...a.mental, ...a.checkup, ...a.exercise];
-    const all = [...a.urgent, ...rest];
-    const count = { ok: 0, review: 0, alert: 0 };
-    all.forEach((x) => count[x.level]++);
-
-    const attention = rest.filter((x) => x.level !== "ok")
-      .sort((p, q) => (q.level === "alert") - (p.level === "alert"));
-    const good = rest.filter((x) => x.level === "ok");
-    const focus = [...a.urgent, ...attention].slice(0, 3);
-
-    $("#doctorPage").innerHTML = `
-      <div class="am-heading">
-        <h2>Overview</h2>
-        <p>Because I care about you, this is what we should consider. Educational guidance, not a diagnosis.</p>
-      </div>
-
-      ${(() => { try { const R = window.AstroMedReadiness && window.AstroMedReadiness.compute(); if (!R || R.total == null) return ""; const c = R.total >= 80 ? "#35d49a" : R.total >= 60 ? "#6fe3ff" : R.total >= 40 ? "#ffc857" : "#ff6b6b"; return `<button type="button" class="ov-ready" data-action="readiness" style="border-color:${c}"><b style="color:${c}">${Math.round(R.total)}</b><span>Readiness score today<small>Tap to see what makes it</small></span></button>`; } catch (e) { return ""; } })()}
-      <div class="ov-summary">
-        <div class="ov-count ok"><b>${count.ok}</b><span>On track</span></div>
-        <div class="ov-count review"><b>${count.review}</b><span>Watch</span></div>
-        <div class="ov-count alert"><b>${count.alert}</b><span>Priority</span></div>
-      </div>
-
-      ${a.urgent.length ? `<div class="am-urgent-box"><h3>Please read this first</h3>${a.urgent.map((x) => cardHtml(x, true)).join("")}</div>` : ""}
-
-      ${focus.length ? `<div class="ov-focus"><h3>Today’s focus</h3><ol>
-        ${focus.map((x) => `<li class="${x.level}"><i></i><span><b>${esc(x.title)}:</b> ${esc(firstSentence(x.todo))}</span></li>`).join("")}
-      </ol></div>` : ""}
-
-      ${!all.length ? `<div class="am-panel"><p>I have no results yet. Complete the daily checkup and the mental-health check-in.</p>
-        <button type="button" class="am-btn" data-go="overview">Start daily checkup</button></div>` : ""}
-
-      ${attention.length ? `<h3 class="am-group">Needs attention</h3>
-        <div class="ov-grid">${attention.map((x) => cardHtml(x, x.level === "alert")).join("")}</div>` : ""}
-
-      ${good.length ? `<h3 class="am-group">On track</h3>
-        <div class="ov-chips">${good.map((x) => `<span class="ov-chip">✓ ${esc(x.title)}</span>`).join("")}</div>` : ""}
-
-      <div class="am-panel">
-        <p>Your saved results and the medical report are in Protocols.</p>
-        <button type="button" class="am-btn" data-go="protocols">Open Protocols</button>
-      </div>`;
-  }
 
   /* ==========================================
      PROTOCOLS — saved results + medical report
