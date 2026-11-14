@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+
+  <title>AstroMed · Space Medical Assistant</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="astromed-sections.css">
+  <link rel="stylesheet" href="astromed-dark.css">
+</head>
+
+<body>
+
+  <!-- =========================================
+       ICON LIBRARY
+  ========================================== -->
+
+  <svg
+    width="0"
+    height="0"
+    style="position:absolute; overflow:hidden"
+    aria-hidden="true"
+  >
+    <defs>
+
+      <symbol id="ic-overview" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <rect x="14" y="14" width="7" height="7" rx="1"/>
+      </symbol>
+
+      <symbol id="ic-twin" viewBox="0 0 24 24">
+        <circle cx="12" cy="5" r="3"/>
+        <path d="M7 21v-7H4v-3l4-3h8l4 3v3h-3v7M10 21v-7h4v7"/>
+      </symbol>
+
+      <symbol id="ic-sim" viewBox="0 0 24 24">
+        <path d="M2 12h4l3-7 4 14 3-7h6"/>
+      </symbol>
+
+      <symbol id="ic-report" viewBox="0 0 24 24">
+        <path d="M6 2h9l4 4v16H6zM15 2v5h4M9 12h7M9 16h7"/>
+      </symbol>
+
+      <symbol id="ic-env" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>
+      </symbol>
+
+      <symbol id="ic-food" viewBox="0 0 24 24">
+        <path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4.5-3.5 8H17"/>
+      </symbol>
+
+      <symbol id="ic-trophy" viewBox="0 0 24 24">
+        <path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4v2a3 3 0 0 0 4 3M16 6h4v2a3 3 0 0 1-4 3M12 13v4M8 21h8M10 17h4"/>
+      </symbol>
+
+      <symbol id="ic-rad" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="2"/>
+        <path d="M12 10L8.5 4.2A9 9 0 0 1 15.5 4.2zM13.7 13l6.8 .1a9 9 0 0 1-3.5 6.1zM10.3 13L7 19.2A9 9 0 0 1 3.5 13.1z"/>
+      </symbol>
+
+      <symbol id="ic-mental" viewBox="0 0 24 24">
+        <path d="M12 21s-7-4.4-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.6-9 9-9 9z"/>
+      </symbol>
+
+      <symbol id="ic-setting" viewBox="0 0 24 24">
+        <path d="M10 2h4l1 3 3 1 3-1 2 4-2 2v-3L1 9l2-4 3 1 3-1z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </symbol>
+
+    </defs>
+  </svg>
+
+
+  <!-- =========================================
+       MAIN APPLICATION
+  ========================================== -->
+
+  <div class="shell">
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
+
+    <nav class="nav" aria-label="Main navigation">
+
+      <button
+        type="button"
+        data-action="environment"
+      >
+        <svg class="icon">
+          <use href="#ic-env"/>
+        </svg>
+
+        Environment
+      </button>
+
+      <button
+        type="button"
+        data-action="readiness"
+      >
+        <svg class="icon">
+          <use href="#ic-trophy"/>
+        </svg>
+
+        Readiness
+      </button>
+
+      <button
+        type="button"
+        data-action="radiation"
+      >
+        <svg class="icon">
+          <use href="#ic-rad"/>
+        </svg>
+
+        Radiation
+      </button>
+
+      <button
+        type="button"
+        class="active"
+        data-action="overview"
+      >
+        <svg class="icon">
+          <use href="#ic-overview"/>
+        </svg>
+
+        Daily Checkup
+      </button>
+
+      <button
+        type="button"
+        data-action="twin"
+      >
+        <svg class="icon">
+          <use href="#ic-twin"/>
+        </svg>
+
+        Exercise & Recovery
+      </button>
+
+      <button
+        type="button"
+        data-action="nutrition"
+      >
+        <svg class="icon">
+          <use href="#ic-food"/>
+        </svg>
+
+        Nutrition
+      </button>
+
+      <button
+        type="button"
+        data-action="mental"
+      >
+        <svg class="icon">
+          <use href="#ic-mental"/>
+        </svg>
+
+        Mental Health
+      </button>
+
+      <button
+        type="button"
+        data-action="progress"
+      >
+        <svg class="icon">
+          <use href="#ic-sim"/>
+        </svg>
+
+        Progress
+      </button>
+
+      <button
+        type="button"
+        data-action="missions"
+      >
+        <svg class="icon">
+          <use href="#ic-trophy"/>
+        </svg>
+
+        Missions
+      </button>
+
+      <button
+        type="button"
+        data-action="doctor"
+      >
+        <svg class="icon">
+          <use href="#ic-overview"/>
+        </svg>
+
+        Overview
+      </button>
+
+      <button
+        type="button"
+        data-action="protocols"
+      >
+        <svg class="icon">
+          <use href="#ic-report"/>
+        </svg>
+
+        Protocols
+      </button>
+
+      <button
+        type="button"
+        data-action="settings"
+      >
+        <svg class="icon">
+          <use href="#ic-setting"/>
+        </svg>
+
+        Settings
+      </button>
+
+      <div class="nav-foot">
+
+        <div class="mars-card">
+          <small>Next destination</small>
+          <strong>Mars</strong>
+
+          <small style="margin-top:6px">
+            Exploration scenario
+          </small>
+        </div>
+
+        <div class="offline-note">
+          <span class="online"></span>
+          Works offline in Firefox
+        </div>
+
+      </div>
+
+    </nav>
+
+
+    <!-- =====================================
+         MAIN CONTENT
+    ====================================== -->
+
+    <main class="content">
+
+
+      <!-- =====================================
+           PAGE 1 — DAILY CHECKUP
+      ====================================== -->
+
+      <div id="checkupPage" class="content-grid">
+
+
+        <!-- ===================================
+             INTERACTIVE ASTRONAUT
+        ==================================== -->
+
+        <section class="twin-card">
+
+          <div class="twin-header">
+
+            <div>
+
+              <h2 class="daily-checkup-title">
+                Daily Checkup
+              </h2>
+
+              <small id="modeText">
+                Suit view · Click to open
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <!-- ASTRONAUT VISUALIZATION -->
+
+          <div class="figure-scene">
+
+            <div class="glow"></div>
+
+
+            <!-- MISSION INFORMATION -->
+
+            <div
+              class="astronaut-mission-info"
+              aria-label="Demo mission information"
+            >
+
+              <div class="astronaut-mission-line">
+
+                <span class="astronaut-status-dot"></span>
+
+                <span>Mission Day 127 / 365</span>
+
+              </div>
+
+              <div class="astronaut-mission-line">
+
+                <span aria-hidden="true">👩🏻‍🚀</span>
+
+                <span>Solange · Demo Astronaut</span>
+
+              </div>
+
+            </div>
+
+
+            <!-- ASTRONAUT BODY -->
+
+            <div
+              id="figureWrap"
+              class="figure-wrap"
+              tabindex="0"
+              role="button"
+              aria-label="Open astronaut spacesuit to see body"
+              title="Click to open the suit"
+            >
+
+
+              <!-- CLOSED SPACESUIT -->
+
+              <img
+                class="astronaut-img"
+                src="astronaut.png"
+                alt="Illustrated astronaut in spacesuit"
+              >
+
+
+              <!-- OPEN SPACESUIT -->
+
+              <img
+                class="astronaut-anatomy-img"
+                src="assets/astronaut_anatomy.png"
+                alt="Astronaut anatomy showing body systems"
+              >
+
+
+              <!-- LEGACY ANATOMY SVG -->
+
+              <svg
+                class="anatomy"
+                viewBox="0 0 300 723"
+                aria-hidden="true"
+              >
+
+                <defs>
+
+                  <linearGradient
+                    id="skin"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0"
+                      stop-color="#ebd6cc"
+                    />
+                    <stop
+                      offset=".55"
+                      stop-color="#f3dcd3"
+                    />
+                    <stop
+                      offset="1"
+                      stop-color="#cda69b"
+                    />
+                  </linearGradient>
+
+                  <linearGradient
+                    id="fold"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0"
+                      stop-color="#f9fafa"
+                    />
+                    <stop
+                      offset="1"
+                      stop-color="#cbd7e6"
+                    />
+                  </linearGradient>
+
+                  <radialGradient id="an-glow">
+                    <stop
+                      offset="0"
+                      stop-color="#a7d6f1"
+                      stop-opacity=".42"
+                    />
+                    <stop
+                      offset="1"
+                      stop-color="#a7d6f1"
+                      stop-opacity="0"
+                    />
+                  </radialGradient>
+
+                </defs>
+
+                <ellipse
+                  cx="153"
+                  cy="278"
+                  rx="73"
+                  ry="126"
+                  fill="url(#an-glow)"
+                />
+
+                <path
+                  d="M117 176 Q140 171 183 176 Q216 193 216 226 L212 351 Q182 371 100 350 L98 226 Q97 193 117 176Z"
+                  fill="#e9e0d7"
+                  stroke="#2e5a90"
+                  stroke-width="5"
+                />
+
+                <path
+                  d="M129 183 Q153 173 177 183 Q195 198 197 228 L194 334 Q154 357 118 334 L115 228 Q115 197 129 183Z"
+                  fill="url(#skin)"
+                  stroke="#cf908c"
+                  stroke-width="2.6"
+                />
+
+                <path
+                  d="M154 189 L154 328"
+                  stroke="#a77779"
+                  stroke-opacity=".42"
+                  stroke-width="2"
+                  stroke-dasharray="4 8"
+                />
+
+                <path
+                  d="M148 202 C137 195 127 207 125 221 C125 240 133 257 148 264Z"
+                  fill="#70c8e7"
+                  fill-opacity=".94"
+                  stroke="#50a9d2"
+                  stroke-width="2"
+                />
+
+                <path
+                  d="M160 202 C176 196 188 212 188 229 C188 245 178 256 161 264Z"
+                  fill="#70c8e7"
+                  fill-opacity=".94"
+                  stroke="#50a9d2"
+                  stroke-width="2"
+                />
+
+                <path
+                  d="M153 213 C143 200 134 213 138 229 C140 241 152 254 153 254 C155 255 170 238 171 229 C174 215 163 205 153 213Z"
+                  fill="#e83a4d"
+                  stroke="#b84653"
+                  stroke-width="1.5"
+                />
+
+                <path
+                  d="M138 268 Q154 280 170 269 M137 285 Q154 294 172 284 M135 305 Q155 314 174 302"
+                  fill="none"
+                  stroke="#fff8f3"
+                  stroke-opacity=".75"
+                  stroke-width="4"
+                />
+
+                <path
+                  class="suit-flap-left"
+                  d="M112 183 Q86 219 97 290 L105 353 Q118 364 130 356 L132 198 Q130 185 112 183Z"
+                  fill="url(#fold)"
+                  stroke="#506888"
+                  stroke-width="2.5"
+                />
+
+                <path
+                  class="suit-flap-right"
+                  d="M195 183 Q224 216 214 290 L204 353 Q189 363 178 356 L175 200 Q176 185 195 183Z"
+                  fill="url(#fold)"
+                  stroke="#506888"
+                  stroke-width="2.5"
+                />
+
+                <path
+                  d="M125 200 L125 339 M183 200 L183 337"
+                  stroke="#1f497b"
+                  stroke-width="5"
+                  stroke-linecap="round"
+                />
+
+                <text
+                  x="154"
+                  y="337"
+                  fill="#1f4c86"
+                  font-size="10"
+                  font-weight="800"
+                  text-anchor="middle"
+                >
+                  BODY SCAN
+                </text>
+
+              </svg>
+
+
+              <!-- ORGAN OVERLAY -->
+
+              <div
+                id="astronautOrganOverlay"
+                class="astronaut-organ-overlay"
+                hidden
+              >
+
+                <img
+                  id="astronautOrganImage"
+                  src="assets/heart.png"
+                  alt="Selected anatomical organ"
+                >
+
+              </div>
+
+
+              <!-- BODY HOTSPOTS -->
+
+              <!-- BRAIN -->
+
+              <button
+                type="button"
+                class="hotspot"
+                data-part="brain"
+                aria-label="Brain and sleep"
+              ></button>
+
+              <span class="hotspot-label label-brain">
+                Brain
+              </span>
+
+
+              <!-- HEART -->
+
+              <button
+                type="button"
+                class="hotspot"
+                data-part="heart"
+                aria-label="Heart"
+              ></button>
+
+              <span class="hotspot-label label-heart">
+                Heart
+              </span>
+
+
+              <!-- LUNGS -->
+
+              <button
+                type="button"
+                class="hotspot"
+                data-part="lungs"
+                aria-label="Lungs"
+              ></button>
+
+              <span class="hotspot-label label-lungs">
+                Lungs
+              </span>
+
+
+              <!-- KIDNEYS -->
+
+              <button
+                type="button"
+                class="hotspot"
+                data-part="kidneys"
+                aria-label="Kidneys and urinary health"
+              ></button>
+
+              <span class="hotspot-label label-kidneys">
+                Kidneys
+              </span>
+
+
+              <!-- PULSE -->
+
+              <button
+                type="button"
+                class="hotspot"
+                data-part="hand"
+                aria-label="Hand and pulse"
+              ></button>
+
+              <span class="hotspot-label label-hand">
+                Pulse
+              </span>
+
+
+              <!-- BONES -->
+
+              <button
+                type="button"
+                class="hotspot"
+                data-part="bones"
+                aria-label="Bones"
+              ></button>
+
+              <span class="hotspot-label label-bones">
+                Bones
+              </span>
+
+
+              <!-- MUSCLES -->
+
+              <button
+                type="button"
+                class="hotspot"
+                data-part="muscles"
+                aria-label="Muscles"
+              ></button>
+
+              <span class="hotspot-label label-muscles">
+                Muscles
+              </span>
+
+            </div>
+
+
+            <!-- OPEN / CLOSE SUIT -->
+
+            <button
+              type="button"
+              class="action-bubble"
+              id="suitButton"
+            >
+              ✦ Open spacesuit
+            </button>
+
+          </div>
+
+
+          <div class="figure-helper">
+            Click astronaut to open · Select a body system
+          </div>
+
+        </section>
+
+
+        <!-- ===================================
+             HEALTH DATA PANEL
+        ==================================== -->
+
+        <section class="card detail-card">
+
+
+          <!-- HEALTH SYSTEM HEADER -->
+
+          <div class="detail-header">
+
+            <div
+              id="detailIcon"
+              class="detail-icon"
+            >
+              ♥
+            </div>
+
+            <div>
+
+              <h2 id="detailTitle">
+                Cardiovascular System
+              </h2>
+
+              <p id="detailSubtitle">
+                Heart rate · Blood pressure · HRV
+              </p>
+
+            </div>
+
+            <span class="demo-badge">
+              Demo values
+            </span>
+
+          </div>
+
+
+          <!-- =================================
+               DAILY HEALTH CHECK
+          ================================== -->
+
+          <section class="daily-check-layout">
+
+
+            <!-- LEFT: ANATOMY -->
+
+            <div class="daily-organ-panel">
+
+              <p class="daily-section-label">
+                SELECTED ANATOMY
+              </p>
+
+              <div
+                id="organImageBox"
+                class="organ-visual"
+              >
+
+                <img
+                  id="organImage"
+                  src="assets/heart.png"
+                  alt="Selected anatomical organ"
+                >
+
+              </div>
+
+            </div>
+
+
+            <!-- RIGHT: MEASUREMENTS -->
+
+            <div class="record-editor daily-record-panel">
+
+              <div class="editor-head">
+
+                <div>
+                  <strong>
+                    Today's measurements
+                  </strong>
+                </div>
+
+              </div>
+
+
+              <!-- DYNAMIC INPUT FIELDS -->
+
+              <div
+                id="inputFields"
+                class="input-row"
+              ></div>
+
+
+              <!-- BUTTONS -->
+
+              <div class="buttons-row">
+
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  id="saveData"
+                >
+                  Save measurements
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-soft"
+                  id="sampleData"
+                >
+                  Demo values
+                </button>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- =================================
+               FULL-WIDTH HEALTH INDICATORS
+          ================================== -->
+
+          <section
+            id="healthStatusPanel"
+            class="health-status-panel"
+          >
+
+            <h3>Health indicators</h3>
+
+            <div
+              id="healthStatusBars"
+              class="health-status-bars"
+            ></div>
+
+          </section>
+
+
+          <!-- HIDDEN ELEMENTS REQUIRED BY JS -->
+
+          <div
+            id="metricCards"
+            class="metric-cards"
+            hidden
+          ></div>
+
+          <div class="chart-card" hidden>
+
+            <div class="chart-head">
+
+              <strong id="chartTitle">
+                Health Trend
+              </strong>
+
+            </div>
+
+            <svg
+              id="trendChart"
+              class="chart-svg"
+              viewBox="0 0 520 159"
+              preserveAspectRatio="none"
+            ></svg>
+
+          </div>
+
+
+          <!-- HIDDEN CLINICAL CONTEXT -->
+
+          <p id="insightText" hidden></p>
+
+        </section>
+        <!-- END HEALTH DATA PANEL -->
+
+
+      </div>
+      <!-- END checkupPage -->
+
+
+      <!-- =====================================
+           PAGE 2 — EXERCISE & RECOVERY
+           IMPORTANT: OUTSIDE checkupPage
+      ====================================== -->
+
+      <section
+        id="exercisePage"
+        class="exercise-page"
+        hidden
+      >
+
+        <div class="exercise-heading">
+
+          <h2>Exercise & Recovery</h2>
+
+          <p>
+            Which type of exercise would you
+            like to log today?
+          </p>
+
+        </div>
+
+
+        <!-- EXERCISE CARDS -->
+
+        <div class="exercise-options">
+
+
+          <!-- ARED -->
+
+          <button
+            type="button"
+            class="exercise-option"
+            data-exercise="ared"
+          >
+
+            <img
+              src="assets/ARED.png"
+              alt="Astronaut performing resistance training"
+              class="exercise-card-image"
+            >
+
+            <h3>ARED</h3>
+
+            <p>Resistance Training</p>
+
+          </button>
+
+
+          <!-- T2 -->
+
+          <button
+            type="button"
+            class="exercise-option"
+            data-exercise="t2"
+          >
+
+            <img
+              src="assets/T2.png"
+              alt="Astronaut running on a treadmill"
+              class="exercise-card-image"
+            >
+
+            <h3>T2</h3>
+
+            <p>Treadmill Running</p>
+
+          </button>
+
+
+          <!-- CEVIS -->
+
+          <button
+            type="button"
+            class="exercise-option"
+            data-exercise="cevis"
+          >
+
+            <img
+              src="assets/CEVIS.png"
+              alt="Astronaut using the cycling system"
+              class="exercise-card-image"
+            >
+
+            <h3>CEVIS</h3>
+
+            <p>Cycling Training</p>
+
+          </button>
+
+        </div>
+
+
+        <!-- SAVE CONFIRMATION -->
+
+        <p
+          id="exerciseSaveStatus"
+          class="exercise-save-status"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+      </section>
+      <!-- END exercisePage -->
+
+
+      <!-- =====================================
+           HIDDEN COMPATIBILITY ELEMENTS
+           REQUIRED BY EXISTING script.js
+      ====================================== -->
+
+      <div
+        id="legacyJsBindings"
+        hidden
+        style="display:none !important"
+        aria-hidden="true"
+      >
+
+        <span id="coveragePercent"></span>
+
+        <div id="coverageList"></div>
+
+        <div id="recentRecords"></div>
+
+        <div id="systemList"></div>
+
+        <button
+          type="button"
+          id="runSim"
+        ></button>
+
+        <button
+          type="button"
+          id="viewReport"
+        ></button>
+
+        <button
+          type="button"
+          id="allRecords"
+        ></button>
+
+        <button
+          type="button"
+          id="exportCsv"
+        ></button>
+
+      </div>
+
+
+      <!-- =====================================
+           FOOTER
+      ====================================== -->
+
+      <div class="footer">
+
+        <span>
+          AstroMed Prototype · AstroGirlies ·
+          NASA Space Apps 2026
+        </span>
+
+        <span>
+          Unofficial educational demo ·
+          Not a medical device
+        </span>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- =========================================
+       NOTIFICATIONS
+  ========================================== -->
+
+  <div
+    class="toasts"
+    id="toasts"
+    aria-live="polite"
+  ></div>
+
+
+  <!-- =========================================
+       MODAL
+  ========================================== -->
+
+  <div
+    id="modalBackdrop"
+    class="modal-backdrop"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+
+      <div class="modal-header">
+
+        <h2 id="modalTitle"></h2>
+
+        <button
+          id="modalClose"
+          class="close"
+          type="button"
+          aria-label="Close dialog"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div id="modalBody"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       JAVASCRIPT
+  ========================================== -->
+
+  <script src="script.js"></script>
+  <script src="exercise.js"></script>
+  <script src="health-indicators.js"></script>
+  <script src="exercise-overview.js"></script>
+  <script src="astromed-cover.js"></script>
+  <script src="astromed-profile.js"></script>
+  <script src="astromed-sections.js"></script>
+  <script src="astromed-environment.js"></script>
+  <script src="astromed-nutrition.js"></script>
+  <script src="astromed-missions.js"></script>
+  <script src="astromed-radiation.js"></script>
+  <script src="astromed-progress.js"></script>
+  <script src="astromed-readiness.js"></script>
+  <script src="astromed-pro.js"></script>
+  <script src="astronaut3d.js"></script>
+
+</body>
+</html>

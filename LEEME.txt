@@ -1,0 +1,19 @@
+ASTROMED - proyecto completo (todo integrado y probado en Chromium)
+
+COMO USAR
+1. Descomprime este ZIP.
+2. Copia TU carpeta de imagenes dentro de assets/ (ARED.png, T2.png, CEVIS.png,
+   astronaut_anatomy.png, heart.png, space-background.jpg ...). Este ZIP no las trae
+   ni las pisa; assets/models/ ya viene con los organos.
+3. Abre index.html con doble clic. No necesitas servidor (los modelos 3D van
+   embebidos en assets/models/*.glb.js).
+
+ARCHIVOS
+  index.html (menu: Daily Checkup, Exercise, Mental Health, Overview, Protocols, Settings)
+  style.css, script.js, exercise.js, exercise-overview.js, health-indicators.js (los tuyos)
+  astromed-sections.css / .js  -> Mental Health, Overview, Protocols
+  astromed-pro.js              -> generador del PDF + tipografia
+  astronaut3d.js               -> astronauta 3D y chequeo guiado rojo->verde
+
+CREDITOS (CC BY, Sketchfab): Human Brain - AH; Human Heart - TinkerLane Studio.
+Revisa la licencia/autor de pulmones, rinones y esqueleto y agrega su credito si es CC BY.
