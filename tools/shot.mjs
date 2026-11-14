@@ -72,6 +72,8 @@ const chrome = spawn(chromePath, [
 ], { stdio: ["ignore", "ignore", "pipe"] });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Never hang the caller: after two minutes stop Chrome and exit with an error.
+setTimeout(() => { console.error("timed out after 120 s"); chrome.kill(); process.exit(3); }, 120000).unref();
 const problems = [];
 let exitCode = 0;
 
