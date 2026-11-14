@@ -203,6 +203,7 @@ function astromedSectionsInit() {
     <section id="missionsPage" class="am-page" hidden></section>
     <section id="radiationPage" class="am-page" hidden></section>
     <section id="readinessPage" class="am-page" hidden></section>
+    <section id="emergencyPage" class="am-page" hidden></section>
     <section id="progressPage" class="am-page" hidden></section>
     <section id="doctorPage" class="am-page" hidden></section>
     <section id="protocolsPage" class="am-page" hidden></section>
@@ -219,6 +220,7 @@ function astromedSectionsInit() {
     nutrition: "nutritionPage",
     radiation: "radiationPage",
     readiness: "readinessPage",
+    emergency: "emergencyPage",
     missions: "missionsPage",
     mental: "mentalPage",
     doctor: "doctorPage",
@@ -242,6 +244,7 @@ function astromedSectionsInit() {
     if (action === "missions" && window.AstroMedMissions) window.AstroMedMissions.render();
     if (action === "radiation" && window.AstroMedRadiation) window.AstroMedRadiation.render();
     if (action === "readiness" && window.AstroMedReadiness) window.AstroMedReadiness.render();
+    if (action === "emergency" && window.AstroMedEmergency) window.AstroMedEmergency.render();
     if (action === "progress" && window.AstroMedProgress) window.AstroMedProgress.render();
     window.scrollTo({ top: 0 });
   }
@@ -254,7 +257,7 @@ function astromedSectionsInit() {
   // New sections: take over the click before script.js sees it.
   document.addEventListener("click", e => {
     const b = e.target.closest(".nav button[data-action]");
-    if (!b || !["environment", "mental", "doctor", "protocols", "progress", "nutrition", "missions", "radiation", "readiness"].includes(b.dataset.action)) return;
+    if (!b || !["environment", "mental", "doctor", "protocols", "progress", "nutrition", "missions", "radiation", "readiness", "emergency"].includes(b.dataset.action)) return;
     e.stopImmediatePropagation();
     e.preventDefault();
     show(b.dataset.action);
@@ -281,10 +284,10 @@ function astromedSectionsInit() {
   const SYSTEM_META = {
     heart: { title: "Cardiovascular System", f: { hr: ["Heart rate", "bpm"], sys: ["Systolic BP", "mmHg"], dia: ["Diastolic BP", "mmHg"], hrv: ["HRV", "ms"] } },
     lungs: { title: "Respiratory System", f: { resp: ["Respiratory rate", "breaths/min"], spo2: ["SpO₂", "%"] } },
-    bones: { title: "Bone & Skeletal System", f: { bmd: ["Reference BMD", "g/cm²"], exercise: ["Resistance exercise", "min"] } },
+    bones: { title: "Bone & Skeletal System", f: { bmd: ["Reference BMD", "g/cm²"], exercise: ["Resistance exercise", "min"], ntx: ["N-telopeptide (urine)", "nmol/mmol creat."] } },
     kidneys: { title: "Renal & Urinary Health", f: { urineOutput: ["Urine output", "mL"], collectionHours: ["Collection period", "h"], weightKg: ["Body weight", "kg"], fluidIntake: ["Fluid intake", "mL"] } },
-    brain: { title: "Sleep & Cognition", f: { sleep: ["Sleep duration", "h"], reaction: ["Reaction time", "ms"], mood: ["Mood (self-report)", "/10"] } },
-    hand: { title: "Peripheral Pulse", f: { pulse: ["Pulse", "bpm"], spo2: ["SpO₂", "%"], skin: ["Skin temperature", "°C"], bodyTemp: ["Oral body temperature", "°C"], glucose: ["Blood glucose", "mg/dL"] } },
+    brain: { title: "Sleep & Cognition", f: { sleep: ["Sleep duration", "h"], deepSleep: ["Deep sleep (1 to 4)", "/4"], reaction: ["Reaction time", "ms"], mood: ["Mood (self-report)", "/10"] } },
+    hand: { title: "Temperature & Glucose", f: { skin: ["Skin temperature", "°C"], bodyTemp: ["Oral body temperature", "°C"], glucose: ["Blood glucose", "mg/dL"] } },
     env: { title: "Environment", f: { temp: ["Cabin temperature", "°C"], pressure: ["Cabin pressure", "kPa"], humidity: ["Humidity", "%"], co2: ["Carbon dioxide (CO₂)", "ppm"], noise: ["Noise level", "dB"], radiation: ["Radiation dose rate", "µSv/h"] } },
     muscles: { title: "Muscular System", f: { activity: ["Activity", "min"], strength: ["Training load", "kg"] } }
   };
@@ -433,6 +436,14 @@ function astromedSectionsInit() {
     : v <= 250 ? R("review", "Blood glucose is high.", "Re-measure, drink water and avoid sugary food. Report repeated high readings to your flight surgeon.")
     : R("alert", "Blood glucose is very high.", "Contact your flight surgeon now.");
   METRIC_RULES.pulse = METRIC_RULES.hr;
+  // N-telopeptide (urine, nmol BCE/mmol creatinine). Ranges from the team doctor's notes (CHECK menopause status).
+  METRIC_RULES.ntx = v => {
+    const p = (window.AstroMedProfile && window.AstroMedProfile.get()) || {};
+    const r = p.sex === "m" ? [21, 83] : p.sex === "f" ? (p.meno === "post" ? [36, 124] : [17, 94]) : [17, 94];
+    if (v > r[1]) return R("review", `N-telopeptide is above the usual range (${r[0]}–${r[1]}). Bone may be breaking down faster.`, "Take vitamin D. If this does not help, ask your flight surgeon about a bisphosphonate. Keep resistive exercise.");
+    if (v < r[0]) return R("review", `N-telopeptide is below the usual range (${r[0]}–${r[1]}).`, "Repeat the test and tell your flight surgeon.");
+    return R("ok", `N-telopeptide is in the usual range (${r[0]}–${r[1]}).`, "Keep your resistive exercise and vitamin D.");
+  };
   METRIC_RULES.bodyTemp = v => v < 36 ? R("review", "Body temperature is low.", "Warm up, check your suit or cabin temperature and measure again.")
     : v <= 37.8 ? R("ok", "Body temperature within the demo reference.", "Keep your routine.")
     : v <= 38.5 ? R("review", "Mild fever range.", "Rest, hydrate and re-measure in 1 hour. Report it if it persists or you have other symptoms.")

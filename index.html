@@ -103,6 +103,15 @@
 
       <button
         type="button"
+        data-action="emergency"
+      >
+        <svg class="icon" viewBox="0 0 24 24"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" fill="currentColor"/></svg>
+
+        Emergency
+      </button>
+
+      <button
+        type="button"
         data-action="readiness"
       >
         <svg class="icon">
@@ -586,11 +595,11 @@
                 type="button"
                 class="hotspot"
                 data-part="hand"
-                aria-label="Hand and pulse"
+                aria-label="Temperature and glucose"
               ></button>
 
               <span class="hotspot-label label-hand">
-                Pulse
+                Temp &amp; sugar
               </span>
 
 
@@ -1060,6 +1069,7 @@
   <script src="astromed-radiation.js"></script>
   <script src="astromed-progress.js"></script>
   <script src="astromed-readiness.js"></script>
+  <script src="astromed-emergency.js"></script>
   <script src="astromed-pro.js"></script>
   <script src="astronaut3d.js"></script>
 

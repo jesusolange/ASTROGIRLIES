@@ -62,6 +62,7 @@
         <label class="pf-f"><span>Mission length (days)</span><input name="total" type="number" min="1" max="3000" step="1" required value="${total()}"></label>
         <label class="pf-f"><span>Age (years)</span><input name="age" type="number" min="18" max="80" step="1" value="${p.age ?? ""}"></label>
         <label class="pf-f"><span>Sex</span><select name="sex"><option value="">Select</option><option value="f" ${p.sex === "f" ? "selected" : ""}>Female</option><option value="m" ${p.sex === "m" ? "selected" : ""}>Male</option></select></label>
+        <label class="pf-f"><span>Menopause (women)</span><select name="meno"><option value="">Not set</option><option value="pre" ${p.meno === "pre" ? "selected" : ""}>Not yet</option><option value="post" ${p.meno === "post" ? "selected" : ""}>Yes, after</option></select></label>
         <label class="pf-f"><span>Weight (kg)</span><input name="weight" type="number" min="30" max="200" step="0.1" value="${p.weightKg ?? ""}"></label>
         <label class="pf-f"><span>Height (cm)</span><input name="height" type="number" min="120" max="230" step="0.5" value="${p.heightCm ?? ""}"></label>
         <p class="pf-note pf-wide">Age, sex, weight and height are optional. Nutrition uses them to set your food goals.</p>
@@ -89,7 +90,7 @@
         name: v.name.trim(),
         startDate: isoDay(start),
         totalDays: Math.max(1, parseInt(v.total, 10) || 365),
-        age: num(v.age), sex: v.sex || null, weightKg: num(v.weight), heightCm: num(v.height)
+        age: num(v.age), sex: v.sex || null, meno: v.meno || null, weightKg: num(v.weight), heightCm: num(v.height)
       });
       close();
       apply();

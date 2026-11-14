@@ -82,6 +82,17 @@
   }
 
   /* ---------- render ---------- */
+  function stormHtml() {
+    return `<div class="rd-cards">
+          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><circle cx="80" cy="56" r="26" fill="#ffc857" class="rd-pulse"/><g stroke="#ffc857" stroke-width="5" stroke-linecap="round" class="rd-rays"><path d="M80 14v-8M80 106v8M38 56h-8M130 56h-8M50 26l-6-6M116 92l6 6M110 26l6-6M44 92l-6 6"/></g><path d="M118 20l10 18h-20z" fill="#ff6b6b"/><text x="118" y="35" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">!</text></svg><b>1 · Storm alert</b><span>Alarm or ground call</span></div>
+          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><rect x="86" y="46" width="58" height="52" rx="8" fill="#3b6cff" opacity=".8"/><rect x="104" y="64" width="22" height="34" rx="4" fill="#0a1a3f"/><g class="rd-walk"><circle cx="40" cy="62" r="9" fill="#fff"/><path d="M40 72v22M40 80l-12 12M40 80l12 10M40 94l-10 16M40 94l10 16" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/></g><path d="M60 100h20" stroke="#6fe3ff" stroke-width="4" stroke-linecap="round" stroke-dasharray="3 7" class="rd-dash"/></svg><b>2 · Go inside</b><span>Stop work outside</span></div>
+          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><rect x="22" y="14" width="116" height="92" rx="14" fill="none" stroke="#6fe3ff" stroke-width="5" class="rd-pulse"/><rect x="38" y="30" width="84" height="60" rx="9" fill="none" stroke="#3b6cff" stroke-width="4"/><circle cx="80" cy="56" r="9" fill="#fff"/><path d="M80 66v14M80 72l-9 8M80 72l9 8" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M110 40l10 10 16-18" stroke="#35d49a" stroke-width="5" fill="none" stroke-linecap="round" transform="translate(-24 6)"/></svg><b>3 · Safe room</b><span>Most shielded area</span></div>
+          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><path d="M80 100V56M62 100h36" stroke="#cfe3ff" stroke-width="5" stroke-linecap="round"/><circle cx="80" cy="50" r="7" fill="#ffc857"/><g fill="none" stroke="#6fe3ff" stroke-width="4" stroke-linecap="round"><path d="M64 36a22 22 0 0 1 0 28" class="rd-wave"/><path d="M96 36a22 22 0 0 0 0 28" class="rd-wave"/><path d="M54 28a34 34 0 0 1 0 44" class="rd-wave w2"/><path d="M106 28a34 34 0 0 0 0 44" class="rd-wave w2"/></g></svg><b>4 · Call ground</b><span>Tell how you feel</span></div>
+        </div>
+        <p class="mi-note">Stay in the safe room until the ground team says it is OK. Then log your dose. A storm can add a lot of dose in a few hours; NASA's limit for one storm is ${SPE_LIMIT} mSv. This is general guidance: follow your mission protocol.</p>
+`;
+  }
+
   function render() {
     const page = $("#radiationPage");
     if (!page) return;
@@ -134,14 +145,9 @@
       </div>
 
       <div class="am-panel rd-spe">
-        <h3>Solar storm: what to do</h3>
-        <div class="rd-cards">
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><circle cx="80" cy="56" r="26" fill="#ffc857" class="rd-pulse"/><g stroke="#ffc857" stroke-width="5" stroke-linecap="round" class="rd-rays"><path d="M80 14v-8M80 106v8M38 56h-8M130 56h-8M50 26l-6-6M116 92l6 6M110 26l6-6M44 92l-6 6"/></g><path d="M118 20l10 18h-20z" fill="#ff6b6b"/><text x="118" y="35" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">!</text></svg><b>1 · Storm alert</b><span>Alarm or ground call</span></div>
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><rect x="86" y="46" width="58" height="52" rx="8" fill="#3b6cff" opacity=".8"/><rect x="104" y="64" width="22" height="34" rx="4" fill="#0a1a3f"/><g class="rd-walk"><circle cx="40" cy="62" r="9" fill="#fff"/><path d="M40 72v22M40 80l-12 12M40 80l12 10M40 94l-10 16M40 94l10 16" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/></g><path d="M60 100h20" stroke="#6fe3ff" stroke-width="4" stroke-linecap="round" stroke-dasharray="3 7" class="rd-dash"/></svg><b>2 · Go inside</b><span>Stop work outside</span></div>
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><rect x="22" y="14" width="116" height="92" rx="14" fill="none" stroke="#6fe3ff" stroke-width="5" class="rd-pulse"/><rect x="38" y="30" width="84" height="60" rx="9" fill="none" stroke="#3b6cff" stroke-width="4"/><circle cx="80" cy="56" r="9" fill="#fff"/><path d="M80 66v14M80 72l-9 8M80 72l9 8" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M110 40l10 10 16-18" stroke="#35d49a" stroke-width="5" fill="none" stroke-linecap="round" transform="translate(-24 6)"/></svg><b>3 · Safe room</b><span>Most shielded area</span></div>
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><path d="M80 100V56M62 100h36" stroke="#cfe3ff" stroke-width="5" stroke-linecap="round"/><circle cx="80" cy="50" r="7" fill="#ffc857"/><g fill="none" stroke="#6fe3ff" stroke-width="4" stroke-linecap="round"><path d="M64 36a22 22 0 0 1 0 28" class="rd-wave"/><path d="M96 36a22 22 0 0 0 0 28" class="rd-wave"/><path d="M54 28a34 34 0 0 1 0 44" class="rd-wave w2"/><path d="M106 28a34 34 0 0 0 0 44" class="rd-wave w2"/></g></svg><b>4 · Call ground</b><span>Tell how you feel</span></div>
-        </div>
-        <p class="mi-note">Stay in the safe room until the ground team says it is OK. Then log your dose. A storm can add a lot of dose in a few hours; NASA's limit for one storm is ${SPE_LIMIT} mSv. This is general guidance: follow your mission protocol.</p>
+        <h3>Solar storm</h3>
+        <p class="mi-note">The solar storm guide is now in the Emergency section.</p>
+        <div class="am-actions"><button type="button" class="am-btn" id="rdGoStorm">☀️ Open storm guide</button></div>
       </div>
 
       <div class="am-panel">
@@ -154,6 +160,7 @@
   }
 
   function bind(page) {
+    $("#rdGoStorm", page)?.addEventListener("click", () => { document.querySelector('.nav [data-action="emergency"]')?.click(); window.AstroMedEmergency && window.AstroMedEmergency.go("storm"); });
     $("#rdForm", page)?.addEventListener("submit", (e) => {
       e.preventDefault();
       const f = e.target, s = load();
@@ -189,5 +196,5 @@
     return out;
   }
 
-  window.AstroMedRadiation = { render, status, findings, LIMIT };
+  window.AstroMedRadiation = { render, status, findings, stormHtml, LIMIT };
 })();

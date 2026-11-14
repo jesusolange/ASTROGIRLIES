@@ -334,6 +334,7 @@
   /* ---------- public API ---------- */
   window.AstroMedEnv = {
     render,
+    comm: () => { try { const e = JSON.parse(localStorage.getItem("astromed-env")); return e && COMM[e.place] ? { place: e.place, ...COMM[e.place] } : null; } catch { return null; } },
     label,
     findings,
     FIELDS,
