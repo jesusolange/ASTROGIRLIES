@@ -5,7 +5,7 @@
 | # | Question | Default if no answer |
 |---|---|---|
 | D1 | Does readable source for the 3D astronaut and the PDF report exist on a teammate's machine? | T02 recovers the 3D source from the bundle; the PDF report stays a prebuilt bundle. |
-| D2 | Emergencies (ticket 7) is marked as a colleague's work. Build it here anyway? | Built here as T06 on `name15`; the colleague's version wins if it arrives. |
+| D2 | Resolved 14 Nov: the teammate pushed the doctor's Emergency guide (commit `1e536a5` on `origin/main`). T14 ports it into the Astro app; it replaces the generic first-aid text. | |
 | D3 | Medic content: Vision self-test thresholds (ticket 6) and the wording of the mental health urgent response (ticket 12). | Published screening basis (Amsler grid, near-vision card), labelled "screening aid, not a diagnosis"; placeholder wording kept in one constant. |
 | D4 | Push `name15` to GitHub and deploy it to Cloudflare Pages (issue 1)? The build settings changed: preset Astro, command `pnpm build`, output `dist`. | Not pushed, not deployed. |
 | D5 | Switch sign-in on for the public demo (issue 1)? It needs the D1 database id, the mail key and the site URL. | Left off. |
@@ -22,3 +22,5 @@
 | O5 | Radiation: the ISS rate is now about 0.7 mSv/day (731 µSv/day, DOSIS 3D, as quoted in Zhang et al. 2020) instead of 0.2 to 0.5; the worker could not open the two Science papers (paywall) to re-read 1.84 and 0.64 mSv/day. Someone with access should confirm the three figures. |
 | O1 | Confirm the Sketchfab URLs and licences for the brain and heart models (README credits). |
 | O2 | In Cloudflare Pages, change the build settings before the next deploy (see D4). |
+| O6 | The five images in the Emergency guide (`chest`, `drain`, `belly-rovsing`, `belly-murphy`, `dermatome`): where do they come from and under what licence? They need a line each in the references (ticket 13). |
+| O7 | `origin/main` and `name15` have diverged since the first commit: main has the Emergency guide on the old flat layout, name15 has everything else on Astro. After T14 the guide is on name15; main then needs to be replaced by name15 (a merge will conflict on every file). Decide who does that and when. |
