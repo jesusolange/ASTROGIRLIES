@@ -1,4 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
+// Importing the storage module guarantees window.AstroMedStore exists before any island reads it.
+import "../scripts/storage.js";
 
 const store = () => window.AstroMedStore.store;
 
