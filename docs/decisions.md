@@ -12,3 +12,4 @@ Newest last. The product decisions at the top of `docs/tickets.md` also apply.
 | 14 Nov 2026 | Default mission type is Mars planetary. | Matches the setting decision (long Moon or Mars mission). |
 | 14 Nov 2026 | Dependency: `astro` (MIT), dev only. | Build tool. |
 | 14 Nov 2026 | Ticket 16 (after submission) is not worked before the deadline. | Stated in the ticket. |
+| 14 Nov 2026 | The interface is written as Preact components mounted as Astro islands (`@astrojs/preact`, `preact`, `@preact/signals`; all MIT). Sections that build HTML from strings are converted. | Owner decision: use a real component library instead of home-made rendering; Astro stays as build and shell. |
