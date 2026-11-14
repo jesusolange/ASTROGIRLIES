@@ -1,0 +1,122 @@
+/* Mission risk map. Colours come only from the --am-* tokens. */
+
+.rk-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.rk-mission { min-width: min(340px, 100%); }
+
+.rk-now { display: grid; gap: 2px; padding-bottom: 4px; }
+.rk-now small { color: var(--am-text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.rk-now b { color: var(--am-text); font-size: 14px; }
+
+.rk-about p { margin: 0 0 10px; }
+.rk-about p:last-child { margin-bottom: 0; }
+.rk-about a { color: var(--am-accent); font-weight: 700; }
+
+.rk-note { color: var(--am-text-muted); font-size: 12px; }
+
+.rk-list { display: grid; gap: 12px; }
+
+.rk-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) minmax(250px, auto) minmax(140px, auto);
+  gap: 16px;
+  align-items: start;
+  padding: 16px 18px;
+  color: var(--am-text);
+  background: var(--am-surface);
+  border: 1px solid var(--am-border);
+  border-left: 4px solid var(--rk-tone, var(--am-border-strong));
+  border-radius: var(--am-radius-small);
+}
+
+.rk-row.green { --rk-tone: var(--am-ok); }
+.rk-row.yellow { --rk-tone: var(--am-warn); }
+.rk-row.red { --rk-tone: var(--am-danger); }
+
+.rk-rank {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  color: var(--am-text);
+  background: var(--am-surface-2);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rk-main h3 { margin: 0 0 4px; color: var(--am-text); font-size: 16px; line-height: 1.3; }
+.rk-title { margin: 0 0 8px; color: var(--am-text-muted); font-size: 12px; line-height: 1.5; }
+
+.rk-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; }
+.rk-meta a { color: var(--am-accent); font-weight: 700; }
+.rk-meta span { color: var(--am-text-muted); }
+
+.rk-ratings { display: grid; gap: 8px; }
+
+.rk-rate { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; }
+.rk-rate > span { min-width: 86px; color: var(--am-text-muted); }
+.rk-rate em {
+  flex-basis: 100%;
+  padding-left: 94px;
+  color: var(--am-text-muted);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.rk-chip {
+  padding: 2px 9px;
+  color: var(--am-text-muted);
+  border: 1px solid var(--am-border-strong);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rk-chip.green { color: var(--am-ok); border-color: var(--am-ok); }
+.rk-chip.yellow { color: var(--am-warn); border-color: var(--am-warn); }
+.rk-chip.red { color: var(--am-danger); border-color: var(--am-danger); }
+
+.rk-watch { align-self: center; }
+.rk-open { margin-top: 0; padding: 8px 14px; font-size: 12px; }
+.rk-unwatched { color: var(--am-warn); font-size: 12px; font-weight: 700; }
+.rk-area { color: var(--am-text-muted); font-size: 12px; font-weight: 700; }
+
+/* Environment: space-cruise icon, mission control and the risk-map link. */
+#environmentPage .env-place svg.env-place-icon { width: 52px; height: 52px; color: var(--am-accent); }
+#environmentPage .env-places { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+#environmentPage .env-mission { margin-bottom: 18px; }
+#environmentPage .env-mission .rk-mission { max-width: 440px; }
+
+.rk-linkbtn {
+  margin: 10px 0 0;
+  padding: 0;
+  color: var(--am-accent);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Profile: keep the primary and secondary buttons on one baseline. */
+.pf-actions .am-btn { margin-top: 0; }
+
+@media (max-width: 1180px) {
+  #environmentPage .env-places { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .rk-row { grid-template-columns: 32px minmax(0, 1fr); }
+  .rk-rank { grid-row: span 2; }
+  .rk-ratings, .rk-watch { grid-column: 2; }
+  #environmentPage .env-places { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

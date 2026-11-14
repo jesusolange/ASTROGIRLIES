@@ -2,7 +2,10 @@
    ASTROMED — ENVIRONMENT (where are you + cabin conditions)
    Educational prototype. Reference ranges are illustrative.
    Load AFTER astromed-sections.js
-============================================== */
+============================================= */
+
+import { currentMission } from "./risks.js";
+import { missionField, setMissionType } from "./riskmap.js";
 
 (function () {
   "use strict";
@@ -55,6 +58,18 @@
         "A one-way signal takes roughly 3 to 22 minutes, so you must decide many things on your own.",
         "Long isolation and dust storms can weigh on mood: use your Mental Health check-ins.",
         "Radiation is lower on the surface than in transit, but still above Earth levels."
+      ]
+    },
+    transit: {
+      name: "In transit", tag: "Deep space cruise", rad: 76.7,
+      icon: '<svg class="env-place-icon" viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="31" cy="35" r="6"/><ellipse cx="31" cy="35" rx="24" ry="9" transform="rotate(-28 31 35)"/><circle cx="54" cy="17" r="3"/><path d="M8 52l6-11 11-6"/></svg>',
+      // 1.84 mSv/day is the MSL RAD cruise measurement used in radiation.js; shown here in µSv/h.
+      demo: { temp: 22, pressure: 101.3, humidity: 45, co2: 2500, noise: 55, radiation: 76.7 },
+      facts: [
+        "Microgravity on the way to Mars unloads bones and muscles: keep your daily resistance and aerobic training.",
+        "Radiation is higher than in low Earth orbit: NASA's Curiosity rover measured about 1.84 mSv per day on the cruise to Mars (NASA/JPL, MSL RAD), which is the same figure shown in Radiation.",
+        "A one-way signal takes roughly 3 to 22 minutes, so you must decide many things on your own.",
+        "Months in a small crewed volume make sleep, privacy and crew check-ins as important as equipment."
       ]
     },
     other: {
@@ -142,6 +157,7 @@
   const log = () => { const l = read(LOG, []); return Array.isArray(l) ? l : []; };
   let draft = null; // unsaved form values
   let lastFindings = [];
+  let shownMission = null;
 
   function baselineRadiation(place) {
     const prev = log().filter((e) => e.place === place && Number.isFinite(e.readings?.radiation)).slice(0, 7).map((e) => e.readings.radiation);
@@ -179,7 +195,8 @@
     iss: { t: "Almost live", one: "< 1 s", rt: "about 1 s", bar: 6, tip: "You can talk with the ground team in real time. Short pauses can happen when a relay satellite changes." },
     rover: { t: "Depends on the planet", one: "Local radio: instant", rt: "To Earth: same as the Moon or Mars", bar: 40, tip: "Talk to your crewmates is live. The delay to Earth is the one of the planet you drive on." },
     moon: { t: "A short pause", one: "about 1.3 s", rt: "about 2.6 s", bar: 22, tip: "Conversation works, with a small pause after each sentence. Say “over” when you finish." },
-    mars: { t: "Long wait", one: "3 to 22 min", rt: "6 to 44 min", bar: 100, tip: "No live talk. Send complete messages (what, when, what you need), keep a list of questions, and decide routine things yourself. About every 2 years the Sun blocks the signal for around 2 weeks (solar conjunction)." }
+    mars: { t: "Long wait", one: "3 to 22 min", rt: "6 to 44 min", bar: 100, tip: "No live talk. Send complete messages (what, when, what you need), keep a list of questions, and decide routine things yourself. About every 2 years the Sun blocks the signal for around 2 weeks (solar conjunction)." },
+    transit: { t: "Long wait", one: "3 to 22 min", rt: "6 to 44 min", bar: 100, tip: "No live talk during the cruise. Send complete messages (what, when, what you need), keep a list of questions, and decide routine things yourself." }
   };
   function commCard(id) {
     const c = COMM[id]; if (!c) return "";
@@ -196,11 +213,21 @@
     const place = s.place;
     const p = place ? PLACES[place] : null;
     const values = draft || s.readings || {};
+    const mission = currentMission();
+    shownMission = mission.id;
 
     page.innerHTML = `
       <div class="am-heading">
         <h2>Environment</h2>
-        <p>Where are you right now? Your location and the air around you shape the risks I watch for, and they are used in your Overview and report.</p>
+        <p>Where are you right now? Your location and the air around you shape the risks the tool watches for, and they are used in Today and your protocols.</p>
+      </div>
+
+      <div class="am-panel env-mission">
+        <h3>Mission</h3>
+        <div class="rk-controls">
+          ${missionField(mission.id)}
+          <p class="rk-note">This mission sets the order of Mission risks and the risk warnings in the app.</p>
+        </div>
       </div>
 
       <div class="am-panel">
@@ -210,7 +237,7 @@
         </div>
         ${place === "other" ? `<label class="pg-field env-custom"><span>Name of your location</span><input type="text" id="envCustom" maxlength="40" placeholder="e.g. Lunar orbit station" value="${esc(s.custom || "")}"></label>` : ""}
         ${p ? commCard(place) : ""}
-        ${p ? `<div class="env-info"><div class="env-facts"><h4>Keep in mind in ${esc(label())}</h4><ul>${p.facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></div><div class="env-space" aria-hidden="true">${p.img ? `<img src="${p.img}" alt="">` : `<span class="env-space-emoji">${p.icon}</span>`}</div></div>` : `<p class="am-small">Pick a location to continue.</p>`}
+        ${p ? `<div class="env-info"><div class="env-facts"><h4>Keep in mind in ${esc(label())}</h4><ul>${p.facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul><button type="button" class="rk-linkbtn" data-riskmap>Mission risks for this location</button></div><div class="env-space" aria-hidden="true">${p.img ? `<img src="${p.img}" alt="">` : `<span class="env-space-emoji">${p.icon}</span>`}</div></div>` : `<p class="am-small">Pick a location to continue.</p>`}
       </div>
 
       ${p ? `<div class="am-panel">
@@ -241,6 +268,9 @@
     }));
     const custom = $("#envCustom");
     if (custom) custom.addEventListener("input", () => { write(KEY, { ...state(), custom: custom.value }); });
+    const missionSelect = page.querySelector("[data-mission-select]");
+    if (missionSelect) missionSelect.addEventListener("change", () => setMissionType(missionSelect.value));
+    page.querySelector("[data-riskmap]")?.addEventListener("click", () => window.AstroMedNav.show("riskmap"));
     const form = $("#envForm");
     if (form) {
       form.addEventListener("submit", (e) => { e.preventDefault(); save(); });
@@ -330,6 +360,11 @@
   }
   function closePopup() { document.querySelector(".env-pop")?.remove(); }
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePopup(); });
+
+  document.addEventListener("astromed-profile-changed", () => {
+    const page = $("#environmentPage");
+    if (page && !page.hidden && currentMission().id !== shownMission) render();
+  });
 
   /* ---------- public API ---------- */
   window.AstroMedEnv = {

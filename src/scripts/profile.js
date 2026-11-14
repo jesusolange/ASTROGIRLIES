@@ -2,7 +2,9 @@
    ASTROMED — ASTRONAUT PROFILE (name, mission day, body data)
    Stored in this browser only (localStorage "astromed-profile").
    Load BEFORE astromed-sections.js
-============================================== */
+============================================= */
+
+import { MISSION_TYPES, DEFAULT_MISSION } from "./risks.js";
 
 (function () {
   "use strict";
@@ -48,6 +50,8 @@
     close();
     const p = read() || {};
     const today = missionDay();
+    const mission = p.missionType || DEFAULT_MISSION;
+    const sex = p.sex === "f" || p.sex === "m" ? p.sex : "x";
     const wrap = document.createElement("div");
     wrap.className = "env-pop pf-wrap";
     wrap.setAttribute("role", "dialog");
@@ -60,11 +64,14 @@
         <label class="pf-f pf-wide"><span>Name</span><input name="name" type="text" maxlength="40" required placeholder="e.g. Solange Quijano" value="${esc(p.name || "")}"></label>
         <label class="pf-f"><span>Today is mission day</span><input name="day" type="number" min="1" max="2000" step="1" required value="${today || 1}"></label>
         <label class="pf-f"><span>Mission length (days)</span><input name="total" type="number" min="1" max="3000" step="1" required value="${total()}"></label>
+        <label class="pf-f pf-wide"><span>Mission type</span><select name="missionType">${MISSION_TYPES.map((m) => `<option value="${m.id}"${m.id === mission ? " selected" : ""}>${esc(m.label)}</option>`).join("")}</select></label>
+        <label class="pf-f"><span>Destination</span><input name="destination" type="text" maxlength="40" list="pfDestinations" placeholder="e.g. Mars" value="${esc(p.destination || "")}"></label>
         <label class="pf-f"><span>Age (years)</span><input name="age" type="number" min="18" max="80" step="1" value="${p.age ?? ""}"></label>
-        <label class="pf-f"><span>Sex</span><select name="sex"><option value="">Select</option><option value="f" ${p.sex === "f" ? "selected" : ""}>Female</option><option value="m" ${p.sex === "m" ? "selected" : ""}>Male</option></select></label>
+        <label class="pf-f"><span>Sex used for energy calculation</span><select name="sex"><option value="f" ${sex === "f" ? "selected" : ""}>Female</option><option value="m" ${sex === "m" ? "selected" : ""}>Male</option><option value="x" ${sex === "x" ? "selected" : ""}>Prefer not to say</option></select></label>
         <label class="pf-f"><span>Weight (kg)</span><input name="weight" type="number" min="30" max="200" step="0.1" value="${p.weightKg ?? ""}"></label>
-        <label class="pf-f"><span>Height (cm)</span><input name="height" type="number" min="120" max="230" step="0.5" value="${p.heightCm ?? ""}"></label>
-        <p class="pf-note pf-wide">Age, sex, weight and height are optional. Nutrition uses them to set your food goals.</p>
+        <label class="pf-f"><span>Height (cm)</span><input name="height" type="number" min="100" max="230" step="0.5" value="${p.heightCm ?? ""}"></label>
+        <datalist id="pfDestinations"><option value="Moon"></option><option value="Mars"></option><option value="Low Earth orbit"></option></datalist>
+        <p class="pf-note pf-wide">Age, sex used for energy calculation, weight and height are optional. Nutrition uses them to set your food goals.</p>
         <div class="pf-actions pf-wide">
           <button type="submit" class="am-btn">Save profile</button>
           <button type="button" class="am-btn am-btn-soft" id="pfCancel">${first ? "Later" : "Cancel"}</button>
@@ -86,9 +93,12 @@
       const start = new Date(); start.setDate(start.getDate() - (d - 1));
       const num = (x) => (x === "" || x == null ? null : Number(x));
       write({
+        ...(read() || {}),
         name: v.name.trim(),
         startDate: isoDay(start),
         totalDays: Math.max(1, parseInt(v.total, 10) || 365),
+        missionType: v.missionType || DEFAULT_MISSION,
+        destination: (v.destination || "").trim() || null,
         age: num(v.age), sex: v.sex || null, weightKg: num(v.weight), heightCm: num(v.height)
       });
       close();
