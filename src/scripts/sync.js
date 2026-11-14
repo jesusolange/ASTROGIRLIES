@@ -2,10 +2,8 @@
    ASTROMED — OPTIONAL ACCOUNT + SYNC
    The app is local-first: it works offline and without signing in.
    Signing in (email magic link) only adds a server copy of your data.
-   Load AFTER astromed-storage.js.
 ============================================== */
-(function (root) {
-  "use strict";
+const account = (function (root) {
 
   // Decide what to do with one local copy and one server copy.
   // local: { dirty, modifiedAt }; remote: { updatedAt } | null; lastRemote: server stamp seen at last sync (null = never).
@@ -20,7 +18,7 @@
   }
 
   const api = { decide };
-  if (typeof module !== "undefined" && module.exports) { module.exports = api; return; }
+  if (typeof window === "undefined") return api;
 
   const store = root.AstroMedStore && root.AstroMedStore.store;
   const LS = { session: "am-session", lastRemote: "am-last-remote", dirty: "am-dirty" };
@@ -164,4 +162,7 @@
 
   api.sync = sync; api.signOut = signOut; api.renderAccount = renderAccount; api.session = session;
   root.AstroMedSync = api;
+  return api;
 })(typeof window !== "undefined" ? window : globalThis);
+
+export const { decide } = account;

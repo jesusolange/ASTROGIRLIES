@@ -277,5 +277,5 @@
     if (e.target.closest("#saveData")) setTimeout(sync, 120);
   });
   const boot = () => { if (window.AstroMedData) sync(); };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+  document.addEventListener("DOMContentLoaded", boot);
 })();

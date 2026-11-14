@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { decide } = require("../astromed-sync.js");
+const { decide } = require("../src/scripts/sync.js");
 
 // local: { dirty, modifiedAt }, remote: { updatedAt } | null, lastRemote: updatedAt seen at last sync (null = never)
 test("nothing to do when neither side changed", () => {

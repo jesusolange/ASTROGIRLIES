@@ -136,6 +136,5 @@
 
   window.AstroMedProfile = { get, missionDay, dayOf, total, name, dayLabel, open: () => open(false), apply };
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  document.addEventListener("DOMContentLoaded", init);
 })();

@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const Store = require("../astromed-storage.js");
+const Store = require("../src/scripts/storage.js");
 
 const fake = (init = {}) => {
   const m = new Map(Object.entries(init));

@@ -1,5 +1,13 @@
 {
   "name": "astromed",
   "private": true,
-  "scripts": { "test": "node --test test/astromed-storage.test.js test/server-core.test.js test/sync-decide.test.js" }
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node --test test/astromed-storage.test.js test/server-core.test.js test/sync-decide.test.js"
+  },
+  "devDependencies": {
+    "astro": "^7.4.11"
+  }
 }

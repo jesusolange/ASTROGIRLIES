@@ -56,7 +56,7 @@
         rgba(4, 12, 36, 0.12),
         rgba(4, 12, 36, 0.22)
       ),
-      url("assets/space-background.jpg");
+      url("/assets/space-background.jpg");
   
     background-position: center;
     background-size: cover;

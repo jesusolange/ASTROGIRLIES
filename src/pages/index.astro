@@ -1,3 +1,8 @@
+---
+import "../styles/style.css";
+import "../styles/sections.css";
+import "../styles/dark.css";
+---
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,9 +13,6 @@
 
   <title>AstroMed · Space Medical Assistant</title>
 
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="astromed-sections.css">
-  <link rel="stylesheet" href="astromed-dark.css">
 </head>
 
 <body>
@@ -1047,23 +1049,13 @@
        JAVASCRIPT
   ========================================== -->
 
-  <script src="astromed-storage.js"></script>
-  <script src="astromed-sync.js"></script>
-  <script src="script.js"></script>
-  <script src="exercise.js"></script>
-  <script src="health-indicators.js"></script>
-  <script src="exercise-overview.js"></script>
-  <script src="astromed-cover.js"></script>
-  <script src="astromed-profile.js"></script>
-  <script src="astromed-sections.js"></script>
-  <script src="astromed-environment.js"></script>
-  <script src="astromed-nutrition.js"></script>
-  <script src="astromed-missions.js"></script>
-  <script src="astromed-radiation.js"></script>
-  <script src="astromed-progress.js"></script>
-  <script src="astromed-readiness.js"></script>
-  <script src="astromed-pro.js"></script>
-  <script src="astronaut3d.js"></script>
+  <script>
+    import "../scripts/main.js";
+  </script>
+
+  <!-- Prebuilt bundles without source (PDF report, 3D astronaut). Deferred so they run after the module entry. -->
+  <script is:inline defer src="/legacy/astromed-pro.js"></script>
+  <script is:inline defer src="/legacy/astronaut3d.js"></script>
 
 </body>
 </html>

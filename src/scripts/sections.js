@@ -703,8 +703,4 @@ function astromedSectionsInit() {
 
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", astromedSectionsInit);
-} else {
-  astromedSectionsInit();
-}
+document.addEventListener("DOMContentLoaded", astromedSectionsInit);

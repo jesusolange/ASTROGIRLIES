@@ -1,11 +1,9 @@
 /* ==============================================
    ASTROMED — STORAGE
    One place for reading, writing, exporting and importing saved data.
-   Load BEFORE the other astromed-* scripts.
    Migrations: migrations[n](data) upgrades data from version n-1 to n.
 ============================================== */
-(function (root) {
-  "use strict";
+const storage = (function (root) {
   const VERSION = 1;
   const APP = "astromed";
   const isAppKey = (k) => /^(astromed|astrotwin)-/.test(k);
@@ -86,11 +84,13 @@
   }
 
   const api = { VERSION, create, memoryStorage };
-  if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else {
+  if (typeof window !== "undefined") {
     let backend;
     try { backend = root.localStorage; backend.getItem("astromed-probe"); } catch { backend = memoryStorage(); }
     api.store = create(backend, { migrations: {} });
     root.AstroMedStore = api;
   }
+  return api;
 })(typeof window !== "undefined" ? window : globalThis);
+
+export const { VERSION, create, memoryStorage } = storage;

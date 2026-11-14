@@ -1,12 +1,12 @@
 # AstroMed (ASTROGIRLIES)
 
-NASA International Space Apps Challenge submission. AstroMed is a self-monitoring health dashboard for astronauts: a 3D body scan, a guided daily checkup, exercise, mental health, nutrition, radiation, environment and readiness tracking, and a printable health report.
+> NASA International Space Apps Challenge submission. AstroMed is a self-monitoring health dashboard for astronauts: a 3D body scan, a guided daily checkup, exercise, mental health, nutrition, radiation, environment and readiness tracking, and a printable health report.
 
 **Live site:** _add the public URL here once deployed (see issue #1)._
 
 ## Challenge
 
-_Add the exact challenge name from the Space Apps challenge page here._ The app lets a crew member monitor their own health on a long mission, without relying on a ground connection.
+"Create Health Monitoring Software for Astronauts on Space Missions"
 
 ## What the app does
 
@@ -20,15 +20,25 @@ Readiness weights and bands are design choices of this prototype, not NASA value
 
 ## Running it
 
-There is no build step and no server. Open `index.html` in a browser, or serve the folder with any static host.
+The app is built with [Astro](https://astro.build). It no longer opens by double-clicking a file: it needs the dev server, or a build served over HTTP. You need Node 22 or newer and pnpm.
 
 ```bash
-python -m http.server 8000
+pnpm install
+pnpm dev        # http://localhost:4321, reloads on save
 ```
+
+To produce and check the static site that gets deployed:
+
+```bash
+pnpm build      # writes dist/
+pnpm preview    # serves dist/
+```
+
+Layout: `src/pages/index.astro` is the page, `src/scripts/` holds one module per section (entry: `main.js`), `src/styles/` the stylesheets, `public/` the images and 3D models, `functions/` the optional server.
 
 ### Deploying (Cloudflare Pages)
 
-Create a Pages project from this repo (private repos work). Framework preset: none. Build command: empty. Build output directory: `/`. Then open the `*.pages.dev` URL in a private window to confirm it loads with no login.
+Create a Pages project from this repo (private repos work). Framework preset: Astro. Build command: `pnpm build`. Build output directory: `dist`. Then open the `*.pages.dev` URL in a private window to confirm it loads with no login.
 
 ### Optional accounts and sync
 
@@ -50,10 +60,12 @@ Without the `DB` binding the sign-in section shows an error and everything else 
 ### Tests
 
 ```bash
-npm test
+pnpm test
 ```
 
-All data is stored in your browser (`localStorage`) and never sent to a server. Use **Settings > Export / Import my data** to back up or move a record.
+`node tools/shot.mjs --url http://localhost:4321/ --out shot.png` loads a page in headless Chrome, saves a screenshot and lists console errors and failed requests.
+
+Data is stored in your browser (`localStorage`) and stays on the device unless you choose to sign in. Use **Settings > Export / Import my data** to back up or move a record.
 
 ## Data sources
 
@@ -74,4 +86,4 @@ _List the NASA standards and reference documents the thresholds come from here (
 
 Brain and heart credits come from `LEEME.txt`; their model files carry no embedded license data, so confirm the Sketchfab URLs before submitting.
 
-Other resources: image assets in `assets/` (ARED, CEVIS, T2, organ and environment images), PDF generation library bundled in `astromed-pro.js`, and the 3D engine bundled in `astronaut3d.js`. _Confirm the names, licenses and sources of these before submitting._
+Other resources: image assets in `assets/` (ARED, CEVIS, T2, organ and environment images), PDF generation library bundled in `public/legacy/astromed-pro.js`, and the 3D engine bundled in `public/legacy/astronaut3d.js`. _Confirm the names, licenses and sources of these before submitting._
