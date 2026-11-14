@@ -1,0 +1,12 @@
+same: vitals
+same: gcs
+same: breath
+same: belly
+same: back
+same: calf
+same: fever
+same: storm
+same: bone
+same: anemia
+
+all doctor cards match word for word

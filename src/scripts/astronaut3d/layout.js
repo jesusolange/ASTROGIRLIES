@@ -6,7 +6,7 @@ export const PART_ORDER = [
   { id: "lungs", label: "Lungs", focusHeight: 2.64, zoom: 2.1 },
   { id: "heart", label: "Heart", focusHeight: 2.58, zoom: 1.7 },
   { id: "kidneys", label: "Kidneys", focusHeight: 2.3, zoom: 1.7 },
-  { id: "hand", label: "Pulse", focusHeight: 2.1, zoom: 1.8 },
+  { id: "hand", label: "Temp & glucose", focusHeight: 2.1, zoom: 1.8 },
   { id: "bones", label: "Bones", focusHeight: 1.9, zoom: 6.4 },
   { id: "muscles", label: "Muscles", focusHeight: 1.9, zoom: 6.4 },
 ];

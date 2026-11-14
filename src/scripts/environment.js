@@ -369,6 +369,7 @@ import { missionField, setMissionType } from "./riskmap.js";
   /* ---------- public API ---------- */
   window.AstroMedEnv = {
     render,
+    comm: () => { const s = read(KEY, null); return s && COMM[s.place] ? { place: s.place, ...COMM[s.place] } : null; },
     label,
     findings,
     FIELDS,

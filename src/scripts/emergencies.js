@@ -1,124 +1,92 @@
-import "../styles/emergencies.css";
-import { SITUATIONS, situationById } from "../data/emergencies.js";
+import { signal } from "@preact/signals";
+import { resolveCardId, situations as listSituations } from "../data/emergencies.js";
 
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const NORMAL = { pulse: [60, 100], resp: [12, 18], spo2: [95, 100] };
+const NTX = [
+  { min: 21, max: 83, label: "Men" },
+  { min: 17, max: 94, label: "Women before menopause" },
+  { min: 36, max: 124, label: "Women after menopause" },
+];
 
-let selectedId = null;
-let openRequested = null;
+export const openCard = signal(null);
 
-function listHtml() {
-  return `
-    <div class="am-heading">
-      <h2>Emergencies</h2>
-      <p>Choose what is happening to you. Each situation shows what to do now, what to prepare, and when to wake the crew medical officer.</p>
-    </div>
-
-    <div class="am-panel em-intro">
-      <p>This is first-response guidance for a crew member without immediate ground support. It is not a diagnosis.</p>
-      <p class="am-small">If you are unsure, wake the crew medical officer. On a mission there is no emergency service to call.</p>
-    </div>
-
-    <div class="em-list" role="list">
-      ${SITUATIONS.map((s) => `
-        <button type="button" class="em-situation" role="listitem" data-emergency="${s.id}">
-          <b>${esc(s.title)}</b>
-          <span>${esc(s.hint)}</span>
-        </button>`).join("")}
-    </div>`;
+export function gcsScore(picks) {
+  const picked = picks.filter(Boolean).length;
+  if (picked < 3) return { picked, total: null, level: null, message: `Picked ${picked} of 3 columns.` };
+  const total = picks[0] + picks[1] + picks[2];
+  if (total >= 13) return { picked, total, level: "ok", message: "Mild or normal. Keep watching." };
+  if (total >= 9) return { picked, total, level: "mid", message: "Moderate drop in awareness. Call the flight surgeon now." };
+  return { picked, total, level: "bad", message: "Severe drop in awareness (8 or less). Life-threatening. Call the flight surgeon now." };
 }
 
-function detailHtml(s) {
-  const source = s.source
-    ? `<p class="em-source">Source: <a href="${esc(s.source.url)}" target="_blank" rel="noopener noreferrer">${esc(s.source.name)}</a></p>`
-    : `<p class="em-source em-design"><b>Design choice.</b> These are generic first-aid steps. They are not taken from a specific clinical guideline, so follow your mission protocol and the crew medical officer.</p>`;
-
-  return `
-    <div class="em-detail-head">
-      <button type="button" class="em-back" data-emergency-back>All situations</button>
-      <h2>${esc(s.title)}</h2>
-      <p>${esc(s.hint)}</p>
-    </div>
-
-    <div class="am-panel em-now">
-      <h3>Do this now</h3>
-      <ol class="em-steps">
-        ${s.steps.map((step) => `<li>${esc(step)}</li>`).join("")}
-      </ol>
-    </div>
-
-    <div class="am-panel em-prepare">
-      <h3>What to prepare</h3>
-      <ul>
-        ${s.prepare.map((item) => `<li>${esc(item)}</li>`).join("")}
-      </ul>
-    </div>
-
-    <div class="am-panel em-escalate">
-      <h3>Wake or call the crew medical officer if</h3>
-      <ul>
-        ${s.escalate.map((item) => `<li>${esc(item)}</li>`).join("")}
-      </ul>
-      <p class="am-small">When contact with Earth exists, the crew medical officer also informs the flight surgeon.</p>
-    </div>
-
-    ${source}
-    <p class="em-disclaimer am-small">This is first-response guidance for a crew member without immediate ground support, not a diagnosis.</p>`;
+export function shockIndex(pulse, systolic) {
+  return pulse && systolic ? pulse / systolic : null;
 }
 
-function bind(page) {
-  page.querySelectorAll("[data-emergency]").forEach((button) => {
-    button.addEventListener("click", () => {
-      selectedId = button.dataset.emergency;
-      render(page);
-    });
-  });
-  page.querySelector("[data-emergency-back]")?.addEventListener("click", () => {
-    selectedId = null;
-    render(page);
-  });
-}
-
-function render(page) {
-  const target = page || document.getElementById("emergenciesPage");
-  if (!target) return;
-  const situation = selectedId ? situationById(selectedId) : null;
-  target.innerHTML = situation ? detailHtml(situation) : listHtml();
-  bind(target);
-  window.scrollTo({ top: 0 });
-}
-
-function open(situationId) {
-  if (!situationById(situationId)) return false;
-  selectedId = situationId;
-  openRequested = situationId;
-  if (window.AstroMedNav) window.AstroMedNav.show("emergencies");
-  else {
-    openRequested = null;
-    render(document.getElementById("emergenciesPage"));
+export function vitalChips(values) {
+  const chips = [];
+  const range = (key, name, unit) => {
+    if (values[key] == null) return;
+    const [low, high] = NORMAL[key];
+    const label = values[key] < low ? "low" : values[key] > high ? "high" : "normal";
+    chips.push({ text: `${name}: ${values[key]} ${unit} · ${label}`, tone: label === "normal" ? "ok" : "bad" });
+  };
+  range("pulse", "Pulse", "/min");
+  range("resp", "Breathing", "/min");
+  range("spo2", "SpO₂", "%");
+  if (values.temp != null) {
+    const fever = values.temp >= 38.5;
+    chips.push({ text: `Temperature: ${values.temp} °C · ${fever ? "fever" : "no fever"}`, tone: fever ? "bad" : "ok" });
   }
-  return true;
+  const index = shockIndex(values.pulse, values.sys);
+  if (index != null) chips.push({ text: `Shock index: ${index.toFixed(2)} (pulse ÷ top pressure)`, tone: "info" });
+  return chips;
 }
 
-function situations() {
-  return SITUATIONS.map(({ id, title }) => ({ id, title }));
+export function ntxRange(profile) {
+  const p = profile || {};
+  if (p.sex === "m") return NTX[0];
+  if (p.sex === "f") return p.meno === "post" ? NTX[2] : NTX[1];
+  return NTX[1];
 }
 
-function findings() {
+export function ntxStatus(value, profile) {
+  const range = ntxRange(profile);
+  const tone = value > range.max ? "bad" : value < range.min ? "mid" : "ok";
+  const state = tone === "bad" ? "high" : tone === "mid" ? "low" : "in range";
+  return {
+    tone,
+    text: `${value}: ${state} for ${range.label.toLowerCase()} (${range.min}–${range.max})`,
+    needSex: !(profile && profile.sex),
+  };
+}
+
+export function situations() {
+  return listSituations();
+}
+
+export function findings() {
   return [];
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (!window.AstroMedNav) return;
-  window.AstroMedNav.register({
-    id: "emergencies",
-    label: "Emergencies",
-    before: "environment",
-    render: (page) => {
-      // A sidebar or external show opens the list; open(id) asks for one situation.
-      selectedId = openRequested;
-      openRequested = null;
-      render(page);
-    },
+export function open(id) {
+  const resolved = resolveCardId(id);
+  if (!resolved) return false;
+  openCard.value = resolved;
+  if (window.AstroMedNav) window.AstroMedNav.show("emergencies");
+  return true;
+}
+
+function registerNav() {
+  if (!window.AstroMedNav) return false;
+  window.AstroMedNav.register({ id: "emergencies", label: "Emergencies", before: "environment" });
+  return true;
+}
+
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    window.AstroMedEmergencies = { open, situations, findings };
+    if (registerNav()) return;
+    const timer = setInterval(() => { if (registerNav()) clearInterval(timer); }, 20);
   });
-  window.AstroMedEmergencies = { open, situations, findings };
-});
+}

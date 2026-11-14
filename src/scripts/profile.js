@@ -68,6 +68,7 @@ import { MISSION_TYPES, DEFAULT_MISSION } from "./risks.js";
         <label class="pf-f"><span>Destination</span><input name="destination" type="text" maxlength="40" list="pfDestinations" placeholder="e.g. Mars" value="${esc(p.destination || "")}"></label>
         <label class="pf-f"><span>Age (years)</span><input name="age" type="number" min="18" max="80" step="1" value="${p.age ?? ""}"></label>
         <label class="pf-f"><span>Sex used for energy calculation</span><select name="sex"><option value="f" ${sex === "f" ? "selected" : ""}>Female</option><option value="m" ${sex === "m" ? "selected" : ""}>Male</option><option value="x" ${sex === "x" ? "selected" : ""}>Prefer not to say</option></select></label>
+        <label class="pf-f"><span>Menopause (women)</span><select name="meno"><option value="">Not set</option><option value="pre" ${p.meno === "pre" ? "selected" : ""}>Not yet</option><option value="post" ${p.meno === "post" ? "selected" : ""}>Yes, after</option></select></label>
         <label class="pf-f"><span>Weight (kg)</span><input name="weight" type="number" min="30" max="200" step="0.1" value="${p.weightKg ?? ""}"></label>
         <label class="pf-f"><span>Height (cm)</span><input name="height" type="number" min="100" max="230" step="0.5" value="${p.heightCm ?? ""}"></label>
         <datalist id="pfDestinations"><option value="Moon"></option><option value="Mars"></option><option value="Low Earth orbit"></option></datalist>
@@ -99,7 +100,7 @@ import { MISSION_TYPES, DEFAULT_MISSION } from "./risks.js";
         totalDays: Math.max(1, parseInt(v.total, 10) || 365),
         missionType: v.missionType || DEFAULT_MISSION,
         destination: (v.destination || "").trim() || null,
-        age: num(v.age), sex: v.sex || null, weightKg: num(v.weight), heightCm: num(v.height)
+        age: num(v.age), sex: v.sex || null, meno: v.meno || null, weightKg: num(v.weight), heightCm: num(v.height)
       });
       close();
       apply();

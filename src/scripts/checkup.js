@@ -80,7 +80,8 @@
 
       fields: [
         { key: "bmd", label: "Reference BMD", unit: "g/cm²", value: 1.12, min: 0, max: 3, step: 0.01 },
-        { key: "exercise", label: "Resistance exercise", unit: "min", value: 45, min: 0, max: 240, step: 1 }
+        { key: "exercise", label: "Resistance exercise", unit: "min", value: 45, min: 0, max: 240, step: 1 },
+        { key: "ntx", label: "N-telopeptide (urine)", unit: "nmol/mmol creat.", value: 50, min: 0, max: 400, step: 1 }
       ],
 
       trendKey: "exercise",
@@ -157,6 +158,7 @@ kidneys: {
 
       fields: [
         { key: "sleep", label: "Sleep duration", unit: "h", value: 7.2, min: 0, max: 24, step: 0.1 },
+        { key: "deepSleep", label: "Deep sleep (1 to 4)", unit: "/4", value: 3, min: 1, max: 4, step: 1 },
         { key: "reaction", label: "Reaction time", unit: "ms", value: 285, min: 0, max: 3000, step: 1 },
         { key: "mood", label: "Mood (self-report)", unit: "/10", value: 7, min: 1, max: 10, step: 1 }
       ],
@@ -167,67 +169,24 @@ kidneys: {
     },
 
     hand: {
-      label: "Pulse & Wearables",
-      title: "Peripheral Pulse",
-      sub: "Pulse · SpO₂ · Temperature · Blood glucose",
+      label: "Temperature & Glucose",
+      title: "Temperature & Glucose",
+      sub: "Skin temperature · Body temperature · Blood glucose",
       symbol: "◉",
 
       description:
         "Potential data from hand or finger wearables, subject to sensor " +
-        "availability and verification.",
+        "availability and verification. Pulse is measured in the heart step.",
 
-      
-fields: [
-  {
-    key: "pulse",
-    label: "Pulse",
-    unit: "bpm",
-    value: 78,
-    min: 0,
-    max: 250,
-    step: 1
-  },
-  {
-    key: "spo2",
-    label: "SpO₂",
-    unit: "%",
-    value: 98,
-    min: 0,
-    max: 100,
-    step: 1
-  },
-  {
-    key: "skin",
-    label: "Skin temperature",
-    unit: "°C",
-    value: 33.1,
-    min: 0,
-    max: 50,
-    step: 0.1
-  },
-  {
-    key: "bodyTemp",
-    label: "Oral body temperature",
-    unit: "°C",
-    value: 36.8,
-    min: 32,
-    max: 43,
-    step: 0.1
-  },
-  {
-    key: "glucose",
-    label: "Blood glucose",
-    unit: "mg/dL",
-    value: 92,
-    min: 20,
-    max: 600,
-    step: 1
-  }
-],
+      fields: [
+        { key: "skin", label: "Skin temperature", unit: "°C", value: 33.1, min: 0, max: 50, step: 0.1 },
+        { key: "bodyTemp", label: "Oral body temperature", unit: "°C", value: 36.8, min: 32, max: 43, step: 0.1 },
+        { key: "glucose", label: "Blood glucose", unit: "mg/dL", value: 92, min: 20, max: 600, step: 1 }
+      ],
 
-      trendKey: "pulse",
-      trendLabel: "Pulse",
-      trend: [75, 77, 82, 79, 84, 78, 78]
+      trendKey: "bodyTemp",
+      trendLabel: "Body temperature",
+      trend: [36.6, 36.8, 36.7, 36.9, 36.8, 36.7, 36.8]
     },
 
     muscles: {
