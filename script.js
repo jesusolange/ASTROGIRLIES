@@ -1299,6 +1299,54 @@ fields: [
 
     content.appendChild(clearButton);
 
+    const store = window.AstroMedStore && window.AstroMedStore.store;
+
+    if (store) {
+      const dataBox = document.createElement("div");
+      dataBox.style.marginTop = "16px";
+      dataBox.innerHTML = "<p>Back up your data to one file, or restore it on another device. Restoring replaces the data saved in this browser.</p>";
+
+      const exportButton = document.createElement("button");
+      exportButton.className = "btn btn-soft";
+      exportButton.textContent = "Export my data";
+      exportButton.addEventListener("click", () => {
+        const blob = new Blob([JSON.stringify(store.exportAll(), null, 2)], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "astromed-data-" + new Date().toISOString().slice(0, 10) + ".json";
+        link.click();
+        URL.revokeObjectURL(link.href);
+        showToast("Data exported");
+      });
+
+      const importInput = document.createElement("input");
+      importInput.type = "file";
+      importInput.accept = "application/json,.json";
+      importInput.hidden = true;
+      importInput.addEventListener("change", async () => {
+        const file = importInput.files[0];
+        importInput.value = "";
+        if (!file) return;
+        try {
+          if (!confirm("Replace all data saved in this browser with the file?")) return;
+          const count = store.importAll(await file.text());
+          showToast("Imported " + count + " items. Reloading...");
+          setTimeout(() => location.reload(), 800);
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+
+      const importButton = document.createElement("button");
+      importButton.className = "btn btn-soft";
+      importButton.style.marginLeft = "8px";
+      importButton.textContent = "Import data";
+      importButton.addEventListener("click", () => importInput.click());
+
+      dataBox.append(exportButton, importButton, importInput);
+      content.appendChild(dataBox);
+    }
+
     openModal(
       "Prototype settings",
       content
