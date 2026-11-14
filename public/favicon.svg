@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="AstroMed">
+  <rect width="32" height="32" rx="7" fill="#0a1634"/>
+  <circle cx="16" cy="16" r="9.5" fill="none" stroke="#6fe3ff" stroke-width="2" opacity="0.6"/>
+  <path d="M16 10.5v11M10.5 16h11" stroke="#e9f2ff" stroke-width="3.4" stroke-linecap="round"/>
+</svg>
