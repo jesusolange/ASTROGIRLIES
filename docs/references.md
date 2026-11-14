@@ -68,6 +68,15 @@ confirmed before submission.
 | Human Brain | AH | Sketchfab (URL to confirm) | CC BY 4.0 |
 | Human Heart | TinkerLane Studio | Sketchfab (URL to confirm) | CC BY 4.0 |
 
+## Authored by the team
+
+| File | Title | Author | Licence |
+|---|---|---|---|
+| `public/icons/icon.svg` | AstroMed app icon, vector source | AstroGirlies team | Project |
+| `public/icons/icon-192.png` | AstroMed app icon, 192 px | AstroGirlies team | Project |
+| `public/icons/icon-512.png` | AstroMed app icon, 512 px | AstroGirlies team | Project |
+| `public/favicon.svg` | AstroMed favicon | AstroGirlies team | Project |
+
 ## Fonts and libraries
 
 No web fonts are bundled: the app uses the system UI font stack, so it works offline with no font
