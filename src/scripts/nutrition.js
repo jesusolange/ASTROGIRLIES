@@ -41,18 +41,19 @@
   function targets(prof, evaHours, af) {
     if (!prof || !prof.age || !prof.sex || !prof.weightKg || !prof.heightCm) return null;
     const kg = prof.weightKg, m = prof.heightCm / 100, age = prof.age;
-    const eer = prof.sex === "m"
-      ? 662 - 9.53 * age + af * (15.9 * kg + 539.6 * m)
-      : 354 - 6.91 * age + af * (9.36 * kg + 726 * m);
-    const kcal = eer + 200 * (evaHours || 0);
+    const male = 662 - 9.53 * age + af * (15.9 * kg + 539.6 * m);
+    const female = 354 - 6.91 * age + af * (9.36 * kg + 726 * m);
+    // "Prefer not to say" (anything other than m or f) uses the average of the two formulas.
+    const pick = (forMale, forFemale) => (prof.sex === "m" ? forMale : prof.sex === "f" ? forFemale : (forMale + forFemale) / 2);
+    const kcal = pick(male, female) + 200 * (evaHours || 0);
     return {
       bmi: kg / (m * m), kcal,
       protein: [1.2 * kg, 1.8 * kg],
       carbs: [kcal * 0.45 / 4, kcal * 0.65 / 4],
       fat: [kcal * 0.20 / 9, kcal * 0.35 / 9],
-      fiber: prof.sex === "m" ? 38 : 25,
+      fiber: pick(38, 25),
       sodiumMax: 2300,
-      fluid: Math.max(32 * kg, prof.sex === "m" ? 2500 : 2100),
+      fluid: Math.max(32 * kg, pick(2500, 2100)),
       veg: 400,
       evaKcal: 200 * (evaHours || 0)
     };

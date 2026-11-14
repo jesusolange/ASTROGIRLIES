@@ -262,7 +262,7 @@ function astromedSectionsInit() {
     const navEl = $(".nav");
     navEl.insertBefore(button, (before && $(`.nav button[data-action="${before}"]`)) || $(".nav-foot", navEl));
   }
-  window.AstroMedNav = { register, show, current: () => current };
+  window.AstroMedNav = { register, show, has: (id) => Boolean(PAGES[id]), current: () => current };
 
   document.addEventListener("click", e => {
     const b = e.target.closest(".ov-ready");
