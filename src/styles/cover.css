@@ -4,13 +4,19 @@
   z-index: 100000;
   display: grid;
   align-items: center;
-  overflow: auto;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
   padding: clamp(24px, 6vw, 96px);
   background: var(--am-bg);
   color: var(--am-text);
   font-family: inherit;
   cursor: pointer;
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+}
+
+html:has(.amc:not(.out)) {
+  overflow: hidden;
 }
 
 .amc.out {
