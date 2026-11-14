@@ -1,0 +1,42 @@
+T02 public API check, captured with:
+  pnpm build
+  node tools/shot.mjs --serve dist --wait 1200 --eval "<the async function below>"
+
+Eval:
+  (async () => {
+    const out = {};
+    document.getElementById("amcGo").click();
+    document.getElementById("pfCancel")?.click();
+    out.parts = window.AstroMed3D.parts();
+    const picked = [];
+    const off = window.AstroMed3D.onSelect((p) => picked.push(p));
+    window.AstroMed3D.select("heart");
+    await new Promise((r) => setTimeout(r, 1500));
+    out.detailTitle = document.querySelector("#detailTitle").textContent;
+    out.guideAfterSelect = document.querySelector(".a3d-guide h3").textContent;
+    document.querySelector('.a3d-list li[data-part="lungs"] button').click();
+    await new Promise((r) => setTimeout(r, 300));
+    window.AstroMed3D.markDone("heart");
+    await new Promise((r) => setTimeout(r, 400));
+    out.done = [...document.querySelectorAll(".a3d-list li.is-done")].map((li) => li.dataset.part);
+    out.guideAfterDone = document.querySelector(".a3d-guide h3").textContent;
+    out.picked = picked;
+    window.AstroMed3D.reset();
+    await new Promise((r) => setTimeout(r, 400));
+    out.guideAfterReset = document.querySelector(".a3d-guide h3").textContent;
+    off();
+    return out;
+  })()
+
+Output:
+  {"parts":["brain","lungs","heart","kidneys","hand","bones","muscles"],
+   "detailTitle":"Cardiovascular System",
+   "guideAfterSelect":"Step 1 of 7",
+   "done":["heart"],
+   "guideAfterDone":"Heart saved ✓",
+   "picked":["lungs"],
+   "guideAfterReset":"Daily checkup"}
+
+This shows select("heart") drives the measurement panel, onSelect fires for a checklist pick,
+markDone("heart") turns the Heart step green, and reset() returns to the suited intro view.
+The 404s printed by the run were only the pre-existing space-background.jpg and favicon.ico.
