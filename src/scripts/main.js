@@ -2,6 +2,7 @@
 // each one registers its start-up on DOMContentLoaded, and those run in this order.
 import "./storage.js";
 import "./sync.js";
+import "./risks.js";
 import "./checkup.js";
 import "./exercise.js";
 import "./health-indicators.js";

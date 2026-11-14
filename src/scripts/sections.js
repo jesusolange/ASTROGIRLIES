@@ -238,8 +238,31 @@ function astromedSectionsInit() {
     if (action === "radiation" && window.AstroMedRadiation) window.AstroMedRadiation.render();
     if (action === "readiness" && window.AstroMedReadiness) window.AstroMedReadiness.render();
     if (action === "progress" && window.AstroMedProgress) window.AstroMedProgress.render();
+    if (REGISTERED[action]) REGISTERED[action](document.getElementById(PAGES[action]));
     window.scrollTo({ top: 0 });
   }
+
+  // Sections added by their own module: AstroMedNav.register({ id, label, icon, render, before }).
+  // Creates the page (<section id="<id>Page" class="am-page">) and its sidebar button; render(pageElement)
+  // runs each time the section opens. `before` is the data-action of the sidebar button to insert in front of.
+  // Pass nav: false for a page that is opened only through AstroMedNav.show(id).
+  const REGISTERED = {};
+  function register({ id, label, icon = "ic-report", render, before, nav = true }) {
+    if (PAGES[id]) return;
+    PAGES[id] = `${id}Page`;
+    REGISTERED[id] = render || (() => {});
+    const anchor = document.getElementById("protocolsPage");
+    anchor.insertAdjacentHTML("afterend", `<section id="${id}Page" class="am-page" hidden></section>`);
+    if (!nav) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.action = id;
+    button.innerHTML = `<svg class="icon"><use href="#${icon}"/></svg>`;
+    button.append(label);
+    const navEl = $(".nav");
+    navEl.insertBefore(button, (before && $(`.nav button[data-action="${before}"]`)) || $(".nav-foot", navEl));
+  }
+  window.AstroMedNav = { register, show, current: () => current };
 
   document.addEventListener("click", e => {
     const b = e.target.closest(".ov-ready");
@@ -249,7 +272,7 @@ function astromedSectionsInit() {
   // New sections: take over the click before script.js sees it.
   document.addEventListener("click", e => {
     const b = e.target.closest(".nav button[data-action]");
-    if (!b || !["environment", "mental", "doctor", "protocols", "progress", "nutrition", "missions", "radiation", "readiness"].includes(b.dataset.action)) return;
+    if (!b || !(["environment", "mental", "doctor", "protocols", "progress", "nutrition", "missions", "radiation", "readiness"].includes(b.dataset.action) || REGISTERED[b.dataset.action])) return;
     e.stopImmediatePropagation();
     e.preventDefault();
     show(b.dataset.action);

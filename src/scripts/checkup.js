@@ -1259,7 +1259,7 @@ fields: [
       <p>
         This demo stores manually entered measurements
         only in your browser (localStorage).
-        Data is never sent to a server.
+        Data stays on this device unless you choose to sign in.
       </p>
 
       <p>

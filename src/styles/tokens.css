@@ -1,0 +1,59 @@
+/* Colour and shape tokens for the whole app. Dark is the default.
+   New CSS uses only these variables for colour: no literal colours outside this file. */
+:root {
+  --am-bg: #050d24;
+  --am-bg-raised: #0a1634;
+  --am-surface: #101f45;
+  --am-surface-2: #162c5c;
+  --am-border: rgba(130, 180, 255, 0.2);
+  --am-border-strong: rgba(130, 180, 255, 0.42);
+
+  --am-text: #e9f2ff;
+  --am-text-muted: #9fb8da;
+  --am-heading: #8fd3ff;
+
+  --am-accent: #6fe3ff;
+  --am-accent-strong: #2866bf;
+  --am-on-accent: #04122b;
+
+  --am-ok: #35d49a;
+  --am-warn: #ffc857;
+  --am-danger: #ff6b6b;
+  --am-info: #6fe3ff;
+
+  --am-field-bg: rgba(255, 255, 255, 0.06);
+  --am-field-border: rgba(130, 180, 255, 0.32);
+  --am-focus: #77c6f0;
+
+  --am-radius: 16px;
+  --am-radius-small: 10px;
+  --am-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="light"] {
+  --am-bg: #f3f6fb;
+  --am-bg-raised: #ffffff;
+  --am-surface: #ffffff;
+  --am-surface-2: #eaf0f8;
+  --am-border: #d5deea;
+  --am-border-strong: #a9b9cf;
+
+  --am-text: #14284a;
+  --am-text-muted: #4a5f7d;
+  --am-heading: #173057;
+
+  --am-accent: #1f5fb8;
+  --am-accent-strong: #1b4f9c;
+  --am-on-accent: #ffffff;
+
+  --am-ok: #147a55;
+  --am-warn: #8a5a00;
+  --am-danger: #b3261e;
+  --am-info: #1f5fb8;
+
+  --am-field-bg: #ffffff;
+  --am-field-border: #a9b9cf;
+  --am-focus: #1f5fb8;
+
+  --am-shadow: 0 10px 28px rgba(35, 63, 100, 0.12);
+}

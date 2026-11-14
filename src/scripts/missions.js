@@ -41,7 +41,7 @@
     { id: "house", pts: 5, auto: false, t: "Housekeeping", d: "Clean your area. Check air vents." },
     { id: "equip", pts: 5, auto: false, t: "Equipment check", d: "Dosimeter on, devices charged." },
     { id: "sleep", pts: 10, auto: false, t: "Keep your sleep window", d: "Go to bed on time. ISS crews sleep 8.5 h." },
-    { id: "eve", pts: 5, auto: false, t: "Evening wrap-up", d: "Send your summary. Note anything for your doctor." }
+    { id: "eve", pts: 5, auto: false, t: "Evening wrap-up", d: "Review your day. Note anything to follow up tomorrow." }
   ];
   const MAXPTS = TASKS.reduce((a, t) => a + t.pts, 0);
 
