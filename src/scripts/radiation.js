@@ -1,8 +1,9 @@
 /* ==============================================
    ASTROMED — RADIATION (cumulative dose, career limit, projection, solar storms)
    Sources: NASA-STD-3001 Vol. 1 Rev B via OCHMO-TB-020 (career limit 600 mSv, ALARA,
-   250 mSv short-term SPE limit); Simonsen et al., "Moon 2 Mars: Space Radiation Protection"
-   (NTRS 20250006168); MSL RAD (JPL/NASA); Chang'e-4 LND.
+   250 mSv short-term SPE limit); Zeitlin et al. 2013 and Hassler et al. 2014 (Science,
+   MSL/RAD cruise and surface); Zhang et al. 2020 (Science Advances, Chang'e-4 LND and
+   DOSIS 3D on the ISS); NASA Human Research Program, Space Radiation.
    Status bands (50% / 80% of the limit) are illustrative design choices.
    Educational prototype: not medical advice.
    Load AFTER astromed-profile.js and astromed-sections.js
@@ -24,14 +25,14 @@
   const load = () => { const s = rd(KEY, null) || {}; return { prior: Number(s.prior) || 0, entries: s.entries || [] }; };
   const save = (s) => wr(KEY, s);
 
-  // Reference dose rates (mSv/day) with sources
+  // Reference dose-equivalent rates (mSv/day) with the primary source for each measurement.
   const REF = [
-    { place: "ISS (low Earth orbit)", v: "0.2 – 0.5", note: "About 40–90 mSv in a typical six-month stay", src: "Simonsen et al., NASA NTRS 20250006168" },
-    { place: "Moon surface", v: "about 1.4", note: "60 µSv/h measured by Chang'e-4 (more than twice the ISS)", src: "Chang'e-4 LND, reported by Phys.org" },
-    { place: "Mars cruise", v: "1.84", note: "Average measured by Curiosity's RAD on the way to Mars; about 3% from solar particles", src: "NASA/JPL, MSL RAD" },
-    { place: "Mars surface", v: "0.64", note: "Measured by RAD on the surface (cruise is nearly three times higher)", src: "MSL RAD, reported by Space.com" }
+    { place: "ISS (low Earth orbit)", v: "about 0.7", note: "731 µSv/day measured by DOSIS 3D on the ISS", src: "Zhang et al. 2020 (DOSIS 3D)", url: "https://doi.org/10.1126/sciadv.aaz1334", src2: "NASA HRP", url2: "https://www.nasa.gov/hrp/elements/radiation/" },
+    { place: "Moon surface", v: "about 1.37", note: "1369 µSv/day (about 57 µSv/h) measured by Chang'e-4 LND; roughly twice the ISS", src: "Zhang et al. 2020, Science Advances", url: "https://doi.org/10.1126/sciadv.aaz1334" },
+    { place: "Mars cruise", v: "1.84", note: "Average measured by RAD during the 253-day cruise to Mars", src: "Zeitlin et al. 2013, Science", url: "https://doi.org/10.1126/science.1235989" },
+    { place: "Mars surface", v: "0.64", note: "Measured by RAD on the surface at Gale Crater; the cruise is nearly three times higher", src: "Hassler et al. 2014, Science", url: "https://doi.org/10.1126/science.1244797" }
   ];
-  const PLACE_RATE = { iss: 0.35, moon: 1.4, mars: 0.64, rover: null, other: null }; // mSv/day, mid or measured values
+  const PLACE_RATE = { iss: 0.73, moon: 1.37, mars: 0.64, rover: null, other: null }; // mSv/day, measured values
 
   /* ---------- calculations ---------- */
   function perDay(s) {
@@ -86,7 +87,7 @@
     const page = $("#radiationPage");
     if (!page) return;
     const s = load(), c = calc(s), P = window.AstroMedProfile;
-    const lbl = { ok: "Far from the limit", review: "Getting closer: check your plan", alert: "Close to the limit: talk to your doctor" };
+    const lbl = { ok: "Far from the limit", review: "Getting closer: check your plan", alert: "Close to the limit: wake the crew medical officer" };
     const today = isoDay(new Date());
     const place = (rd("astromed-env", {}) || {}).place;
     const tr = PLACE_RATE[place];
@@ -109,8 +110,9 @@
 
       <div class="am-panel">
         <h3>Where you are going</h3>
+        <p class="mi-note">Your profile supplies the mission start date and the total mission length. Add each dose in "Add a dose" below. This page averages your dose over the last seven recorded days and multiplies that daily rate by the remaining mission days.</p>
         ${c.projected != null ? `<p class="rd-st ${c.projLevel}">If you keep the same daily rate for the ${c.left} remaining mission days, your career total would be about <b>${c.projected.toFixed(0)} mSv</b> (${((c.projected / LIMIT) * 100).toFixed(0)}% of the limit).${c.projLevel === "alert" ? " That exceeds the 600 mSv limit: this plan needs ground review." : ""}</p>`
-          : "<p class=\"mi-note\">Add your mission day (profile) and one dose to see a forecast.</p>"}
+          : "<p class=\"mi-note\">To see a forecast, enter your mission start date and total mission length in your profile, then add at least one dose below.</p>"}
         ${tr && c.left != null ? `<p class="mi-note">For comparison, a typical rate at your location would add about ${(tr * c.left).toFixed(0)} mSv over the remaining ${c.left} days (${tr} mSv/day).</p>` : ""}
         ${chart(s, c)}
       </div>
@@ -134,21 +136,17 @@
       </div>
 
       <div class="am-panel rd-spe">
-        <h3>Solar storm: what to do</h3>
-        <div class="rd-cards">
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><circle cx="80" cy="56" r="26" fill="#ffc857" class="rd-pulse"/><g stroke="#ffc857" stroke-width="5" stroke-linecap="round" class="rd-rays"><path d="M80 14v-8M80 106v8M38 56h-8M130 56h-8M50 26l-6-6M116 92l6 6M110 26l6-6M44 92l-6 6"/></g><path d="M118 20l10 18h-20z" fill="#ff6b6b"/><text x="118" y="35" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">!</text></svg><b>1 · Storm alert</b><span>Alarm or ground call</span></div>
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><rect x="86" y="46" width="58" height="52" rx="8" fill="#3b6cff" opacity=".8"/><rect x="104" y="64" width="22" height="34" rx="4" fill="#0a1a3f"/><g class="rd-walk"><circle cx="40" cy="62" r="9" fill="#fff"/><path d="M40 72v22M40 80l-12 12M40 80l12 10M40 94l-10 16M40 94l10 16" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/></g><path d="M60 100h20" stroke="#6fe3ff" stroke-width="4" stroke-linecap="round" stroke-dasharray="3 7" class="rd-dash"/></svg><b>2 · Go inside</b><span>Stop work outside</span></div>
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><rect x="22" y="14" width="116" height="92" rx="14" fill="none" stroke="#6fe3ff" stroke-width="5" class="rd-pulse"/><rect x="38" y="30" width="84" height="60" rx="9" fill="none" stroke="#3b6cff" stroke-width="4"/><circle cx="80" cy="56" r="9" fill="#fff"/><path d="M80 66v14M80 72l-9 8M80 72l9 8" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M110 40l10 10 16-18" stroke="#35d49a" stroke-width="5" fill="none" stroke-linecap="round" transform="translate(-24 6)"/></svg><b>3 · Safe room</b><span>Most shielded area</span></div>
-          <div class="rd-c"><svg viewBox="0 0 160 120" aria-hidden="true"><path d="M80 100V56M62 100h36" stroke="#cfe3ff" stroke-width="5" stroke-linecap="round"/><circle cx="80" cy="50" r="7" fill="#ffc857"/><g fill="none" stroke="#6fe3ff" stroke-width="4" stroke-linecap="round"><path d="M64 36a22 22 0 0 1 0 28" class="rd-wave"/><path d="M96 36a22 22 0 0 0 0 28" class="rd-wave"/><path d="M54 28a34 34 0 0 1 0 44" class="rd-wave w2"/><path d="M106 28a34 34 0 0 0 0 44" class="rd-wave w2"/></g></svg><b>4 · Call ground</b><span>Tell how you feel</span></div>
-        </div>
-        <p class="mi-note">Stay in the safe room until the ground team says it is OK. Then log your dose. A storm can add a lot of dose in a few hours; NASA's limit for one storm is ${SPE_LIMIT} mSv. This is general guidance: follow your mission protocol.</p>
+        <h3>Solar storm</h3>
+        <p>A solar particle event can add a large dose in a few hours. Move to the most shielded part of the habitat, stay there until the ground team or your radiation plan says it is safe, then log the dose.</p>
+        <p class="mi-note">NASA's short-term limit for one storm is ${SPE_LIMIT} mSv. This is general guidance: follow your mission protocol.</p>
+        <div class="am-actions"><button type="button" class="am-btn" id="rdStorm">Open solar storm steps</button></div>
       </div>
 
       <div class="am-panel">
         <h3>Reference dose rates</h3>
         <div class="nu-tw"><table class="nu-table"><thead><tr><th>Place</th><th>mSv per day</th><th>Notes</th><th>Source</th></tr></thead>
-          <tbody>${REF.map((r) => `<tr style="cursor:default"><td>${esc(r.place)}</td><td><b>${esc(r.v)}</b></td><td>${esc(r.note)}</td><td>${esc(r.src)}</td></tr>`).join("")}</tbody></table></div>
-        <p class="mi-note" style="margin-top:12px">Whole mission estimates: a Mars round trip is estimated at 525 to about 1,625 mSv depending on length and the solar cycle (Simonsen et al.), which is why the 600 mSv career limit is a design challenge for Mars. Career limit and ALARA: NASA-STD-3001 Vol. 1 Rev B (V1 4029, V1 4030), summarized in the NASA OCHMO radiation technical brief. These reference values are typical measurements, not predictions for your mission.</p>
+          <tbody>${REF.map((r) => `<tr style="cursor:default"><td>${esc(r.place)}</td><td><b>${esc(r.v)}</b></td><td>${esc(r.note)}</td><td><a style="color:var(--am-accent);font-weight:700" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.src)}</a>${r.src2 ? `; <a style="color:var(--am-accent);font-weight:700" href="${esc(r.url2)}" target="_blank" rel="noopener noreferrer">${esc(r.src2)}</a>` : ""}</td></tr>`).join("")}</tbody></table></div>
+        <p class="mi-note" style="margin-top:12px">The RAD measurements show how quickly dose adds up in transit and on the surface, which is why the 600 mSv career limit is a design challenge for Mars. Career limit and ALARA: NASA-STD-3001 Vol. 1 Rev B (V1 4029, V1 4030), summarized in the NASA OCHMO radiation technical brief. For the space radiation environment and its health risks, see the <a style="color:var(--am-accent);font-weight:700" href="https://www.nasa.gov/hrp/elements/radiation/" target="_blank" rel="noopener noreferrer">NASA Human Research Program</a>. These reference values are typical measurements, not predictions for your mission.</p>
       </div>`;
     bind(page);
   }
@@ -166,6 +164,10 @@
     $("#rdConv", page)?.addEventListener("input", (e) => {
       const v = Number(e.target.value);
       $("#rdConvOut", page).textContent = e.target.value !== "" && v >= 0 ? `${v} µSv/h = ${((v * 24) / 1000).toFixed(3)} mSv/day` : "";
+    });
+    $("#rdStorm", page)?.addEventListener("click", () => {
+      if (window.AstroMedEmergencies) window.AstroMedEmergencies.open("solar-storm");
+      else window.AstroMedNav?.show("emergencies");
     });
   }
 
