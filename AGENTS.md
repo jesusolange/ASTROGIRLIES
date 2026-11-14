@@ -21,7 +21,7 @@ Read `docs/tickets.md` (the decisions at the top are binding) and `docs/decision
 
 ## 2. Stack and layout
 
-Astro static site, vanilla JavaScript modules, no UI framework. pnpm only.
+Astro static site with Preact components (`@astrojs/preact`). Older sections are still vanilla JavaScript modules that build HTML from strings; they are being converted. pnpm only.
 
 | Path | What | Owner |
 |---|---|---|
@@ -59,30 +59,33 @@ Your task spec lists the paths you own. Anything else: ask first.
 - **Modules talk through imports** where the other side is already a module with exports; `window.AstroMed*`
   globals remain for the older modules. Do not add new globals except the one public object of your section.
 
-## 3a. Sections are Astro components
+## 3a. The interface is Preact components
 
-Markup belongs in `.astro` files, not in JavaScript strings. This is what lets a developer (and Astro's dev tools)
-find the source of an element.
+The interface is written as Preact components mounted from Astro as islands (`@astrojs/preact`). Do not build HTML
+in strings, do not write your own rendering, templating or component helper, and do not clone `<template>`
+elements. Use what Preact and Astro provide.
 
-- Each section has one component, `src/components/sections/<Name>.astro`, whose root is
-  `<section id="<id>Page" class="am-page" hidden>`. It is listed once in `src/components/Sections.astro`
-  (coordinator-owned; stubs exist for Emergencies, Today, RiskMap, Vision, Immune; ask for a new line).
-  `AstroMedNav.register` picks up that element instead of creating one.
-- Split a large section into child components under `src/components/<section>/`. Keep each file under 200 lines.
-- Content known at build time is rendered by Astro: import the data in the component frontmatter and loop in the
-  template (risk table, emergency cards, questionnaire items, reference tables, static help text, SVG diagrams).
-- Content that depends on what the astronaut stored is filled in by the section's module at run time. Put the shape
-  of each repeated item in a `<template id="...">` inside the component and clone it
-  (`template.content.cloneNode(true)`), setting text with `textContent`. Do not build HTML in strings, and do not
-  use `innerHTML` with stored or typed values.
-- Styles go in the component's `<style>` block (scoped; cloned `<template>` content is covered). Shared rules stay
-  in `src/styles/`. Colours only through the `--am-*` tokens.
-- Behaviour stays in `src/scripts/<section>.js` as functions that take the page element; the component ends with
-  `<script>import { init } from "../../scripts/<section>.js"; init();</script>` or the module keeps its
-  `DOMContentLoaded` handler. Pure logic (scoring, comparison, ranking) stays free of DOM code and keeps its tests.
-- A module that still builds a section from strings is legacy: when you touch such a section, move its markup into
-  a component as part of the task.
-
+- Each section has a mount point, `src/components/sections/<Name>.astro`, listed once in
+  `src/components/Sections.astro` (coordinator-owned; ask for a new line). It contains only:
+  `<section id="<id>Page" class="am-page" hidden><NameView client:only="preact" /></section>` with
+  `import NameView from "../<section>/<Name>View.jsx";` in its frontmatter.
+- The section itself is Preact components under `src/components/<section>/*.jsx`, each under 200 lines, one
+  component per file, named after what it shows (`RiskRow.jsx`, `GcsPicker.jsx`). Shared pieces go in
+  `src/components/ui/`.
+- State lives in components (`useState`, `useMemo`, or `@preact/signals` for state shared between components).
+  Stored data: `const [value, save] = useStored("astromed-<key>", fallback)` from `src/lib/use-stored.js`.
+  Never read or write the DOM by hand (`querySelector`, `innerHTML`, `addEventListener`) inside a section.
+- Logic that is not interface (scoring, ranking, comparison, thresholds, data) stays in plain modules under
+  `src/scripts/` or `src/data/`, with `node:test` tests, and is imported by the components. Tests do not import
+  `.jsx` files.
+- Styles: one CSS file per section next to its components, imported from the view (`import "./vision.css";`),
+  class names prefixed with the section name, colours only through the `--am-*` tokens.
+- Text in JSX is escaped. Never use `dangerouslySetInnerHTML` with stored or typed values.
+- The section still registers its sidebar entry with `window.AstroMedNav.register({ id, label, before })` (no
+  `render`) from a `DOMContentLoaded` handler in its logic module, and keeps its one public object
+  (`window.AstroMed<Section>` with `findings()` and whatever other modules call) set from that module.
+- A module that still builds a section from strings is legacy. When your task touches such a section, convert it
+  to components as part of the task and delete the string-building code.
 ## 4. Process rules
 
 - Stay inside your worktree. Scratch files go in `.tmp/` inside it.
