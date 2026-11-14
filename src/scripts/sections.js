@@ -5,7 +5,6 @@
 ============================================== */
 
 import { analyzeMental, protocolRows } from "./mental.js";
-import { initMental } from "./mental-page.js";
 
 function astromedSectionsInit() {
 
@@ -33,10 +32,9 @@ function astromedSectionsInit() {
      INJECT PAGES
   ========================================== */
 
-  const pages = ["mental", "environment", "nutrition", "missions", "radiation", "readiness", "progress", "doctor", "protocols"];
+  const pages = ["environment", "nutrition", "missions", "radiation", "readiness", "progress", "doctor", "protocols"];
   footer.insertAdjacentHTML("beforebegin", pages.map(id => `<section id="${id}Page" class="am-page" hidden></section>`).join(""));
 
-  initMental();
 
   /* ==========================================
      NAVIGATION

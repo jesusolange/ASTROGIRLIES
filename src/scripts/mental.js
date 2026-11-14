@@ -90,9 +90,9 @@ const STRESS_CAT_TIPS = {
   behavioural: "Pick one habit to adjust this week. Keep contact with family and crew, and keep your exercise routine."
 };
 
-const MOODS = [["Great", "great"], ["Okay", "okay"], ["Stressed", "stressed"], ["Down", "down"], ["Not sure", "unsure"]];
+export const MOODS = [["Great", "great"], ["Okay", "okay"], ["Stressed", "stressed"], ["Down", "down"], ["Not sure", "unsure"]];
 
-const MOOD_REPLIES = {
+export const MOOD_REPLIES = {
   great: ["dep", "Great to hear! A short check-in now and then still helps you notice trends. Choose either test."],
   okay: ["dep", "Thanks for sharing. Take the depression and isolation check-in, or switch to the stress test."],
   stressed: ["stress", "That sounds heavy. I opened the stress and burn-out test for you."],
