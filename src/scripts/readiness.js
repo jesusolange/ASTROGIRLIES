@@ -3,7 +3,7 @@
 // The NASA ratings are NASA's. The coverage rule, the formula and the bands are our design choice.
 import { currentMission, areaWeights, rankedRisks, SOURCE } from "./risks.js";
 
-export const COVERAGE_MIN = 0.5; // design choice: less recent weight than this means no score
+export const COVERAGE_MIN = 0.5; // design choice: fewer recorded due areas than this share means no score
 export const RECENT_DAYS = 7; // design choice: daily data is "recent" for a week
 export const MENTAL_DAYS = 14;
 export const SCORE_LEVEL = { ok: 100, review: 55, alert: 15 };
@@ -22,11 +22,16 @@ const avg = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.leng
 
 /* ---------- pure scoring ---------- */
 
-export function coverageOf(weights, scores) {
-  const total = weights.reduce((sum, w) => sum + w.weight, 0);
-  if (!total) return 0;
-  const covered = weights.reduce((sum, w) => sum + (scores[w.key] ? w.weight : 0), 0);
-  return covered / total;
+const isReference = (area) => Boolean(area && (area.reference || REFERENCE_AREAS.has(area.key)));
+
+// The share of due areas that have a current record. Reference areas are shown but never due.
+// This is the one coverage rule the score, the hero and the due list read.
+export function coverageOf(areas, scores) {
+  const list = Array.isArray(areas) ? areas : [];
+  const due = list.filter((area) => area && !isReference(area));
+  const done = due.filter((area) => scores && scores[area.key]);
+  const missing = due.filter((area) => !(scores && scores[area.key]));
+  return { done: done.length, due: due.length, share: due.length ? done.length / due.length : 0, missing };
 }
 
 export function weightedScore(weights, scores) {
@@ -41,19 +46,24 @@ export function bandFor(value) {
 }
 
 // weights: [{ key, weight, ... }], scores: { [key]: { score, note } }.
-// Missing areas are pulled toward the middle by the share of weight covered, so missing checks
+// Missing areas are pulled toward the middle by the share of due areas covered, so missing checks
 // cannot look healthy. Below the coverage share there is no score at all.
 export function evaluateReadiness(weights, scores, options = {}) {
   const minCoverage = options.minCoverage ?? COVERAGE_MIN;
   const coverage = coverageOf(weights, scores);
-  const missing = weights.filter((w) => !scores[w.key] && !REFERENCE_AREAS.has(w.key));
-  const reference = weights.filter((w) => REFERENCE_AREAS.has(w.key));
-  if (!weights.length || coverage + 1e-9 < minCoverage) {
-    return { status: "insufficient", coverage, missing, reference, raw: null, total: null, band: null };
+  const reference = (Array.isArray(weights) ? weights : []).filter(isReference);
+  if (!coverage.due || coverage.share + 1e-9 < minCoverage) {
+    return {
+      status: "insufficient", coverage: coverage.share, covered: coverage.done, due: coverage.due,
+      missing: coverage.missing, reference, raw: null, total: null, band: null
+    };
   }
   const raw = weightedScore(weights, scores);
-  const total = Math.round(clamp(50 + (raw - 50) * coverage, 0, 100));
-  return { status: "scored", coverage, missing, reference, raw: Math.round(raw), total, band: bandFor(total) };
+  const total = Math.round(clamp(50 + (raw - 50) * coverage.share, 0, 100));
+  return {
+    status: "scored", coverage: coverage.share, covered: coverage.done, due: coverage.due,
+    missing: coverage.missing, reference, raw: Math.round(raw), total, band: bandFor(total)
+  };
 }
 
 /* ---------- reading the app's data ---------- */
@@ -195,7 +205,7 @@ export function findings() {
     return [{
       level: "info",
       title: "Readiness · not enough data",
-      saw: `Recent data covers ${r.coveragePct}% of the risk-weighted checks for this mission.`,
+      saw: `You have recorded ${r.covered} of ${r.due} areas that are due for this mission.`,
       todo: names ? `Do these checks next: ${names}.` : "Do your daily checks so a score can be shown."
     }];
   }
@@ -203,7 +213,7 @@ export function findings() {
   return [{
     level,
     title: `Readiness score: ${r.total}/100 (${r.band.title})`,
-    saw: `Based on ${r.areas.length - r.missing.length - r.reference.length} of ${r.areas.length} monitored areas, covering ${r.coveragePct}% of the risk weight.`,
+    saw: `From ${r.covered} of ${r.due} due areas.`,
     todo: r.band.advice
   }];
 }

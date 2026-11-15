@@ -112,7 +112,8 @@ export function buildQueue(readiness) {
     if (!check || !exists(check.section)) return null;
     const last = area.key === "vision" ? lastVisionDay() : lastDoneFor(area.key);
     const interval = intervalFor(area.score);
-    if (!isDue(last, interval.days)) return null;
+    // A missing area always belongs in the due list; a recorded area only when its interval has passed.
+    if (area.data && !isDue(last, interval.days)) return null;
     return { area, check, last, interval };
   }).filter(Boolean);
 }

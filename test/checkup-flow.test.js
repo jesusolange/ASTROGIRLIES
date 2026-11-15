@@ -102,13 +102,11 @@ test("readValues accepts values inside the field range and names the first inval
   assert.match(Flow.readValues(fields, { hr: "", sys: "118" }).error, /heart rate/i);
 });
 
-test("draftFor uses the latest reading and marks a simulated fill", () => {
+test("draftFor starts every field empty so the astronaut enters each value", () => {
   const draft = Flow.draftFor("heart", [{
     part: "heart",
     time: "2026-11-14T12:00:00.000Z",
-    simulated: true,
     values: { hr: 90, sys: 120, dia: 80, hrv: 40 }
   }]);
-  assert.equal(draft.values.hr, 90);
-  assert.equal(draft.simulated, true);
+  assert.deepEqual(draft.values, { hr: "", sys: "", dia: "", hrv: "" });
 });

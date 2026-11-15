@@ -15,13 +15,10 @@ function readRecords() {
   }
 }
 
-function findings() {
+export function findings() {
   return findingsFromRecords(readRecords(), (key, value) => (
     window.AstroMedData && window.AstroMedData.rule ? window.AstroMedData.rule(key, value) : null
   ));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  hydrate(readRecords());
-  window.AstroMedCheckup = { findings };
-});
+hydrate(readRecords());

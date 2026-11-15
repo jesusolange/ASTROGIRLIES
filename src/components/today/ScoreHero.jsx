@@ -3,19 +3,17 @@ import { COVERAGE_MIN } from "../../scripts/readiness.js";
 export default function ScoreHero({ readiness }) {
   const scored = readiness.status === "scored";
   const band = readiness.band;
-  const note = scored
-    ? `Recent data covers ${readiness.coveragePct}% of the risk weight for this mission.${readiness.missing.length ? ` ${readiness.missing.length} check${readiness.missing.length === 1 ? "" : "s"} still missing.` : ""}`
-    : "An area with no recent data counts as missing, not as healthy.";
+  const coverage = `${readiness.covered} of ${readiness.due} areas recorded`;
   return (
     <section class="am-panel td-hero">
       <div class={`td-score ${scored ? `td-${band.key}` : "td-none"}`}>
-        <b>{scored ? readiness.total : "?"}</b>
-        <small>{scored ? "of 100" : ""}</small>
+        <b>{scored ? readiness.total : "\u2013"}</b>
+        {scored ? <small>of 100</small> : null}
       </div>
       <div class="td-hero-main">
-        <h3>{scored ? band.title : "Not enough data"}</h3>
-        <p>{scored ? band.advice : `Recent data covers ${readiness.coveragePct}% of the risk-weighted checks. A score is shown only from ${Math.round(COVERAGE_MIN * 100)}% coverage; that share is our design choice.`}</p>
-        <p class="td-note">{note}</p>
+        <h3>{scored ? band.title : `Not enough data: ${coverage}`}</h3>
+        {scored ? <p class="td-coverage">from {coverage}</p> : null}
+        <p>{scored ? band.advice : `A score appears only when at least ${Math.round(COVERAGE_MIN * 100)}% of the due areas are recorded.`}</p>
         <a class="td-link" href="#tdHow">How this score is made</a>
       </div>
       <div class="td-hero-mission">

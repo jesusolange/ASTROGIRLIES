@@ -14,29 +14,60 @@ test("NASA area weights sum to 1 and follow the mission", () => {
   assert.notEqual(top("mars-planetary"), top("leo-short"));
 });
 
-test("a high score needs enough coverage", () => {
-  const weights = [
-    { key: "a", weight: 0.4 },
-    { key: "b", weight: 0.6 }
-  ];
-  const oneArea = Readiness.evaluateReadiness(weights, { a: { score: 100 } });
-  assert.equal(oneArea.status, "insufficient");
-  assert.equal(oneArea.total, null);
-  assert.equal(oneArea.coverage, 0.4);
-  assert.deepEqual(oneArea.missing.map((w) => w.key), ["b"]);
+test("coverage counts the share of due areas with a current record", () => {
+  const areas = ["a", "b", "c", "d"].map((key) => ({ key, weight: 0.25 }));
+  const none = Readiness.coverageOf(areas, {});
+  assert.equal(none.done, 0);
+  assert.equal(none.due, 4);
+  assert.equal(none.share, 0);
+  assert.deepEqual(none.missing.map((area) => area.key), ["a", "b", "c", "d"]);
 
-  const both = Readiness.evaluateReadiness(weights, { a: { score: 100 }, b: { score: 100 } });
-  assert.equal(both.status, "scored");
-  assert.equal(both.total, 100);
+  const half = Readiness.coverageOf(areas, { a: { score: 80 }, b: { score: 80 } });
+  assert.equal(half.done, 2);
+  assert.equal(half.share, 0.5);
+
+  const reference = Readiness.coverageOf([...areas, { key: "emergencies", weight: 0.1 }], {});
+  assert.equal(reference.due, 4);
 });
 
-test("missing weight pulls the score toward the middle, never to a high score", () => {
+test("a score appears only at 50% coverage of the due areas", () => {
+  const seven = ["a", "b", "c", "d", "e", "f", "g"].map((key) => ({ key, weight: 1 / 7 }));
+  const scoresFor = (count) => Object.fromEntries(seven.slice(0, count).map((area) => [area.key, { score: 100 }]));
+
+  const zero = Readiness.evaluateReadiness(seven, scoresFor(0));
+  assert.equal(zero.status, "insufficient");
+  assert.equal(zero.total, null);
+  assert.equal(zero.covered, 0);
+  assert.equal(zero.due, 7);
+
+  const below = Readiness.evaluateReadiness(seven, scoresFor(3));
+  assert.equal(below.status, "insufficient");
+  assert.equal(below.total, null);
+  assert.ok(below.coverage < Readiness.COVERAGE_MIN);
+
+  const fourOfSeven = Readiness.evaluateReadiness(seven, scoresFor(4));
+  assert.equal(fourOfSeven.status, "scored");
+  assert.equal(fourOfSeven.covered, 4);
+  assert.equal(fourOfSeven.due, 7);
+  assert.notEqual(fourOfSeven.total, null);
+
+  const four = ["a", "b", "c", "d"].map((key) => ({ key, weight: 0.25 }));
+  const atHalf = Readiness.evaluateReadiness(four, { a: { score: 90 }, b: { score: 90 } });
+  assert.equal(atHalf.status, "scored");
+  assert.equal(atHalf.coverage, 0.5);
+  assert.equal(atHalf.covered, 2);
+  assert.equal(atHalf.due, 4);
+  assert.notEqual(atHalf.total, null);
+});
+
+test("missing areas pull the score toward the middle, never to a high score", () => {
   const weights = [
-    { key: "a", weight: 0.5 },
-    { key: "b", weight: 0.25 },
-    { key: "c", weight: 0.25 }
+    { key: "a", weight: 0.3 },
+    { key: "b", weight: 0.2 },
+    { key: "c", weight: 0.25 },
+    { key: "d", weight: 0.25 }
   ];
-  const result = Readiness.evaluateReadiness(weights, { a: { score: 100 } });
+  const result = Readiness.evaluateReadiness(weights, { a: { score: 100 }, b: { score: 100 } });
   assert.equal(result.status, "scored");
   assert.equal(result.coverage, 0.5);
   assert.equal(result.total, 75);

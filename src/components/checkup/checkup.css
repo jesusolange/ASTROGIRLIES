@@ -47,11 +47,6 @@
 }
 .che-system { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .che-sub { margin: 0 0 10px; font-size: 12px; color: var(--am-text-muted); }
-.che-sim {
-  flex: 0 0 auto; padding: 5px 10px; border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--am-warn) 55%, transparent);
-  background: var(--am-warn-bg); color: var(--am-warn); font-size: 10px; font-weight: 700; white-space: nowrap;
-}
 .che-desc { margin: 0 0 14px; font-size: 12px; line-height: 1.6; color: var(--am-text-muted); }
 
 .che-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
@@ -59,6 +54,7 @@
 .che-field-label { font-size: 12px; font-weight: 650; color: var(--am-text); }
 .che-field-label small { font-weight: 500; color: var(--am-text-muted); }
 .che-field input { width: 100%; box-sizing: border-box; }
+.che-field-slider { padding: 0; accent-color: var(--am-accent); cursor: pointer; }
 .che-field-help { font-size: 10px; color: var(--am-text-muted); }
 
 /* ---------- gauges ---------- */
@@ -104,7 +100,6 @@
 .che-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .che-buttons .ui-btn, .che-next .ui-btn, .che-restart .ui-btn { margin-top: 0; }
 .che-error { margin: 10px 0 0; font-size: 12px; color: var(--am-danger); }
-.che-message { margin: 10px 0 0; font-size: 12px; color: var(--am-accent); }
 .che-note { margin: 10px 0 0; font-size: 10px; line-height: 1.5; color: var(--am-text-muted); }
 
 /* ---------- history ---------- */

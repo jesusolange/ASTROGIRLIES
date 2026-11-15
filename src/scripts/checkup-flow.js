@@ -183,16 +183,13 @@ export function recordsFor(records, part) {
   return (Array.isArray(records) ? records : []).filter((record) => record && record.part === part);
 }
 
-export function draftFor(part, records) {
+// Every field starts empty. Only what the astronaut enters this time is saved.
+export function draftFor(part) {
   const system = SYSTEMS[part];
-  if (!system) return { values: {}, simulated: false };
-  const latest = latestFor(records, part);
+  if (!system) return { values: {} };
   const values = {};
-  system.fields.forEach((field) => {
-    const stored = latest && latest.values ? latest.values[field.key] : undefined;
-    values[field.key] = stored != null && Number.isFinite(Number(stored)) ? Number(stored) : field.typical;
-  });
-  return { values, simulated: Boolean(latest && latest.simulated) };
+  system.fields.forEach((field) => { values[field.key] = ""; });
+  return { values };
 }
 
 export function readValues(fields, draft) {

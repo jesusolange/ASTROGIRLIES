@@ -49,7 +49,7 @@ export default function MentalHealthView() {
   const [mood, setMood] = useState(null);
   const [reply, setReply] = useState("");
   const [depAnswers, setDepAnswers] = useState(() => DEP_Q.map(() => null));
-  const [stressAnswers, setStressAnswers] = useState(() => STRESS_Q.map(() => 0));
+  const [stressAnswers, setStressAnswers] = useState(() => STRESS_Q.map(() => null));
   const [entries, setEntries] = useState(latestByType);
   const [rows, setRows] = useState(history);
   const depResult = useRef(null);
@@ -136,6 +136,7 @@ export default function MentalHealthView() {
           columns={3}
           values={stressAnswers}
           onAnswer={answerStress}
+          required
           onSubmit={() => save("stress", stressAnswers.map(Number), stressResult)}
         />
         {entries.stress ? (
