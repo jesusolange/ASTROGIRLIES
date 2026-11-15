@@ -1,6 +1,6 @@
 // The deck's logic: collect every section's cards, order them by the NASA risk rating of their topic,
 // and split them into due, recorded and guide cards.
-import { TOPIC_BY_ID } from "../../data/topics.js";
+import { TOPIC_BY_ID, TOPICS } from "../../data/topics.js";
 import { rankedRisks } from "../../scripts/risks.js";
 
 function loadModules() {
@@ -79,4 +79,25 @@ export function findCard(cards, id) {
 
 export function cardsForTopic(topicId, cards = allCards()) {
   return cards.filter((card) => card.topic === topicId);
+}
+
+// Every card as search groups: the topic is the group, the cards are its items. Cards whose topic is
+// not in the topic table go into a last group so nothing is hidden.
+export function cardGroups(cards = allCards(), topics = TOPICS) {
+  const byTopic = new Map();
+  for (const card of cards) {
+    const topicId = TOPIC_BY_ID.has(card.topic) ? card.topic : "other";
+    if (!byTopic.has(topicId)) byTopic.set(topicId, []);
+    byTopic.get(topicId).push({ id: card.id, label: card.title });
+  }
+  const groups = [];
+  for (const topic of topics) {
+    if (byTopic.has(topic.id)) {
+      groups.push({ id: topic.id, label: topic.label, items: byTopic.get(topic.id) });
+    }
+  }
+  if (byTopic.has("other")) {
+    groups.push({ id: "other", label: "Other", items: byTopic.get("other") });
+  }
+  return groups;
 }

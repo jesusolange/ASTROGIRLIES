@@ -17,6 +17,7 @@
 import "./kit.css";
 import { useId, useRef, useState } from "preact/hooks";
 import Button from "./Button.jsx";
+import { FieldTooltipContext } from "./Field.jsx";
 import LevelBadge from "./LevelBadge.jsx";
 import { toast } from "../../lib/ui.js";
 
@@ -35,11 +36,18 @@ export default function CheckCard({ card, onDone }) {
   const Component = card.Component;
   const guide = Boolean(card.reference);
 
+  function nativeField(name) {
+    const field = refs.current[name];
+    return field && typeof field.setCustomValidity === "function" ? field : null;
+  }
+
   const form = {
     values,
     set(name, value) {
       setValues((old) => ({ ...old, [name]: value }));
       setError((old) => (old && old.field === name ? null : old));
+      const field = nativeField(name);
+      if (field) field.setCustomValidity("");
     },
     errorFor(name) {
       return error && error.field === name ? error.message : undefined;
@@ -52,7 +60,14 @@ export default function CheckCard({ card, onDone }) {
   function showResult(next, undo) {
     if (!next) return;
     setResult(next);
-    toast({ text: next.toast || `${card.title} recorded.`, undo });
+    const restore = typeof undo === "function"
+      ? () => {
+          setError(null);
+          setResult(null);
+          undo();
+        }
+      : null;
+    toast({ text: next.toast || `${card.title} recorded.`, undo: restore });
   }
 
   function save() {
@@ -67,6 +82,10 @@ export default function CheckCard({ card, onDone }) {
     if (outcome.error) {
       setError(outcome.error);
       const field = refs.current[outcome.error.field];
+      if (field && typeof field.setCustomValidity === "function") {
+        field.setCustomValidity(outcome.error.message || "Check the answer and try again.");
+        if (typeof field.reportValidity === "function") field.reportValidity();
+      }
       if (field && typeof field.focus === "function") field.focus();
       return;
     }
@@ -106,14 +125,23 @@ export default function CheckCard({ card, onDone }) {
           {result.actions && result.actions.length ? (
             <div class="ui-card-actions">
               {result.actions.map((action) => (
-                <Button key={action.label} variant={action.variant || "primary"} onClick={action.onClick}>{action.label}</Button>
+                <Button
+                  key={action.label}
+                  variant={action.variant || "primary"}
+                  onClick={() => {
+                    onDone?.(card);
+                    action.onClick?.();
+                  }}
+                >{action.label}</Button>
               ))}
             </div>
           ) : null}
         </div>
       ) : (
         <div class="ui-card-body">
-          <Component form={form} onSaved={showResult} onDone={next} />
+          <FieldTooltipContext.Provider value={true}>
+            <Component form={form} onSaved={showResult} onDone={next} />
+          </FieldTooltipContext.Provider>
         </div>
       )}
 

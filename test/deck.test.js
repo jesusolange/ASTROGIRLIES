@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  cardsFromModules, cardsForTopic, deckProgress, dueCards, findCard, guideCards,
+  cardGroups, cardsFromModules, cardsForTopic, deckProgress, dueCards, findCard, guideCards,
   isRecorded, orderCards, recordedCards, topicScore
 } from "../src/components/check/deck.js";
 
@@ -70,4 +70,16 @@ test("cardsForTopic returns the cards of one topic", () => {
 test("findCard matches by id", () => {
   assert.equal(findCard(sample, "drinks").id, "drinks");
   assert.equal(findCard(sample, "missing"), null);
+});
+
+test("cardGroups puts every card under its topic and keeps the topic order", () => {
+  const groups = cardGroups([
+    card("eye", "vision", { title: "Grid test" }),
+    card("drinks", "nutrition", { title: "Meals" }),
+    card("eye-two", "vision", { title: "Near vision" }),
+    card("stray", "unknown", { title: "Stray" })
+  ]);
+  assert.deepEqual(groups.map((group) => group.id), ["vision", "nutrition", "other"]);
+  assert.deepEqual(groups[0].items.map((item) => item.label), ["Grid test", "Near vision"]);
+  assert.deepEqual(groups[2].items.map((item) => item.id), ["stray"]);
 });

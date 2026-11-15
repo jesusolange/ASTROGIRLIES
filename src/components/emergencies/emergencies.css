@@ -16,32 +16,6 @@
 .emg-banner b { color: var(--am-danger); }
 
 .emg-search { margin: 0 0 18px; }
-.emg-search-label { display: block; margin-bottom: 6px; color: var(--am-text-muted); font-size: 12px; font-weight: 650; }
-.emg-search-field {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 0 14px;
-  color: var(--am-text-muted);
-  background: var(--am-field-bg);
-  border: 1px solid var(--am-field-border);
-  border-radius: var(--am-radius-small);
-}
-.emg-search-field:focus-within { border-color: var(--am-focus); box-shadow: 0 0 0 2px var(--am-focus); }
-.emg-search-field input {
-  flex: 1;
-  min-width: 0;
-  min-height: 46px;
-  padding: 0;
-  color: var(--am-text);
-  background: none;
-  border: 0;
-  font: inherit;
-  font-size: 14px;
-}
-.emg-search-field input:focus-visible { outline: none; }
-.emg-search-count { margin: 6px 0 0; color: var(--am-text-muted); font-size: 12px; }
 
 .emg-vital {
   margin: 0 0 22px;

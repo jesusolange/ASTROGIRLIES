@@ -3,8 +3,10 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import { go, openCard, route } from "../../lib/nav.js";
 import CheckCard from "../ui/CheckCard.jsx";
 import Icon from "../ui/Icon.jsx";
+import SearchOverlay from "../ui/SearchOverlay.jsx";
 import {
-  allCards, cardsForTopic, deckProgress, dueCards, findCard, guideCards, orderCards, recordedCards
+  allCards, cardGroups, cardsForTopic, deckProgress, dueCards, findCard, guideCards, orderCards,
+  recordedCards
 } from "./deck.js";
 import "../ui/ui.css";
 import "./check.css";
@@ -24,6 +26,7 @@ export default function CheckView() {
   const guides = useMemo(() => guideCards(cards), [cards]);
   const recorded = useMemo(() => recordedCards(cards), [cards]);
   const progress = useMemo(() => deckProgress(cards), [cards]);
+  const searchGroups = useMemo(() => cardGroups(cards), [cards]);
 
   const routeId = route.value.id;
   const opened = routeId ? findCard(cards, routeId) : null;
@@ -69,6 +72,14 @@ export default function CheckView() {
       <header class="ck-head">
         <p>One card at a time. Save records it for today.</p>
       </header>
+
+      <SearchOverlay
+        groups={searchGroups}
+        label="Search checks"
+        placeholder="Search checks"
+        emptyText="No check matches that search."
+        onSelect={(item) => openCard(item.id)}
+      />
 
       {progress.total > 0 ? (
         <p class="ck-count" aria-live="polite">{progress.recorded} of {progress.total} recorded today</p>

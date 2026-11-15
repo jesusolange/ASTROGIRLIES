@@ -1,16 +1,22 @@
-// A labelled form control with optional help and error text.
+// A labelled form control with optional help and error text. Inside a check card the browser's own
+// validation bubble carries the error on a native control, so no red line is drawn under it.
 // Props: label, id (the control's id), help (optional), error (optional),
 // children (the input, select or a group such as Chips), className.
-import { cloneElement, isValidElement } from "preact";
+import { cloneElement, createContext, isValidElement } from "preact";
+import { useContext } from "preact/hooks";
 
 const LABELABLE = ["input", "select", "textarea"];
 
+export const FieldTooltipContext = createContext(false);
+
 export default function Field({ label, id, help, error, children, className = "" }) {
+  const tooltip = useContext(FieldTooltipContext);
+  const native = isValidElement(children) && LABELABLE.includes(children.type);
+  const showError = Boolean(error) && !(tooltip && native);
   const helpId = help ? `${id}-help` : null;
-  const errorId = error ? `${id}-error` : null;
+  const errorId = showError ? `${id}-error` : null;
   const labelId = `${id}-label`;
   const describedBy = [helpId, errorId].filter(Boolean).join(" ") || undefined;
-  const native = isValidElement(children) && LABELABLE.includes(children.type);
   const control = isValidElement(children)
     ? cloneElement(children, {
         id: children.props.id || id,
@@ -29,7 +35,7 @@ export default function Field({ label, id, help, error, children, className = ""
       )}
       {control}
       {help ? <small class="ui-field-help" id={helpId}>{help}</small> : null}
-      {error ? <span class="ui-field-error" id={errorId} role="alert">{error}</span> : null}
+      {showError ? <span class="ui-field-error" id={errorId} role="alert">{error}</span> : null}
     </div>
   );
 }

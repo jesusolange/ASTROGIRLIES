@@ -1,4 +1,4 @@
-/* Interactive kit components: icons, chips, steps, terms, dialog, toast and the check card.
+/* Interactive kit components: icons, chips, steps, terms, toast and the check card.
    Colours come from tokens.css only. */
 
 /* ---------- Icon ---------- */
@@ -101,14 +101,14 @@
 
 /* ---------- Term ---------- */
 
+.ui-term-wrap {
+  display: inline;
+}
+
 .ui-term {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  margin: -13px 0;
-  padding: 0 2px;
+  display: inline;
+  margin: 0;
+  padding: 0;
   color: inherit;
   background: none;
   border: 0;
@@ -133,72 +133,6 @@
   box-shadow: var(--am-shadow);
   font-size: 12px;
   line-height: 1.55;
-}
-
-/* ---------- Dialog ---------- */
-
-.ui-dialog {
-  width: min(560px, 94vw);
-  max-width: min(560px, 94vw);
-  max-height: 88vh;
-  padding: 0;
-  color: var(--am-text);
-  background: var(--am-bg-raised);
-  border: 1px solid var(--am-border);
-  border-radius: var(--am-radius);
-  box-shadow: var(--am-shadow);
-}
-
-.ui-dialog::backdrop {
-  background: var(--am-overlay);
-}
-
-.ui-dialog-body {
-  padding: 18px 20px 20px;
-}
-
-.ui-dialog-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.ui-dialog-head h2 {
-  margin: 0;
-  color: var(--am-heading);
-  font-size: 18px;
-}
-
-.ui-dialog-close {
-  display: inline-grid;
-  place-items: center;
-  min-width: 44px;
-  min-height: 44px;
-  color: var(--am-text);
-  background: none;
-  border: 0;
-  border-radius: var(--am-radius-small);
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.ui-dialog-close:hover {
-  background: var(--am-surface-hover);
-}
-
-.ui-dialog-content {
-  margin-top: 10px;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.ui-dialog-foot {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 16px;
 }
 
 /* ---------- Toasts ---------- */
