@@ -1,7 +1,7 @@
 // Mission risk model: NASA's ratings per mission type, and which part of the app covers each risk.
 // The ratings are NASA's (Human Research Roadmap). The ranking score and the area weights are our formula.
 import data from "../data/hrr-risks.js";
-import coverage from "../data/risk-coverage.js";
+import { topicFor } from "../data/topics.js";
 
 export const MISSION_TYPES = [
   { id: "leo-short", drm: "leo", duration: "short", label: "Low Earth orbit, under 30 days" },
@@ -32,14 +32,14 @@ export function ratingFor(risk, missionId) {
   const m = missionType(missionId);
   const cell = (risk.ratings[m.drm] || {})[m.duration] || {};
   const ops = side(cell.ops);
-  const cover = coverage[risk.id] || null;
+  const topic = topicFor(risk.id);
   return {
     id: risk.id, title: risk.title, short: risk.short, url: risk.url, published: risk.published,
     ops, lth: side(cell.lth),
     opsDisposition: cell.ops ? cell.ops.disposition : null,
     score: ops ? ops.score : 0,
-    monitored: Boolean(cover), section: cover ? cover.section : null, part: cover ? cover.part || null : null,
-    area: cover ? cover.area : null,
+    monitored: Boolean(topic), section: topic ? topic.id : null, part: null,
+    area: topic ? topic.label : null,
   };
 }
 

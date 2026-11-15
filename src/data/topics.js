@@ -6,7 +6,7 @@ export const TOPICS = [
   { id: "kidneys", label: "Kidneys", riskIds: [81], emergency: null },
   { id: "immune", label: "Immune", riskIds: [80, 85], emergency: "fever" },
   { id: "radiation", label: "Radiation", riskIds: [96], emergency: "storm" },
-  { id: "mental", label: "Mental health", riskIds: [99], emergency: null },
+  { id: "mental", label: "Mental health", riskIds: [99], emergency: "self-harm" },
   { id: "sleep", label: "Sleep", riskIds: [100], emergency: null },
   { id: "vision", label: "Vision", riskIds: [105], emergency: "vision-change" },
   { id: "environment", label: "Cabin conditions", riskIds: [173], emergency: "cabin-air" },

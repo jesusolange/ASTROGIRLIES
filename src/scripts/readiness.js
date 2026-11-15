@@ -1,7 +1,8 @@
-// Readiness from the NASA risk map. Each monitored area carries the weight of its highest in-mission
-// NASA rating for the chosen mission; the app's own data turns each area into a 0-100 result.
+// Readiness from the NASA risk map. Each topic carries the weight of its highest in-mission NASA
+// rating for the chosen mission; the app's own data turns each topic into a 0-100 result.
 // The NASA ratings are NASA's. The coverage rule, the formula and the bands are our design choice.
-import { currentMission, areaWeights, rankedRisks, SOURCE } from "./risks.js";
+import { currentMission, rankedRisks, SOURCE } from "./risks.js";
+import { TOPICS } from "../data/topics.js";
 
 export const COVERAGE_MIN = 0.5; // design choice: fewer recorded due areas than this share means no score
 export const RECENT_DAYS = 7; // design choice: daily data is "recent" for a week
@@ -13,7 +14,6 @@ export const BANDS = [
   { min: 40, key: "easy", title: "Take it easy", advice: "Keep tasks light and work on the lowest checks below." },
   { min: 0, key: "rest", title: "Rest today", advice: "Rest today and keep your tasks light." }
 ];
-const REFERENCE_AREAS = new Set(["emergencies"]);
 
 const DAY = 864e5;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -22,10 +22,10 @@ const avg = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.leng
 
 /* ---------- pure scoring ---------- */
 
-const isReference = (area) => Boolean(area && (area.reference || REFERENCE_AREAS.has(area.key)));
+const isReference = (area) => Boolean(area && area.reference);
 
 // The share of due areas that have a current record. Reference areas are shown but never due.
-// This is the one coverage rule the score, the hero and the due list read.
+// This is the one coverage rule the score and the due list read.
 export function coverageOf(areas, scores) {
   const list = Array.isArray(areas) ? areas : [];
   const due = list.filter((area) => area && !isReference(area));
@@ -72,12 +72,6 @@ const read = (key, fallback) => {
   const store = typeof window !== "undefined" && window.AstroMedStore && window.AstroMedStore.store;
   return store ? store.get(key, fallback) : fallback;
 };
-
-function navHas(section) {
-  if (typeof window === "undefined") return false;
-  if (window.AstroMedNav && typeof window.AstroMedNav.has === "function") return window.AstroMedNav.has(section);
-  return Boolean(section);
-}
 
 function levelList(entries) {
   return entries.map((r) => (r && SCORE_LEVEL[r.level] != null ? SCORE_LEVEL[r.level] : null)).filter((v) => v != null);
@@ -159,10 +153,13 @@ function visionScore() {
 }
 
 export function scoreArea(key) {
-  if (key.startsWith("overview:")) return checkupScore(key.slice("overview:".length));
   switch (key) {
+    case "bones": return checkupScore("bones");
+    case "kidneys": return checkupScore("kidneys");
+    case "sleep": return checkupScore("brain");
+    case "heart": return checkupScore("heart");
     case "nutrition": return nutritionScore();
-    case "twin": return exerciseScore();
+    case "exercise": return exerciseScore();
     case "mental": return mentalScore();
     case "environment": return environmentScore();
     case "immune": return immuneScore();
@@ -174,57 +171,38 @@ export function scoreArea(key) {
 
 export function collectScores(areas) {
   const scores = {};
-  areas.forEach((area) => {
-    if (!navHas(area.section)) { scores[area.key] = null; return; }
-    scores[area.key] = scoreArea(area.key);
-  });
+  areas.forEach((area) => { scores[area.key] = scoreArea(area.key); });
   return scores;
+}
+
+// One area per topic; its weight is the topic's highest in-mission NASA rating for the mission.
+export function areasFor(missionId) {
+  const byId = new Map(rankedRisks(missionId).map((r) => [r.id, r]));
+  const areas = TOPICS.map((topic) => {
+    const risk = topic.riskIds.map((id) => byId.get(id)).filter(Boolean).sort((a, b) => b.score - a.score)[0] || null;
+    return { key: topic.id, topicId: topic.id, area: topic.label, score: risk ? risk.score : 0, risk, riskId: risk ? risk.id : null };
+  });
+  const total = areas.reduce((sum, area) => sum + area.score, 0) || 1;
+  return areas.map((area) => ({ ...area, weight: area.score / total })).sort((a, b) => b.weight - a.weight);
 }
 
 /* ---------- public computation ---------- */
 
 export function compute() {
   const mission = currentMission();
-  const weights = areaWeights(mission.id);
-  const byId = new Map(rankedRisks(mission.id).map((r) => [r.id, r]));
-  const areas = weights.map((w) => ({ ...w, risk: byId.get(w.riskId) || null }));
+  const areas = areasFor(mission.id);
   const scores = collectScores(areas);
   const result = evaluateReadiness(areas, scores);
   return {
     mission,
-    areas: areas.map((a) => ({ ...a, data: scores[a.key] || null, reference: REFERENCE_AREAS.has(a.key) })),
+    areas: areas.map((a) => ({ ...a, data: scores[a.key] || null, reference: false })),
     ...result,
     coveragePct: Math.round(result.coverage * 100)
   };
 }
 
-export function findings() {
-  const r = compute();
-  if (r.status !== "scored") {
-    const names = r.missing.map((a) => a.area).join(", ");
-    return [{
-      level: "info",
-      title: "Readiness · not enough data",
-      saw: `You have recorded ${r.covered} of ${r.due} areas that are due for this mission.`,
-      todo: names ? `Do these checks next: ${names}.` : "Do your daily checks so a score can be shown."
-    }];
-  }
-  const level = r.total >= 80 ? "ok" : r.total >= 60 ? "review" : "alert";
-  return [{
-    level,
-    title: `Readiness score: ${r.total}/100 (${r.band.title})`,
-    saw: `From ${r.covered} of ${r.due} due areas.`,
-    todo: r.band.advice
-  }];
-}
-
-export function immuneFindings() {
-  const immune = typeof window !== "undefined" ? window.AstroMedImmune : null;
-  return immune && typeof immune.findings === "function" ? immune.findings() : [];
-}
-
 export { SOURCE };
 
 if (typeof window !== "undefined") {
-  window.AstroMedReadiness = { compute, findings, immuneFindings, evaluateReadiness, coverageOf, COVERAGE_MIN, SOURCE };
+  window.AstroMedReadiness = { compute, evaluateReadiness, coverageOf, COVERAGE_MIN, SOURCE };
 }

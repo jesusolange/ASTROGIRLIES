@@ -26,7 +26,7 @@ test("coverage counts the share of due areas with a current record", () => {
   assert.equal(half.done, 2);
   assert.equal(half.share, 0.5);
 
-  const reference = Readiness.coverageOf([...areas, { key: "emergencies", weight: 0.1 }], {});
+  const reference = Readiness.coverageOf([...areas, { key: "reference", weight: 0.1, reference: true }], {});
   assert.equal(reference.due, 4);
 });
 
@@ -103,4 +103,39 @@ test("bands run from rest to ready", () => {
   assert.equal(Readiness.bandFor(59).key, "easy");
   assert.equal(Readiness.bandFor(40).key, "easy");
   assert.equal(Readiness.bandFor(39).key, "rest");
+});
+
+test("every topic is an area and the weights add to 1 for the chosen mission", () => {
+  const Store = require("../src/scripts/storage.js");
+  const Topics = require("../src/data/topics.js");
+  const m = new Map([["astromed-profile", JSON.stringify({ missionType: "mars-planetary" })]]);
+  globalThis.AstroMedStore = { store: Store.create({
+    get length() { return m.size; },
+    key: (i) => [...m.keys()][i] ?? null,
+    getItem: (k) => (m.has(k) ? m.get(k) : null),
+    setItem: (k, v) => m.set(k, String(v)),
+    removeItem: (k) => m.delete(k)
+  }) };
+  const result = Readiness.compute();
+  assert.equal(result.mission.id, "mars-planetary");
+  assert.equal(result.areas.length, Topics.TOPICS.length);
+  assert.ok(Math.abs(result.areas.reduce((sum, area) => sum + area.weight, 0) - 1) < 1e-9);
+  const keys = result.areas.map((area) => area.key);
+  for (const topic of Topics.TOPICS) assert.ok(keys.includes(topic.id), topic.id);
+});
+
+test("without enough recorded topics there is no score", () => {
+  const Store = require("../src/scripts/storage.js");
+  const m = new Map();
+  globalThis.AstroMedStore = { store: Store.create({
+    get length() { return m.size; },
+    key: (i) => [...m.keys()][i] ?? null,
+    getItem: (k) => (m.has(k) ? m.get(k) : null),
+    setItem: (k, v) => m.set(k, String(v)),
+    removeItem: (k) => m.delete(k)
+  }) };
+  const result = Readiness.compute();
+  assert.equal(result.status, "insufficient");
+  assert.equal(result.total, null);
+  assert.ok(result.due > 0);
 });
