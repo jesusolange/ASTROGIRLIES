@@ -12,6 +12,7 @@ import "./check.css";
 export default function CheckView() {
   const [revision, setRevision] = useState(0);
   const [activeId, setActiveId] = useState(null);
+  const [passed, setPassed] = useState([]);
 
   useEffect(() => {
     if (!window.AstroMedStore || !window.AstroMedStore.store) return undefined;
@@ -30,7 +31,13 @@ export default function CheckView() {
   const topicCards = !opened && routeId ? cardsForTopic(routeId, cards) : [];
   const topicDue = topicCards.filter((card) => due.includes(card));
   const scoped = topicCards.length > 0;
-  const queue = scoped ? topicDue : due;
+  // Cards passed in this visit (with Next or "Done for now") go to the end, so a card that is still due
+  // (a meal card before dinner) does not come straight back.
+  const pending = scoped ? topicDue : due;
+  const queue = [
+    ...pending.filter((card) => !passed.includes(card.id)),
+    ...pending.filter((card) => passed.includes(card.id)).sort((a, b) => passed.indexOf(a.id) - passed.indexOf(b.id)),
+  ];
   const active = opened || (activeId ? findCard(cards, activeId) : null);
 
   useEffect(() => {
@@ -42,7 +49,8 @@ export default function CheckView() {
     setActiveId(queue[0].id);
   }, [routeId, opened, scoped, activeId, queue]);
 
-  function finish() {
+  function finish(card) {
+    if (card && card.id) setPassed((old) => [...old.filter((id) => id !== card.id), card.id]);
     setActiveId(null);
     if (opened || (scoped && topicDue.length <= 1)) go("#/check");
   }

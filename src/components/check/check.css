@@ -6,6 +6,11 @@
   padding: 0 0 24px;
 }
 
+/* A card with its visuals beside it takes most of the screen width. */
+.ck-wrap:has(.ui-card-row) {
+  max-width: 1320px;
+}
+
 .ck-head h1 {
   margin: 0 0 6px;
   color: var(--am-heading);

@@ -336,6 +336,27 @@
   color: var(--am-text);
 }
 
+.ui-card-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.ui-card-aside {
+  min-width: 0;
+  padding: 16px;
+  background: var(--am-surface);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+}
+
+@media (max-width: 900px) {
+  .ui-card-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ui-card-actions {
   display: flex;
   flex-wrap: wrap;

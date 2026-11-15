@@ -6,7 +6,11 @@
 //     Component({ form, onSaved })   // renders the fields; form = { values, set, errorFor, fieldRef }
 //     save(values) -> { error: { field, message } } | { result, undo }
 //     isDone() -> boolean,
-//     summary() -> string   // optional: what was recorded today, shown in "Done for today" }
+//     summary() -> string,  // optional: what was recorded today, shown in "Done for today"
+//     Aside({ form, result }) // optional: visuals in their own container to the right of the card
+//   }
+// Component also receives onDone(): a card logged several times a day calls it from "Done for now"
+// to leave without a result; the deck moves on and the card stays due.
 // result = { level, saw, todo, toast?, actions?: [{ label, onClick, variant? }], body?: node }
 //   level null hides the badge; body replaces saw and todo; actions render as buttons under the result.
 // A card may also save by itself and call onSaved(result, undo).
@@ -76,7 +80,8 @@ export default function CheckCard({ card, onDone }) {
     timer.current = setTimeout(() => onDone?.(card), wait);
   }
 
-  return (
+  const Aside = card.Aside;
+  const article = (
     <article class={`ui-card ${leaving ? "is-leaving" : ""}`.trim()} aria-labelledby={titleId}>
       <header class="ui-card-head">
         <h2 class="ui-card-title" id={titleId}>{card.title}</h2>
@@ -108,7 +113,7 @@ export default function CheckCard({ card, onDone }) {
         </div>
       ) : (
         <div class="ui-card-body">
-          <Component form={form} onSaved={showResult} />
+          <Component form={form} onSaved={showResult} onDone={next} />
         </div>
       )}
 
@@ -122,5 +127,15 @@ export default function CheckCard({ card, onDone }) {
         ) : null}
       </footer>
     </article>
+  );
+
+  if (!Aside) return article;
+  return (
+    <div class={`ui-card-row ${leaving ? "is-leaving" : ""}`.trim()}>
+      {article}
+      <aside class="ui-card-aside" aria-label={`${card.title}: overview`}>
+        <Aside form={form} result={result} />
+      </aside>
+    </div>
   );
 }
