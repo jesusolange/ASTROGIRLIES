@@ -10,7 +10,7 @@ export const TERMS = {
   "Flight surgeon": "The mission's doctor on Earth who supports the crew.",
   "GCS": "Glasgow Coma Scale: a score of eye, verbal and motor responses that describes level of consciousness.",
   "SANS": "Spaceflight Associated Neuro-ocular Syndrome: eye and vision changes linked to spaceflight.",
-  "ICR": "Intercostal space: the gap between two ribs, used to place a chest needle or drain.",
+  "ICR": "Intercostal space: the gap between two ribs, used to place a chest drain.",
   "EVA": "Extravehicular activity: a spacewalk outside the spacecraft.",
   "DVT": "Deep vein thrombosis: a blood clot in a deep vein, usually in the leg.",
   "BMD": "Bone mineral density: the amount of mineral in a bone, a measure of bone strength.",

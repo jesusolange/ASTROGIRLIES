@@ -93,16 +93,16 @@ export const CARDS = [
     blocks: [
       { type: "stage", n: 1, layout: "compare", title: "Check for a collapsed lung (pneumothorax)", diagram: [
         { type: "images", images: [
-          { src: "/assets/emergency/chest.jpg", alt: "Chest with the needle point and the chest drain point", ai: true },
+          { src: "/assets/emergency/chest.jpg", alt: "Chest with the two chest drain sites", ai: true },
           { src: "/assets/emergency/drain.jpg", alt: "Chest drain: tip at the top for air, low for fluid", ai: true },
         ], legend: [
-          { tone: "bad", text: "1. Needle: ICR 2–3, mid-clavicular line" },
-          { tone: "ok", text: "2. Chest drain: ICR 4–5, mid or anterior axillary line" },
+          { tone: "bad", text: "Site 1: ICR 2–3, mid-clavicular line" },
+          { tone: "ok", text: "Site 2: ICR 4–5, mid or anterior axillary line" },
         ] },
       ], look: [
         "Lung ultrasound: air between the ribs and no lung tissue under the probe", "Or: no breathing sound in part of the lung when you listen (auscultation)",
       ], todo: [
-        "Needle first: a large needle in the 2nd–3rd intercostal space (ICR) on the mid-clavicular line, OR in the 4th–5th ICR on the mid or anterior axillary line.", "Then a chest drain. Local anaesthesia, small cut (mini-thoracotomy).",
+        "Choose the site: the 2nd–3rd intercostal space (ICR) on the mid-clavicular line, OR the 4th–5th ICR on the mid or anterior axillary line.", "Place a chest drain there. Local anaesthesia, small cut (mini-thoracotomy).",
         "Prepare the channel: open it bluntly with scissors or forceps at the TOP edge of the lower rib of that space.", "Tunnel upwards, open the parietal pleura, feel the pleural space with a finger.",
         "Grab the drain with forceps (no guide rod) and push it in about 20 cm, guided by the finger if possible.", "Tip of the drain: AIR rises, so put it at the top (apex). FLUID flows down, so put it low (caudal).",
       ], no: "Go to step 2." },
