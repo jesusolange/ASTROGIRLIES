@@ -111,12 +111,6 @@ export default function Cover({ onClosed }) {
     openProfile(true, "you");
   }
 
-  function removed() {
-    setSelectedId(null);
-    setPin("");
-    setError("");
-  }
-
   return (
     <div
       class={`amc${closing ? " amc-out" : ""}`}
@@ -161,7 +155,6 @@ export default function Cover({ onClosed }) {
               onPick={pick}
               onPin={(next) => { setPin(next); setError(""); }}
               onAdd={addMember}
-              onRemoved={removed}
             />
 
             <div class="amc-actions">

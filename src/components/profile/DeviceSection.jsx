@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { closeDialog } from "../../scripts/profile.js";
-import { IDLE_MS, PIN_MAX, PIN_MIN, activeSignal, clearPinFor, lock, setPinFor } from "../../scripts/people.js";
+import { IDLE_MS, PIN_MAX, PIN_MIN, activeSignal, clearPinFor, lock, savePinFor } from "../../scripts/people.js";
 import Button from "../ui/Button.jsx";
 import Field from "../ui/Field.jsx";
 import RemovePerson from "../crew/RemovePerson.jsx";
@@ -8,35 +8,73 @@ import "../crew/crew.css";
 
 export default function DeviceSection() {
   const person = activeSignal.value;
+  const [current, setCurrent] = useState("");
   const [pin, setPin] = useState("");
-  const [error, setError] = useState("");
+  const [repeat, setRepeat] = useState("");
+  const [errors, setErrors] = useState({});
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [removing, setRemoving] = useState(false);
 
   if (!person) return null;
 
+  function change(setter) {
+    return (event) => {
+      setter(event.currentTarget.value.replace(/\D/g, ""));
+      if (note) setNote("");
+    };
+  }
+
+  function clearError(key) {
+    setErrors((currentErrors) => (currentErrors[key] ? { ...currentErrors, [key]: undefined } : currentErrors));
+  }
+
+  function reset() {
+    setErrors({});
+    setNote("");
+  }
+
   async function savePin(event) {
     event.preventDefault();
-    setError("");
-    setNote("");
+    if (busy) return;
+    reset();
     setBusy(true);
     try {
-      await setPinFor(person.id, pin);
+      const result = await savePinFor(person.id, pin, repeat, current);
+      if (!result.ok) {
+        setErrors(result.errors);
+        return;
+      }
+      setCurrent("");
       setPin("");
-      setNote("PIN saved.");
+      setRepeat("");
+      setNote(person.pinHash ? "PIN changed." : "PIN saved.");
     } catch (problem) {
-      setError(problem && problem.message ? problem.message : "Could not save the PIN.");
+      setErrors({ pin: problem && problem.message ? problem.message : "Could not save the PIN." });
     } finally {
       setBusy(false);
     }
   }
 
-  function dropPin() {
-    clearPinFor(person.id);
-    setPin("");
-    setError("");
-    setNote("PIN removed.");
+  async function dropPin() {
+    if (busy) return;
+    reset();
+    setBusy(true);
+    try {
+      const result = await clearPinFor(person.id, current);
+      if (!result.ok) {
+        setErrors(result.errors);
+        return;
+      }
+      setCurrent("");
+      setPin("");
+      setRepeat("");
+      setNote("PIN removed.");
+    } catch (problem) {
+      setErrors({ current: problem && problem.message ? problem.message : "Could not remove the PIN." });
+    } finally {
+      setBusy(false);
+    }
   }
 
   function lockNow() {
@@ -60,16 +98,28 @@ export default function DeviceSection() {
         <Button variant="soft" onClick={lockNow}>Lock</Button>
       </div>
 
-      <form class="pf-pin" onSubmit={savePin}>
+      <form class="pf-pin" onSubmit={savePin} noValidate>
         <p>
           The PIN keeps your records out of casual view on this device. It is not encryption, and it cannot be
           recovered if forgotten. This is our design choice.
         </p>
-        <Field
-          label={person.pinHash ? "New PIN (4 to 8 digits)" : "PIN (4 to 8 digits, optional)"}
-          id="pf-pin"
-          error={error || undefined}
-        >
+        {person.pinHash ? (
+          <Field label="Current PIN" id="pf-pin-current" error={errors.current}>
+            <input
+              id="pf-pin-current"
+              type="password"
+              inputMode="numeric"
+              autocomplete="off"
+              minLength={PIN_MIN}
+              maxLength={PIN_MAX}
+              pattern={`\\d{${PIN_MIN},${PIN_MAX}}`}
+              value={current}
+              disabled={busy}
+              onInput={(event) => { change(setCurrent)(event); clearError("current"); }}
+            />
+          </Field>
+        ) : null}
+        <Field label="New PIN (4 to 8 digits)" id="pf-pin" error={errors.pin}>
           <input
             id="pf-pin"
             type="password"
@@ -80,12 +130,28 @@ export default function DeviceSection() {
             pattern={`\\d{${PIN_MIN},${PIN_MAX}}`}
             value={pin}
             disabled={busy}
-            onInput={(event) => { setPin(event.currentTarget.value.replace(/\D/g, "")); setError(""); setNote(""); }}
+            onInput={(event) => { change(setPin)(event); clearError("pin"); }}
+          />
+        </Field>
+        <Field label="Repeat new PIN" id="pf-pin-repeat" error={errors.repeat}>
+          <input
+            id="pf-pin-repeat"
+            type="password"
+            inputMode="numeric"
+            autocomplete="off"
+            minLength={PIN_MIN}
+            maxLength={PIN_MAX}
+            pattern={`\\d{${PIN_MIN},${PIN_MAX}}`}
+            value={repeat}
+            disabled={busy}
+            onInput={(event) => { change(setRepeat)(event); clearError("repeat"); }}
           />
         </Field>
         <div class="pf-actions">
-          <Button type="submit" variant="soft" disabled={busy}>{busy ? "Saving..." : "Set PIN"}</Button>
-          {person.pinHash ? <Button variant="soft" onClick={dropPin}>Remove PIN</Button> : null}
+          <Button type="submit" variant="soft" disabled={busy}>
+            {busy ? "Saving..." : person.pinHash ? "Change PIN" : "Set PIN"}
+          </Button>
+          {person.pinHash ? <Button variant="soft" disabled={busy} onClick={dropPin}>Remove PIN</Button> : null}
         </div>
         {note ? <p class="pf-note" role="status">{note}</p> : null}
       </form>

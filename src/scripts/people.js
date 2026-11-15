@@ -230,18 +230,36 @@ export function enter(id) {
   return { ok: true, person };
 }
 
-export async function setPinFor(id, pin) {
-  const api = store();
-  const code = await makePin(pin);
-  const list = listFrom(api).map((person) => (person.id === id ? { ...person, ...code } : person));
-  writeList(api, list);
-  return true;
+export function pinEntryErrors(pin, repeat) {
+  const errors = {};
+  if (!isValidPin(pin)) errors.pin = `Use ${PIN_MIN} to ${PIN_MAX} digits.`;
+  if (pin !== repeat) errors.repeat = "The new PINs do not match.";
+  return errors;
 }
 
-export function clearPinFor(id) {
+export async function savePinFor(id, pin, repeat, currentPin) {
   const api = store();
-  const list = listFrom(api).map((person) => (person.id === id ? { ...person, pinSalt: null, pinHash: null } : person));
-  writeList(api, list);
+  const person = personById(listFrom(api || {}), id);
+  if (!api || !person) return { ok: false, errors: { pin: "Choose your name first." } };
+  if (person.pinHash && !(await verifyPin(person, currentPin || ""))) {
+    return { ok: false, errors: { current: "Wrong current PIN. Try again." } };
+  }
+  const errors = pinEntryErrors(pin, repeat);
+  if (Object.keys(errors).length) return { ok: false, errors };
+  const code = await makePin(pin);
+  writeList(api, listFrom(api).map((item) => (item.id === id ? { ...item, ...code } : item)));
+  return { ok: true };
+}
+
+export async function clearPinFor(id, currentPin) {
+  const api = store();
+  const person = personById(listFrom(api || {}), id);
+  if (!api || !person) return { ok: false, errors: { current: "Choose your name first." } };
+  if (person.pinHash && !(await verifyPin(person, currentPin || ""))) {
+    return { ok: false, errors: { current: "Wrong current PIN. Try again." } };
+  }
+  writeList(api, listFrom(api).map((item) => (item.id === id ? { ...item, pinSalt: null, pinHash: null } : item)));
+  return { ok: true };
 }
 
 export function removePerson(id) {
