@@ -1,123 +1,80 @@
-import Panel from "../ui/Panel.jsx";
+// Today's totals against the profile's targets: the plate shares, one ring per target, and the meals logged.
+import { Beef, Carrot, Cookie, Droplet, GlassWater, Nut, Wheat, Zap } from "lucide-preact";
+import { needList, status } from "../../scripts/nutrition.js";
+import PlateChart from "./PlateChart.jsx";
 
-const SIZE = 300;
-const RING_WIDTH = 16;
-const PLATE_R = 74;
-
-function ring(ratio, level) {
-  const r = (SIZE - RING_WIDTH) / 2;
-  const C = 2 * Math.PI * r;
-  const v = Math.max(0, Math.min(1, ratio));
-  return (
-    <circle
-      class={`nutrition-plate-arc nutrition-plate-arc--${level}`}
-      cx={SIZE / 2} cy={SIZE / 2} r={r} fill="none" stroke-width={RING_WIDTH}
-      stroke-linecap="round" stroke-dasharray={`${v * C} ${C}`}
-      transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}
-    />
-  );
-}
-
-function sector(start, end, kind, progress) {
-  const cx = 150, cy = 150;
-  const rad = (a) => (a - 90) * Math.PI / 180;
-  const x0 = cx + PLATE_R * Math.cos(rad(start)), y0 = cy + PLATE_R * Math.sin(rad(start));
-  const x1 = cx + PLATE_R * Math.cos(rad(end)), y1 = cy + PLATE_R * Math.sin(rad(end));
-  return (
-    <path
-      class={`nutrition-plate-sector nutrition-plate-sector--${kind}`}
-      d={`M${cx} ${cy} L${x0} ${y0} A${PLATE_R} ${PLATE_R} 0 0 1 ${x1} ${y1}Z`}
-      opacity={(0.22 + 0.78 * Math.min(1, Math.max(0, progress))).toFixed(2)}
-    />
-  );
-}
-
-function label(x, y, text, progress) {
-  return <text x={x} y={y} font-size="30" text-anchor="middle" opacity={(0.22 + 0.78 * Math.min(1, Math.max(0, progress))).toFixed(2)}>{text}</text>;
-}
-
-function Plate({ T, tot, level }) {
-  const ratio = T ? tot.kcal / T.kcal : 0;
-  const pc = T ? tot.carb / T.carbs[0] : 0;
-  const pp = T ? tot.prot / T.protein[0] : 0;
-  const pv = T ? tot.veg / T.veg : 0;
-  return (
-    <svg class="nutrition-plate" viewBox="0 0 300 300" role="img" aria-label={`Calories ${Math.round(tot.kcal)} of ${T ? Math.round(T.kcal) : "?"}`}>
-      <circle cx="150" cy="150" r="142" fill="none" stroke="var(--am-field-border)" stroke-width="16" opacity="0.35" />
-      {ring(ratio, level)}
-      <circle class="nutrition-plate-rim" cx="150" cy="150" r="104" />
-      <circle class="nutrition-plate-face" cx="150" cy="150" r="92" />
-      {sector(0, 120, "carb", pc)}
-      {sector(120, 240, "protein", pp)}
-      {sector(240, 360, "veg", pv)}
-      <circle cx="150" cy="150" r={PLATE_R} fill="none" stroke="var(--am-bg-raised)" stroke-width="3" />
-      <path d="M150 150L150 76M150 150L214 187M150 150L86 187" stroke="var(--am-bg-raised)" stroke-width="3" />
-      {label(188, 118, "🍞", pc)}{label(150, 214, "🍗", pp)}{label(112, 118, "🥦", pv)}
-    </svg>
-  );
-}
-
-function MiniRing({ icon, label: text, value, goal, unit, cap }) {
-  const p = goal ? value / goal : 0;
+function MiniRing({ Glyph, label, value, goal, unit, cap }) {
+  const ratio = goal ? value / goal : 0;
   const level = cap
-    ? (p > 1 ? "high" : p > 0.85 ? "warn" : "ok")
-    : (p >= 1 ? "ok" : p >= 0.5 ? "mid" : "low");
-  const r = (84 - 9) / 2, C = 2 * Math.PI * r;
+    ? (ratio > 1 ? "high" : ratio > 0.85 ? "warn" : "ok")
+    : (ratio >= 1 ? "ok" : ratio >= 0.5 ? "mid" : "low");
+  const radius = (84 - 9) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const filled = Math.max(0, Math.min(1, ratio)) * circumference;
   return (
-    <div class="nutrition-mini">
-      <svg viewBox="0 0 84 84" width="84" height="84" aria-hidden="true">
-        <circle cx="42" cy="42" r={r} fill="none" stroke="var(--am-field-border)" stroke-width="9" opacity="0.35" />
-        <circle
-          class={`nutrition-mini-arc nutrition-mini-arc--${level}`}
-          cx="42" cy="42" r={r} fill="none" stroke-width="9" stroke-linecap="round"
-          stroke-dasharray={`${Math.max(0, Math.min(1, p)) * C} ${C}`}
-          transform="rotate(-90 42 42)"
-        />
-        <text x="42" y="50" font-size="24" text-anchor="middle">{icon}</text>
-      </svg>
+    <div class="ntr-mini">
+      <span class="ntr-mini-ring">
+        <svg viewBox="0 0 84 84" width="84" height="84" aria-hidden="true">
+          <circle cx="42" cy="42" r={radius} fill="none" class="ntr-mini-track" stroke-width="9" />
+          <circle
+            class={`ntr-mini-arc ntr-mini-arc--${level}`}
+            cx="42" cy="42" r={radius} fill="none" stroke-width="9" stroke-linecap="round"
+            stroke-dasharray={`${filled} ${circumference}`}
+            transform="rotate(-90 42 42)"
+          />
+        </svg>
+        <Glyph class="ntr-mini-icon" size={22} strokeWidth={2} aria-hidden="true" />
+      </span>
       <b>{Math.round(value)}<small> {unit}</small></b>
-      <span>{text}</span>
+      <span>{label}</span>
       <em>{cap ? `max ${Math.round(goal)}` : `goal ${Math.round(goal)}`}</em>
     </div>
   );
 }
 
-export default function NutritionTargets({ T, tot, list, statusFn, needFn }) {
-  const ratio = tot.kcal / T.kcal;
-  const state = statusFn(ratio, tot.kcal > 0);
+export default function NutritionTargets({ T, tot, list }) {
+  const state = status(tot.kcal / T.kcal, tot.kcal > 0);
   const left = Math.max(0, T.kcal - tot.kcal);
-  const need = needFn(tot, T);
-  const eaten = { Breakfast: false, Lunch: false, Dinner: false };
-  list.forEach((e) => { if (e.meal in eaten) eaten[e.meal] = true; });
+  const need = needList(tot, T);
+  const eaten = new Set(list.map((entry) => entry.meal));
 
   return (
-    <Panel className="nutrition-hero">
-      <div class="nutrition-ringbox">
-        <Plate T={T} tot={tot} level={state.level} />
-        <div class="nutrition-center"><b>{Math.round(tot.kcal)}</b><span>of {Math.round(T.kcal)} kcal</span></div>
+    <section class="ntr-targets">
+      <div class="ntr-plate">
+        <PlateChart totals={tot} />
+        <div class="ntr-plate-center">
+          <b>{Math.round(tot.kcal)}</b>
+          <span>of {Math.round(T.kcal)} kcal</span>
+        </div>
       </div>
-      <div class="nutrition-side">
-        <div class={`nutrition-state nutrition-state--${state.level}`}>
+
+      <div class="ntr-side">
+        <p class={`ntr-state ntr-state--${state.level}`}>
           <b>{state.label}</b>
           {left > 0 && tot.kcal > 0 ? <em>{Math.round(left)} kcal left</em> : null}
+        </p>
+
+        <div class="ntr-rings">
+          <MiniRing Glyph={Zap} label="Energy" value={tot.kcal} goal={T.kcal} unit="kcal" />
+          <MiniRing Glyph={Beef} label="Protein" value={tot.prot} goal={T.protein[0]} unit="g" />
+          <MiniRing Glyph={Wheat} label="Carbs" value={tot.carb} goal={T.carbs[0]} unit="g" />
+          <MiniRing Glyph={Nut} label="Fat" value={tot.fat} goal={T.fat[0]} unit="g" />
+          <MiniRing Glyph={GlassWater} label="Water" value={tot.fluid} goal={T.fluid} unit="mL" />
+          <MiniRing Glyph={Carrot} label="Vegetables" value={tot.veg} goal={T.veg} unit="g" />
+          <MiniRing Glyph={Cookie} label="Salt" value={tot.sodium} goal={T.sodiumMax} unit="mg" cap />
+          <MiniRing Glyph={Droplet} label="Iron" value={tot.iron} goal={T.iron} unit="mg" />
         </div>
-        <div class="nutrition-rings">
-          <MiniRing icon="🍗" label="Protein" value={tot.prot} goal={T.protein[0]} unit="g" />
-          <MiniRing icon="🍞" label="Carbs" value={tot.carb} goal={T.carbs[0]} unit="g" />
-          <MiniRing icon="🥑" label="Fat" value={tot.fat} goal={T.fat[0]} unit="g" />
-          <MiniRing icon="💧" label="Water" value={tot.fluid} goal={T.fluid} unit="mL" />
-          <MiniRing icon="🥦" label="Veg" value={tot.veg} goal={T.veg} unit="g" />
-          <MiniRing icon="🧂" label="Salt" value={tot.sodium} goal={T.sodiumMax} unit="mg" cap />
-        </div>
-        <div class="nutrition-meals">
-          {["Breakfast", "Lunch", "Dinner"].map((m) => (
-            <span key={m} class={eaten[m] ? "on" : ""}>{m}{eaten[m] ? " ✓" : ""}</span>
+
+        <div class="ntr-meals">
+          {["Breakfast", "Lunch", "Dinner"].map((meal) => (
+            <span key={meal} class={eaten.has(meal) ? "is-on" : ""}>{meal}</span>
           ))}
         </div>
+
         {need.length
-          ? <p class="nutrition-need"><b>Still need:</b> {need.join(" · ")}</p>
-          : <p class="nutrition-need nutrition-need--ok">All goals reached for this day.</p>}
+          ? <p class="ntr-need"><b>Still need:</b> {need.join(" · ")}</p>
+          : <p class="ntr-need ntr-need--ok">All goals reached for this day.</p>}
       </div>
-    </Panel>
+    </section>
   );
 }

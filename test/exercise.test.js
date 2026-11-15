@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEVICES, deviceOf, validateSession, buildSession, addSession } from "../src/scripts/exercise.js";
-import { buildOverview, validSessions } from "../src/scripts/exercise-overview.js";
+import {
+  DEVICES, deviceOf, validateSession, buildSession, addSession, sessionsToday, doneToday,
+  weeklyResistive, removeSession, RESISTIVE_WEEKLY_TARGET, parseVo2, todaySummary
+} from "../src/scripts/exercise.js";
+import { buildOverview, validSessions, weeklyNumbers } from "../src/scripts/exercise-overview.js";
 
 const now = new Date(2026, 10, 14, 12, 0, 0);
 const daysAgo = (n) => new Date(2026, 10, 14 - n, 12, 0, 0).toISOString();
@@ -104,6 +107,52 @@ test("performance compares the latest two comparable sessions", () => {
   const load = performance.find((p) => /ARED Squat/.test(p.label));
   assert.equal(load.from, 80);
   assert.equal(load.to, 90);
+});
+
+test("one session today marks the day done and several records are kept", () => {
+  const today = [session("ared", { minutes: 30 }, 0), session("t2", { minutes: 20 }, 0)];
+  assert.equal(sessionsToday(today, now).length, 2);
+  assert.equal(doneToday(today, now), true);
+  assert.equal(doneToday([session("ared", { minutes: 30 }, 1)], now), false);
+});
+
+test("weekly resistive counts ARED sessions in the last seven days", () => {
+  const data = [
+    session("ared", { minutes: 20 }, 0),
+    session("ared", { minutes: 20 }, 2),
+    session("cevis", { minutes: 20 }, 1),
+    session("ared", { minutes: 20 }, 6),
+    session("ared", { minutes: 20 }, 7)
+  ];
+  assert.equal(RESISTIVE_WEEKLY_TARGET, 3);
+  assert.equal(weeklyResistive(data, now), 3);
+});
+
+test("a session can be removed by its id", () => {
+  const data = [{ ...session("ared", { minutes: 20 }, 0), id: "a" }, { ...session("t2", { minutes: 20 }, 0), id: "b" }];
+  assert.deepEqual(removeSession(data, "a").map((item) => item.id), ["b"]);
+});
+
+test("the deck summary names today's sessions and minutes", () => {
+  const data = [session("ared", { minutes: 45 }, 0), session("t2", { minutes: 20 }, 0)];
+  assert.equal(todaySummary(data, now), "2 sessions, 65 min");
+  assert.equal(todaySummary([session("ared", { minutes: 45 }, 1)], now), "");
+});
+
+test("a VO2max test is accepted only with a realistic value and a date", () => {
+  assert.equal(parseVo2({ value: "42", date: "2026-11-14" }).ok, true);
+  assert.equal(parseVo2({ value: "", date: "2026-11-14" }).ok, false);
+  assert.equal(parseVo2({ value: "4", date: "2026-11-14" }).ok, false);
+  assert.equal(parseVo2({ value: "91", date: "2026-11-14" }).ok, false);
+  assert.equal(parseVo2({ value: "42", date: "" }).ok, false);
+});
+
+test("the weekly numbers carry the chart data for Progress", () => {
+  const numbers = weeklyNumbers([session("ared", { minutes: 45, effort: 6 }, 0)], now);
+  assert.equal(numbers.days.length, 7);
+  assert.equal(numbers.currentCount, 1);
+  assert.equal(numbers.totalMinutes, 45);
+  assert.equal(numbers.days[6].amount, 45);
 });
 
 test("the overview reports an empty week and higher effort", () => {

@@ -101,7 +101,7 @@ export function buildOverview(data, now = new Date()) {
   if (current.length === 0) {
     insights.push({
       title: "No recent training logs",
-      message: "Record an ARED, T2 or CEVIS session to start seeing changes. An empty log does not prove training was missed."
+      message: "Record a strength, treadmill or bike session to start seeing changes. An empty log does not prove training was missed."
     });
   } else {
     const soreness = current.map((s) => asNumber(s.values?.soreness)).filter((n) => n !== null && n >= 0 && n <= 10);
@@ -165,5 +165,20 @@ export function buildOverview(data, now = new Date()) {
     machines: perType,
     performance,
     insights
+  };
+}
+
+// The weekly numbers Progress draws (the charts themselves left this section).
+export function weeklyNumbers(data, now = new Date()) {
+  const overview = buildOverview(data, now);
+  return {
+    days: overview.days,
+    peak: overview.peak,
+    currentCount: overview.currentCount,
+    totalMinutes: overview.totalMinutes,
+    previousMinutes: overview.previousMinutes,
+    comparison: overview.comparison,
+    machines: overview.machines,
+    performance: overview.performance
   };
 }

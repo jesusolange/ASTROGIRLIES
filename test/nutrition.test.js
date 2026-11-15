@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import {
   targets, totalsOf, dayEntries, factor, unitLabel, buildEntry, status,
   weekRows, summaryFor, findingsFor, addToLibrary, parseFoodList, mergeFoodList,
-  isoDay, blankNutrition, waterEntry, lookupFood
+  isoDay, blankNutrition, waterEntry, lookupFood, doneToday, plateShares, ironTarget,
+  ironUnder, searchFoods, removeEntry, todaySummary
 } from "../src/scripts/nutrition.js";
 
 const profile = { age: 40, sex: "m", weightKg: 80, heightCm: 180, startDate: "2026-11-01" };
@@ -21,6 +22,14 @@ test("energy target follows the male equation at activity 1.11", () => {
   close(T.fluid, 2560);
   close(T.sodiumMax, 2300);
   close(T.veg, 400);
+  close(T.iron, 10);
+});
+
+test("the iron goal is the same for every crew member", () => {
+  assert.equal(ironTarget({ sex: "m" }), 10);
+  assert.equal(ironTarget({ sex: "f", meno: "pre" }), 10);
+  assert.equal(ironTarget({ sex: "x" }), 10);
+  assert.equal(ironTarget(null), 10);
 });
 
 test("prefer not to say averages the male and female formulas", () => {
@@ -40,10 +49,47 @@ test("EVA hours add 200 kcal each and target needs a complete profile", () => {
 
 test("daily totals add every nutrient field", () => {
   const totals = totalsOf([
-    { kcal: 100, carb: 10, prot: 5, fat: 2, fiber: 3, sodium: 50, veg: 20, fluid: 200 },
-    { kcal: 250, carb: 30, prot: 12, fat: 8, fiber: 4, sodium: 100, veg: 0, fluid: 0 }
+    { kcal: 100, carb: 10, prot: 5, fat: 2, fiber: 3, sodium: 50, veg: 20, fluid: 200, iron: 2 },
+    { kcal: 250, carb: 30, prot: 12, fat: 8, fiber: 4, sodium: 100, veg: 0, fluid: 0, iron: 3 }
   ]);
-  assert.deepEqual(totals, { kcal: 350, carb: 40, prot: 17, fat: 10, fiber: 7, sodium: 150, veg: 20, fluid: 200 });
+  assert.deepEqual(totals, { kcal: 350, carb: 40, prot: 17, fat: 10, fiber: 7, sodium: 150, veg: 20, fluid: 200, iron: 5 });
+});
+
+test("a day is done when breakfast, lunch and dinner are recorded", () => {
+  const state = { ...blankNutrition(), entries: [
+    entry(at(2026, 11, 14), 100),
+    entry(at(2026, 11, 14), 200, { meal: "Lunch" })
+  ] };
+  assert.equal(doneToday(state, "2026-11-14"), false);
+  state.entries.push(entry(at(2026, 11, 14), 300, { meal: "Dinner" }));
+  assert.equal(doneToday(state, "2026-11-14"), true);
+  assert.equal(doneToday(state, "2026-11-13"), false);
+});
+
+test("the deck summary names the calories and main meals", () => {
+  const state = { ...blankNutrition(), entries: [
+    entry(at(2026, 11, 14), 400),
+    entry(at(2026, 11, 14), 500, { meal: "Lunch" })
+  ] };
+  assert.equal(todaySummary(state, "2026-11-14"), "900 kcal, 2 of 3 main meals");
+  assert.equal(todaySummary(state, "2026-11-13"), "");
+});
+
+test("plate shares follow the grams eaten and add up", () => {
+  const shares = plateShares({ carb: 150, prot: 50, veg: 100 });
+  close(shares[0].share, 0.5);
+  close(shares[1].share, 1 / 6);
+  close(shares[2].share, 1 / 3);
+  close(shares.reduce((sum, row) => sum + row.share, 0), 1);
+  assert.deepEqual(plateShares({ carb: 0, prot: 0, veg: 0 }).map((row) => row.share), [0, 0, 0]);
+});
+
+test("iron under target is flagged and an entry can be removed", () => {
+  const T = targets(profile, 0, 1.11);
+  assert.equal(ironUnder({ iron: 4 }, T), true);
+  assert.equal(ironUnder({ iron: 10 }, T), false);
+  const state = { ...blankNutrition(), entries: [entry(at(2026, 11, 14), 100)] };
+  assert.equal(removeEntry(state, state.entries[0].id).entries.length, 0);
 });
 
 test("entries are grouped by the local day", () => {
@@ -138,12 +184,22 @@ test("legacy records without lib or eva still load", () => {
 
 test("food lists load from CSV and JSON and merge by name", () => {
   const csv = parseFoodList("code,name,kcal,prot\n123,Oats,150,5\n", "list.csv");
-  assert.deepEqual(csv[0], { code: "123", name: "Oats", unit: "portion", kcal: 150, carb: 0, prot: 5, fat: 0, fiber: 0, sodium: 0, veg: 0, fluid: 0 });
+  assert.deepEqual(csv[0], { code: "123", name: "Oats", unit: "portion", kcal: 150, carb: 0, prot: 5, fat: 0, fiber: 0, sodium: 0, veg: 0, fluid: 0, iron: 0 });
   const json = parseFoodList(JSON.stringify([{ name: "Rice", kcal: 200, unit: "g" }]), "list.json");
   assert.equal(json[0].unit, "g");
   const merged = mergeFoodList(csv, [{ ...json[0], name: "Oats", kcal: 160 }]);
   assert.equal(merged.length, 1);
   assert.equal(merged[0].kcal, 160);
+});
+
+test("imported foods are searched first and search matches name or code", () => {
+  const imported = { code: "9", name: "Iron bar", unit: "portion", kcal: 200, iron: 4 };
+  const saved = { code: "1", name: "Milk", unit: "mL", kcal: 50, iron: 0 };
+  const lib = mergeFoodList([saved], [imported]);
+  assert.equal(lib[0].name, "Iron bar");
+  assert.deepEqual(searchFoods(lib, "iron").map((food) => food.name), ["Iron bar"]);
+  assert.deepEqual(searchFoods(lib, "1").map((food) => food.name), ["Milk"]);
+  assert.equal(searchFoods(lib, "").length, 2);
 });
 
 test("without a network the barcode lookup names manual entry and CSV import", async () => {

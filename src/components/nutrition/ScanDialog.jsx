@@ -41,12 +41,12 @@ export default function ScanDialog({ onClose, onCode, onError }) {
   }, []);
 
   return (
-    <div class="nutrition-scan" role="dialog" aria-modal="true" aria-label="Scan a barcode">
-      <div class="nutrition-scan-card">
+    <div class="ntr-scan" role="dialog" aria-modal="true" aria-label="Scan a barcode">
+      <div class="ntr-scan-card">
         <video ref={videoRef} playsinline muted />
-        <div class="nutrition-scan-frame" aria-hidden="true" />
+        <div class="ntr-scan-frame" aria-hidden="true" />
         <p>Point the camera at the barcode</p>
-        <button type="button" class="am-btn am-btn-soft" onClick={onClose}>Cancel</button>
+        <button type="button" class="ui-btn ui-btn-soft" onClick={onClose}>Cancel</button>
       </div>
     </div>
   );

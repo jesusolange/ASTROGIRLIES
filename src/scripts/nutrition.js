@@ -5,10 +5,19 @@
 import { alsoTell } from "./mission.js";
 
 export const KEY = "astromed-nutrition";
-export const FIELDS = ["kcal", "carb", "prot", "fat", "fiber", "sodium", "veg", "fluid"];
+export const FIELDS = ["kcal", "carb", "prot", "fat", "fiber", "sodium", "veg", "fluid", "iron"];
 export const MEALS = ["Breakfast", "Lunch", "Dinner", "Snack"];
 export const UNITS = ["g", "mL", "portion"];
 export const AF_OPTIONS = [1.11, 1.25];
+
+// Iron in flight: NASA spaceflight nutrition cites about 8 to 10 mg per day for every crew member, lower than
+// the ground value for women because iron stores rise in weightlessness. This 10 mg goal is our design choice;
+// the app records iron from the package label or the imported food list and never estimates it.
+export const IRON_GOAL = 10;
+
+export function ironTarget() {
+  return IRON_GOAL;
+}
 
 const round1 = (n) => Math.round(n * 10) / 10;
 const num = (x) => Math.max(0, Number(x) || 0);
@@ -59,11 +68,48 @@ export function targets(prof, evaHours, af = 1.11) {
     sodiumMax: 2300,
     fluid: Math.max(32 * kg, pick(2500, 2100)),
     veg: 400,
+    iron: ironTarget(prof),
     evaKcal: 200 * (evaHours || 0)
   };
 }
 
 export const dayEntries = (state, day) => (state.entries || []).filter((e) => isoDay(new Date(e.time)) === day);
+
+const DAY_MEALS = ["Breakfast", "Lunch", "Dinner"];
+
+// Home's rule: breakfast, lunch and dinner all recorded today. A meal may be logged more than once.
+export function doneToday(state, day) {
+  const meals = new Set(dayEntries(state, day).map((e) => e.meal));
+  return DAY_MEALS.every((meal) => meals.has(meal));
+}
+
+export function removeEntry(state, id) {
+  return { ...state, entries: (state.entries || []).filter((entry) => entry.id !== id) };
+}
+
+// One line for the deck's "Done for today" list.
+export function todaySummary(state, day = isoDay(new Date())) {
+  const list = dayEntries(state, day);
+  if (!list.length) return "";
+  const tot = totalsOf(list);
+  const meals = DAY_MEALS.filter((meal) => list.some((entry) => entry.meal === meal)).length;
+  return `${Math.round(tot.kcal)} kcal, ${meals} of 3 main meals`;
+}
+
+// The plate's three slices, sized by the grams actually eaten. Shares add up to 1 when anything is logged.
+export function plateShares(tot) {
+  const rows = [
+    { key: "carb", label: "Carbohydrate" },
+    { key: "prot", label: "Protein" },
+    { key: "veg", label: "Vegetables" }
+  ].map((row) => ({ ...row, grams: Math.max(0, Number(tot && tot[row.key]) || 0) }));
+  const total = rows.reduce((sum, row) => sum + row.grams, 0);
+  return rows.map((row) => ({ ...row, share: total > 0 ? row.grams / total : 0, total }));
+}
+
+export function ironUnder(tot, T) {
+  return Boolean(T && tot && tot.iron < T.iron);
+}
 
 export function totalsOf(list) {
   const t = Object.fromEntries(FIELDS.map((k) => [k, 0]));
@@ -136,7 +182,7 @@ export function addToLibrary(lib, item) {
 export function waterEntry(day, now = new Date(), amount = 250) {
   return {
     id: entryId(now), time: stampForDay(day, now), meal: "Drink", name: "Water",
-    portions: 1, kcal: 0, carb: 0, prot: 0, fat: 0, fiber: 0, sodium: 0, veg: 0, fluid: amount
+    portions: 1, kcal: 0, carb: 0, prot: 0, fat: 0, fiber: 0, sodium: 0, veg: 0, fluid: amount, iron: 0
   };
 }
 
@@ -148,11 +194,15 @@ export function weekRows(state, prof, now = new Date()) {
     const T = targets(prof, Number(eva[key]) || 0, state.af || 1.11);
     return {
       key, weekday: d.toLocaleDateString("en-GB", { weekday: "short" }),
-      kcal: tot.kcal, any: list.length > 0, targetKcal: T ? T.kcal : null,
+      kcal: tot.kcal, ...tot, any: list.length > 0, targetKcal: T ? T.kcal : null,
+      target: T ? { kcal: T.kcal, protein: T.protein[0], carbs: T.carbs[0], fat: T.fat[0], fluid: T.fluid, veg: T.veg, iron: T.iron, sodiumMax: T.sodiumMax } : null,
       meals: ["Breakfast", "Lunch", "Dinner"].filter((m) => list.some((e) => e.meal === m)).length
     };
   });
 }
+
+// The weekly numbers Progress draws (the chart itself left this section).
+export const weeklyNutrition = weekRows;
 
 // Average of the last 3 logged days vs goal (null if no data or no profile).
 export function summaryFor(state, prof, now = new Date()) {
@@ -207,13 +257,21 @@ export function parseFoodList(text, filename = "list.csv") {
     });
 }
 
+// Imported foods go to the front so they are found first when the astronaut searches "My foods".
 export function mergeFoodList(lib, rows) {
   const next = [...lib];
   rows.forEach((item) => {
     const i = next.findIndex((x) => (item.code && x.code === item.code) || String(x.name).toLowerCase() === item.name.toLowerCase());
-    if (i >= 0) next[i] = item; else next.push(item);
+    if (i >= 0) next[i] = item; else next.unshift(item);
   });
   return next;
+}
+
+export function searchFoods(lib, query) {
+  const q = String(query || "").trim().toLowerCase();
+  const list = Array.isArray(lib) ? lib : [];
+  if (!q) return list;
+  return list.filter((food) => `${food.name || ""} ${food.code || ""}`.toLowerCase().includes(q));
 }
 
 /* ---------- Open Food Facts lookup ---------- */
