@@ -7,7 +7,8 @@ These replace the earlier tickets (see git history of this file). One spec per t
 ## How to run them
 
 - Batches run in order. Inside a batch the five tickets run in parallel; their owned paths do not overlap.
-- A batch starts only after the one before it is merged into `name15` and `pnpm test`, `pnpm build` pass.
+- A batch starts only after the one before it is merged into `name15`, `pnpm test` and `pnpm build` pass, the
+  coordinator has told the owner what changed, and the owner has reviewed the app and said to go on.
 - If time runs out, the last merged batch is the submission. Each batch leaves the app working.
 - T30 (3D repair) has no dependencies and may start with batch 1 if a sixth agent is free.
 - Evidence: no screenshots, from workers or the coordinator; skip every screenshot item in "Done when". The owner
