@@ -70,7 +70,7 @@
   padding: 12px 22px;
   color: var(--am-btn-primary-text);
   background: var(--am-accent-strong);
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 12px;
   font: inherit;
   font-size: 13px;
@@ -85,7 +85,6 @@
 }
 
 .ui-btn-soft {
-  margin-top: 8px;
   color: var(--am-text);
   background: color-mix(in srgb, var(--am-text) 10%, transparent);
   border: 1px solid var(--am-border);
