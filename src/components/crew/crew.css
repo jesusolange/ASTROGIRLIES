@@ -21,7 +21,7 @@
 .amcr-title {
   margin: 0 0 12px;
   color: var(--am-stage-text);
-  font-size: 1.05rem;
+  font-size: var(--am-fs-lg);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -29,7 +29,7 @@
 .amcr-empty {
   margin: 0;
   color: var(--am-stage-text-muted);
-  font-size: 15px;
+  font-size: var(--am-fs-md);
 }
 
 .amcr-people {
@@ -75,20 +75,20 @@
   border-radius: 50%;
   background: var(--am-accent);
   color: var(--am-on-accent);
-  font-size: 15px;
+  font-size: var(--am-fs-md);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 
 .amcr-name {
   flex: 1;
-  font-size: 1.05rem;
+  font-size: var(--am-fs-lg);
   font-weight: 700;
 }
 
 .amcr-lock {
   color: var(--am-text-muted);
-  font-size: 11px;
+  font-size: var(--am-fs-xs);
   font-weight: 700;
   letter-spacing: 0.1em;
 }
@@ -106,7 +106,7 @@
   background: none;
   color: var(--am-stage-text);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--am-fs-sm);
   font-weight: 700;
   text-align: left;
   cursor: pointer;
@@ -125,7 +125,7 @@
 
 .amcr-pin-label {
   color: var(--am-stage-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -141,12 +141,12 @@
   background: var(--am-field-bg);
   color: var(--am-text);
   font: inherit;
-  font-size: 1.25rem;
+  font-size: var(--am-fs-lg);
   letter-spacing: 0.35em;
 }
 
 .amcr-remove-input {
-  font-size: 1rem;
+  font-size: var(--am-fs-md);
   letter-spacing: normal;
 }
 
@@ -164,7 +164,7 @@
 .amcr-pin-error,
 .amcr-remove-error {
   color: var(--am-danger-soft);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 700;
 }
 
@@ -184,7 +184,7 @@
 }
 
 .amcr-remove-label {
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 700;
   color: var(--am-stage-text-muted);
 }

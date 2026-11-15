@@ -1,4 +1,4 @@
-import "../../styles/astronaut3d.css";
+import "./astronaut3d.css";
 import { PARTS, VIEWS } from "./layout.js";
 import { createStage } from "./stage.js";
 

@@ -1,5 +1,5 @@
 // The cover: destination planet, mission facts and the sign-in for everyone who shares the device.
-import "../styles/cover.css";
+import "../components/cover/cover.css";
 import { h, render } from "preact";
 import { effect } from "@preact/signals";
 import Cover from "../components/cover/Cover.jsx";

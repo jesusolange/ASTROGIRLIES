@@ -17,7 +17,7 @@
 .env-aside-name {
   margin: 0;
   color: var(--am-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   font-weight: 650;
 }
 
@@ -30,7 +30,7 @@
 .env-lead {
   margin: 0 0 16px;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
 }
 
@@ -39,9 +39,9 @@
   padding: 10px 12px;
   color: var(--am-text);
   background: var(--am-field-bg);
-  border-left: 4px solid var(--am-ok);
+  border: 1px solid var(--am-ok);
   border-radius: var(--am-radius-small);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   line-height: 1.55;
 }
 
@@ -56,7 +56,7 @@
 .env-result-place {
   margin: 0 0 10px;
   color: var(--am-heading);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 700;
 }
 
@@ -67,7 +67,7 @@
   gap: 3px;
   padding: 10px 12px;
   background: var(--am-field-bg);
-  border-left: 4px solid var(--env-tone, var(--am-border));
+  border: 1px solid var(--env-tone, var(--am-border));
   border-radius: var(--am-radius-small);
 }
 
@@ -79,9 +79,9 @@
   gap: 8px;
 }
 
-.env-reading b { color: var(--am-text); font-size: 13px; }
-.env-reading span { color: var(--am-text-muted); font-size: 12px; line-height: 1.5; }
-.env-reading-todo { color: var(--am-text) !important; }
+.env-reading b { color: var(--am-text); font-size: var(--am-fs-sm); }
+.env-reading span { color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.5; }
+.env-reading span.env-reading-todo { color: var(--am-text); font-weight: 600; }
 
 .env-ok { --env-tone: var(--am-ok); }
 .env-review { --env-tone: var(--am-warn); }

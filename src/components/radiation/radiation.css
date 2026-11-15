@@ -3,7 +3,7 @@
 .rd-lead {
   margin: 0 0 16px;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
 }
 
@@ -20,7 +20,7 @@
 .rd-note {
   margin: 0 0 10px;
   color: var(--am-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   line-height: 1.55;
 }
 
@@ -51,7 +51,7 @@
 .rd-details summary {
   cursor: pointer;
   color: var(--am-heading);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 600;
 }
 
@@ -84,7 +84,7 @@
   display: flex;
   justify-content: space-between;
   color: var(--am-text-muted);
-  font-size: 11px;
+  font-size: var(--am-fs-xs);
 }
 
 .rd-kpis {
@@ -95,10 +95,10 @@
 }
 
 .rd-kpis div { display: grid; gap: 1px; }
-.rd-kpis dt { color: var(--am-text-muted); font-size: 11px; }
-.rd-kpis dd { margin: 0; color: var(--am-text); font-size: 13px; font-weight: 700; }
+.rd-kpis dt { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+.rd-kpis dd { margin: 0; color: var(--am-text); font-size: var(--am-fs-sm); font-weight: 700; }
 
-.rd-level { margin: 4px 0 0; font-size: 13px; color: var(--am-text); }
+.rd-level { margin: 4px 0 0; font-size: var(--am-fs-sm); color: var(--am-text); }
 .rd-level.rd-ok { color: var(--am-ok); }
 .rd-level.rd-review { color: var(--am-warn); }
 .rd-level.rd-alert { color: var(--am-danger); }

@@ -87,7 +87,7 @@
 .pf-summary p {
   margin: 0;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.45;
 }
 
@@ -100,7 +100,7 @@
   color: var(--am-on-accent);
   background: var(--am-accent);
   border-radius: 50%;
-  font-size: 20px;
+  font-size: var(--am-fs-lg);
   font-weight: 800;
   letter-spacing: 0.04em;
 }
@@ -148,10 +148,30 @@
   grid-column: 1 / -1;
 }
 
+.pf-f {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--am-accent);
+  font-size: var(--am-fs-xs);
+  font-weight: 600;
+}
+
+.pf-f input,
+.pf-f select {
+  padding: 9px 10px;
+  color: var(--am-field-text);
+  background: var(--am-field-bg);
+  border: 1px solid var(--am-field-border);
+  border-radius: var(--am-radius-small);
+  font: inherit;
+  font-size: var(--am-fs-sm);
+}
+
 .pf-note {
   margin: 12px 0 0;
   color: var(--am-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   line-height: 1.55;
 }
 
@@ -168,7 +188,7 @@
 .pf-notes h4 {
   margin: 0 0 8px;
   color: var(--am-text);
-  font-size: 15px;
+  font-size: var(--am-fs-md);
 }
 
 .pf-notes ul {
@@ -177,14 +197,14 @@
   margin: 0;
   padding-left: 18px;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.55;
 }
 
 .pf-delay {
   margin: 12px 0 0;
   color: var(--am-text);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 650;
   line-height: 1.5;
 }
@@ -205,7 +225,7 @@
 .pf-place figcaption {
   margin-top: 6px;
   color: var(--am-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   line-height: 1.45;
 }
 
@@ -238,13 +258,13 @@
 .pf-block h4 {
   margin: 0;
   color: var(--am-heading);
-  font-size: 15px;
+  font-size: var(--am-fs-md);
 }
 
 .pf-block p {
   margin: 0;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
 }
 
@@ -281,7 +301,7 @@
 .pf-export p {
   margin: 0;
   color: var(--am-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   line-height: 1.5;
 }
 
@@ -350,6 +370,6 @@
 .pf-remove-person p {
   margin: 0;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
 }

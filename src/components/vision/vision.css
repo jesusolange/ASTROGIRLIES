@@ -5,10 +5,10 @@
   outline-offset: 2px;
 }
 
-.vs-fine { margin: 10px 0 0; color: var(--am-text-muted); font-size: 12px; line-height: 1.55; }
-.vs-hint { margin: 8px 0 0; color: var(--am-text-muted); font-size: 12px; line-height: 1.5; }
-.vs-note { margin: 10px 0 0; color: var(--am-warn); font-size: 12px; line-height: 1.5; }
-.vs-chosen { margin: 10px 0 0; color: var(--am-accent); font-size: 13px; font-weight: 650; }
+.vs-fine { margin: 10px 0 0; color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.55; }
+.vs-hint { margin: 8px 0 0; color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.5; }
+.vs-note { margin: 10px 0 0; color: var(--am-warn); font-size: var(--am-fs-xs); line-height: 1.5; }
+.vs-chosen { margin: 10px 0 0; color: var(--am-accent); font-size: var(--am-fs-sm); font-weight: 650; }
 
 /* ---------- figure opener ---------- */
 
@@ -23,7 +23,7 @@
   border: 1px solid var(--am-border);
   border-radius: 999px;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 650;
   cursor: pointer;
 }
@@ -47,7 +47,7 @@
 }
 .vs-cal .ui-field { width: 100%; }
 .vs-cal input[type="range"] { width: 100%; accent-color: var(--am-accent); }
-.vs-cal-read { margin: 0; color: var(--am-text); font-size: 13px; font-variant-numeric: tabular-nums; }
+.vs-cal-read { margin: 0; color: var(--am-text); font-size: var(--am-fs-sm); font-variant-numeric: tabular-nums; }
 
 /* ---------- Amsler grid ---------- */
 
@@ -139,8 +139,8 @@
 .vs-line.on { border-color: var(--am-accent); background: var(--am-selected-bg); }
 .vs-line-opts { display: flex; align-items: center; gap: var(--vs-gap, 10px); }
 .vs-opt { flex: none; width: var(--vs-opt, 16px); height: var(--vs-opt, 16px); fill: var(--am-text); }
-.vs-line-lab { color: var(--am-text); font-size: 12px; font-weight: 700; white-space: nowrap; }
-.vs-line-lab small { display: block; color: var(--am-text-muted); font-size: 11px; font-weight: 500; }
+.vs-line-lab { color: var(--am-text); font-size: var(--am-fs-xs); font-weight: 700; white-space: nowrap; }
+.vs-line-lab small { display: block; color: var(--am-text-muted); font-size: var(--am-fs-xs); font-weight: 500; }
 .vs-cannot { width: auto; justify-content: flex-start; margin-top: 8px; border: 1px dashed var(--am-border-strong); }
 
 /* ---------- chips ---------- */

@@ -3,7 +3,7 @@
 .im-lead {
   margin: 0 0 14px;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
 }
 
@@ -12,13 +12,13 @@
   gap: 4px;
   margin: 14px 0 0;
   padding: 12px 14px;
-  border-left: 4px solid var(--im-tone, var(--am-border));
+  border: 1px solid var(--im-tone, var(--am-border));
   background: var(--am-field-bg);
   border-radius: var(--am-radius-small);
 }
 
 .im-status b { color: var(--im-tone, var(--am-text)); }
-.im-status span { color: var(--am-text-muted); font-size: 12px; line-height: 1.55; }
+.im-status span { color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.55; }
 .im-ok { --im-tone: var(--am-ok); }
 .im-review { --im-tone: var(--am-warn); }
 .im-alert { --im-tone: var(--am-danger); }

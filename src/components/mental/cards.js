@@ -10,7 +10,7 @@ import DepressionCard from "./DepressionCard.jsx";
 import MoodCard from "./MoodCard.jsx";
 import SelfHarmBody from "./SelfHarmBody.jsx";
 import StressCard from "./StressCard.jsx";
-import "../../styles/mental.css";
+import "./mental.css";
 
 const SELF_HARM_ACTION = {
   label: "Open the full card",

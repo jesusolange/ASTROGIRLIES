@@ -45,14 +45,14 @@
 
 .ui-panel-title {
   margin: 0 0 14px;
-  font-size: 18px;
+  font-size: var(--am-fs-lg);
   letter-spacing: -0.3px;
   color: var(--am-heading);
 }
 
 .ui-panel p {
   margin: 0 0 12px;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
   color: var(--am-text-muted);
 }
@@ -73,7 +73,7 @@
   border: 1px solid transparent;
   border-radius: 12px;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
@@ -112,7 +112,7 @@
   border: 2px solid transparent;
   border-radius: 14px;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   font-weight: 650;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease;
@@ -133,7 +133,7 @@
 .ui-field {
   display: grid;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   color: var(--am-text-muted);
 }
 
@@ -151,7 +151,7 @@
   border: 1px solid var(--am-border);
   border-radius: var(--am-radius-small);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   color-scheme: dark;
 }
 
@@ -188,7 +188,7 @@
   border: 0;
   border-radius: 999px;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 650;
   cursor: pointer;
 }
@@ -217,7 +217,7 @@
   color: var(--am-info);
   border: 1px solid currentColor;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -277,13 +277,13 @@
 
 .ui-finding-head strong {
   color: var(--am-text);
-  font-size: 14px;
+  font-size: var(--am-fs-sm);
 }
 
 .ui-finding p {
   margin: 0 0 6px;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.55;
 }
 

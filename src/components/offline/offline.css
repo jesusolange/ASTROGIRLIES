@@ -14,7 +14,7 @@
 
 .am-offline p {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   line-height: 1.45;
 }
 
@@ -42,12 +42,12 @@
   border: 1px solid var(--am-border-strong);
   border-radius: 999px;
   box-shadow: var(--am-shadow);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
 }
 
 .am-update-button {
   padding: 6px 13px;
-  color: var(--am-on-accent);
+  color: var(--am-btn-primary-text);
   background: var(--am-accent-strong);
   border: 0;
   border-radius: 999px;

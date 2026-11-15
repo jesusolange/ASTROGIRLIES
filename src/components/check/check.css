@@ -14,21 +14,21 @@
 .ck-head h1 {
   margin: 0 0 6px;
   color: var(--am-heading);
-  font-size: 22px;
+  font-size: var(--am-fs-lg);
   letter-spacing: -0.4px;
 }
 
 .ck-head p {
   margin: 0 0 16px;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
 }
 
 .ck-count {
   margin: 0 0 12px;
   color: var(--am-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   font-weight: 650;
 }
 
@@ -76,13 +76,13 @@
 .ck-done h2 {
   margin: 0;
   color: var(--am-heading);
-  font-size: 18px;
+  font-size: var(--am-fs-lg);
 }
 
 .ck-done p {
   margin: 0;
   color: var(--am-text-muted);
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   line-height: 1.6;
 }
 
@@ -104,7 +104,7 @@
   border: 0;
   border-bottom: 1px solid var(--am-border);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   text-align: left;
   cursor: pointer;
 }
@@ -116,13 +116,13 @@
 .ck-guides h2 {
   margin: 0 0 4px;
   color: var(--am-heading);
-  font-size: 16px;
+  font-size: var(--am-fs-md);
 }
 
 .ck-guides-note {
   margin: 0 0 10px;
   color: var(--am-text-muted);
-  font-size: 12px;
+  font-size: var(--am-fs-xs);
   line-height: 1.55;
 }
 
@@ -139,7 +139,7 @@
   border: 1px solid var(--am-border);
   border-radius: var(--am-radius-small);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   text-align: left;
   cursor: pointer;
 }
@@ -166,7 +166,7 @@
   border: 1px solid var(--am-border);
   border-radius: var(--am-radius-small);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--am-fs-sm);
   font-weight: 650;
   cursor: pointer;
 }
