@@ -27,3 +27,4 @@ Newest last. The product decisions at the top of `docs/tickets.md` also apply.
 | 15 Nov 2026 | The current colour palette stays. | Owner decision. |
 | 15 Nov 2026 | Points, levels and badges stay, shown statically on Home beside the streak and completion ring (T27). This replaces "levels or points" in the professional-tone row above. The demo mission's astronaut is "Solange", shown as "Solange · Demo Astronaut" while demo data is loaded. Every profile field is required. | Owner decisions after the batch 1 review. |
 | 15 Nov 2026 | A short toast or small animation when a point total, level or badge is earned is allowed (none under prefers-reduced-motion). | Owner decision. |
+| 15 Nov 2026 | Accounts and sync are removed; data stays on the device; export and import move it. | Owner decision. |

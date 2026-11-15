@@ -34,7 +34,7 @@ Vite with `@preact/preset-vite`. One `index.html`, one root component. pnpm only
 |---|---|---|
 | `index.html`, `src/main.jsx`, `src/components/App.jsx` | Entry and root component | coordinator |
 | `src/lib/nav.js` | Hash routes | coordinator |
-| `src/scripts/storage.js`, `sync.js` | Storage and optional sync | coordinator |
+| `src/scripts/storage.js` | Storage on the device | coordinator |
 | `src/scripts/risks.js`, `src/data/hrr-risks.js` | NASA risk model (contract) | coordinator |
 | `src/data/topics.js` | Topic, check, risk and emergency card in one table (contract) | coordinator |
 | `src/styles/tokens.css` | Colour tokens (contract) | coordinator |
@@ -42,7 +42,6 @@ Vite with `@preact/preset-vite`. One `index.html`, one root component. pnpm only
 | `src/components/<section>/**` | Components, `cards.js` and one CSS file per section | per task |
 | `src/scripts/<section>.js` | Logic per section, with tests | per task |
 | `public/**` | Images, models, PDF bundle | per task |
-| `functions/**`, `schema.sql` | Optional Cloudflare Pages server | coordinator |
 | `docs/**`, `AGENTS.md`, `README.md`, `tools/**` | Docs and tooling | coordinator |
 
 Your task spec lists the paths you own. Anything else: ask first.

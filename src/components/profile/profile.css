@@ -293,22 +293,6 @@
   transform: translateY(1px) scale(0.99);
 }
 
-.pf-sync {
-  display: grid;
-  gap: 10px;
-}
-
-.pf-sync p {
-  margin: 0;
-  color: var(--am-text-muted);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.pf-sync p.pf-sync-status {
-  color: var(--am-text);
-}
-
 .pf-sources {
   padding-bottom: 10px;
 }

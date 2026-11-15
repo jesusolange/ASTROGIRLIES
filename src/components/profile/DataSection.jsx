@@ -5,7 +5,6 @@ import { downloadText, measurementsCsv, RECORDS_KEY } from "../../lib/csv.js";
 import { KEY } from "../../scripts/profile.js";
 import { loadDemo } from "../../scripts/demo-data.js";
 import Button from "../ui/Button.jsx";
-import SyncAccount from "./SyncAccount.jsx";
 import DeviceSection from "./DeviceSection.jsx";
 
 const store = () => window.AstroMedStore && window.AstroMedStore.store;
@@ -85,11 +84,6 @@ export default function DataSection() {
   return (
     <div class="pf-data">
       <section class="pf-block">
-        <h4>Account and sync</h4>
-        <SyncAccount />
-      </section>
-
-      <section class="pf-block">
         <h4>Demo mission</h4>
         <p>
           Fill the app with 14 days for Solange, a demo astronaut on a Mars mission. Every check, chart and
@@ -125,7 +119,7 @@ export default function DataSection() {
 
       <section class="pf-block">
         <h4>Erase</h4>
-        <p>Erase every record, the profile and the demo mission from this browser. Your account is not deleted.</p>
+        <p>Erase every record, the profile and the demo mission from this browser.</p>
         <div class="pf-actions">
           <Button variant="danger" onClick={eraseAll}>Erase all data</Button>
         </div>

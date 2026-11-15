@@ -172,7 +172,7 @@ export default function Cover({ onClosed }) {
             </div>
           </form>
 
-          <p class="amc-note">Your records stay on this device unless you choose to sign in.</p>
+          <p class="amc-note">Your records stay on this device.</p>
         </div>
       </div>
 

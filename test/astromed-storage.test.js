@@ -94,21 +94,13 @@ test("a failed import write keeps the previous data", () => {
   assert.equal(st.getItem("astromed-keep"), "1");
 });
 
-test("set stamps a modified time and notifies listeners; export ignores the stamp", () => {
-  const s = Store.create(fake(), { now: () => 777 });
+test("set notifies listeners; export holds only app keys", () => {
+  const s = Store.create(fake());
   let calls = 0;
   s.subscribe(() => calls++);
-  assert.equal(s.getModified(), 0);
   s.set("astromed-a", 1);
-  assert.equal(s.getModified(), 777);
   assert.equal(calls, 1);
   assert.deepEqual(Object.keys(s.exportAll().data), ["astromed-a"]);
-});
-
-test("importAll can keep a given modified time (used when pulling from the server)", () => {
-  const s = Store.create(fake(), { now: () => 999 });
-  s.importAll(JSON.stringify({ app: "astromed", version: Store.VERSION, data: { "astromed-a": 1 } }), { modifiedAt: 123 });
-  assert.equal(s.getModified(), 123);
 });
 
 test("every app key lives under the active person and reads back with the plain key", () => {

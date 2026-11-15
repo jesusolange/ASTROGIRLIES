@@ -1,6 +1,6 @@
 /* AstroMed service worker.
    Precache list and version are written into this file after each production build by
-   tools/service-worker.mjs. /api/* is the optional sync server: it is never cached. */
+   tools/service-worker.mjs. */
 
 const VERSION = "__ASTROMED_VERSION__";
 const PRECACHE = __ASTROMED_PRECACHE__;
@@ -29,17 +29,12 @@ self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
 });
 
-function isApi(url) {
-  return url.pathname === "/api" || url.pathname.startsWith("/api/");
-}
-
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-  if (isApi(url)) return;
 
   event.respondWith(
     caches.open(CACHE).then(async (cache) => {

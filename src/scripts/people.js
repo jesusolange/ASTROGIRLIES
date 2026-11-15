@@ -244,14 +244,6 @@ export function clearPinFor(id) {
   writeList(api, list);
 }
 
-function forgetSync(id) {
-  const api = store();
-  const registry = registryOf(api);
-  if (!registry || !registry.keys) return;
-  const suffix = `:${id}`;
-  registry.keys().filter((key) => key.startsWith("am-") && key.endsWith(suffix)).forEach((key) => registry.remove(key));
-}
-
 export function removePerson(id) {
   const api = store();
   if (!api) return;
@@ -259,7 +251,6 @@ export function removePerson(id) {
   api.removePerson(id);
   const list = removeFromList(listFrom(api), id);
   writeList(api, list);
-  forgetSync(id);
   if (wasActive) api.setActive(null);
   if (typeof document !== "undefined") document.dispatchEvent(new CustomEvent("astromed-lock"));
 }

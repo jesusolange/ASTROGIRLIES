@@ -1,8 +1,0 @@
-name = "astromed"
-compatibility_date = "2026-01-01"
-pages_build_output_dir = "dist"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "astromed"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"

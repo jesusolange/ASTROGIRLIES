@@ -16,13 +16,9 @@ const storage = (function (root) {
 
   function create(storage, opts = {}) {
     const migrations = opts.migrations || {};
-    const now = opts.now || Date.now;
-    const STAMP = "am-local-modified"; // not an app key, so it is never exported
     const listeners = [];
     let activeId = null;
-    const stampKey = () => (activeId ? `${STAMP}:${activeId}` : STAMP);
     const physical = (k) => (activeId ? `${PREFIX}${activeId}:${k}` : k);
-    const touch = (t) => { try { storage.setItem(stampKey(), String(t)); } catch (e) { console.error(e); } };
     const notify = () => listeners.slice().forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
 
     const parse = (raw) => {
@@ -43,11 +39,9 @@ const storage = (function (root) {
     const writeLogical = (k, v) => write(physical(k), v);
     const set = (k, v) => {
       const ok = writeLogical(k, v);
-      if (ok) { touch(now()); notify(); }
+      if (ok) notify();
       return ok;
     };
-    const getModified = () => Number(storage.getItem(stampKey())) || 0;
-    const setModified = (t) => touch(t);
     const subscribe = (fn) => { listeners.push(fn); return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); }; };
 
     const rawKeys = () => {
@@ -112,7 +106,7 @@ const storage = (function (root) {
       return { app: APP, version: VERSION, exportedAt: new Date().toISOString(), data };
     }
 
-    function importAll(text, o = {}) {
+    function importAll(text) {
       let doc;
       try { doc = JSON.parse(text); } catch { throw new Error("This file is not valid JSON."); }
       if (!doc || doc.app !== APP || typeof doc.data !== "object" || doc.data === null) {
@@ -135,13 +129,12 @@ const storage = (function (root) {
         Object.keys(backup).forEach((k) => { try { storage.setItem(k, backup[k]); } catch (e) { console.error(e); } });
         throw new Error("Could not save the imported data (browser storage is full). Your previous data was kept.");
       }
-      touch(o.modifiedAt ?? now());
       notify();
       return keys.length;
     }
 
     return {
-      get, getFor, set, setActive, active, appKeys, exportAll, importAll, getModified, setModified,
+      get, getFor, set, setActive, active, appKeys, exportAll, importAll,
       subscribe, hasLegacyData, migrateLegacy, removePerson, registry
     };
   }

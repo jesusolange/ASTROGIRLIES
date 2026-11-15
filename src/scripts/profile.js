@@ -3,7 +3,6 @@
 
 import { signal } from "@preact/signals";
 import { MISSION_TYPES, DEFAULT_MISSION } from "./risks.js";
-import { accountStatus } from "./sync.js";
 
 export const KEY = "astromed-profile";
 export const DAY = 86400000;
@@ -130,11 +129,11 @@ export function initialsOf(fullName) {
   return String(fullName || "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 }
 
-// What the top bar shows for the profile: name, initials, demo flag and sync state.
+// What the top bar shows for the profile: name, initials and demo flag.
 export function barState() {
   const p = get();
   const n = name();
-  return { name: n, initials: initialsOf(n), demo: Boolean(p && p.demo), sync: accountStatus() };
+  return { name: n, initials: initialsOf(n), demo: Boolean(p && p.demo) };
 }
 export function closeDialog() {
   dialog.value = { open: false, first: false };

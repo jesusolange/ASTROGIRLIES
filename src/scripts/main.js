@@ -1,7 +1,6 @@
 // Single entry for the browser. The order matters while the modules still talk through window globals:
 // each one registers its start-up on DOMContentLoaded, and those run in this order.
 import "./storage.js";
-import "./sync.js";
 import "./risks.js";
 import "../lib/nav.js";
 import "../lib/ui.js";

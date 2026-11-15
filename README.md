@@ -34,28 +34,11 @@ pnpm build      # writes dist/
 pnpm preview    # serves dist/
 ```
 
-Layout: `index.html` is the page, `src/main.jsx` the entry, `src/components/App.jsx` the root component, `src/scripts/` holds one module per section (entry: `main.js`), `src/styles/` the stylesheets, `public/` the images and 3D models, `functions/` the optional server.
+Layout: `index.html` is the page, `src/main.jsx` the entry, `src/components/App.jsx` the root component, `src/scripts/` holds one module per section (entry: `main.js`), `src/styles/` the stylesheets, `public/` the images and 3D models.
 
 ### Deploying (Cloudflare Pages)
 
-Create a Pages project from this repo (private repos work). Framework preset: Vite. Build command: `pnpm build`. Build output directory: `dist`. Then open the `*.pages.dev` URL in a private window to confirm it loads with no login.
-
-### Optional accounts and sync
-
-The app works without a server. If you add one, people can sign in with an email magic link (no password) and keep a copy of their data on the server. It is local-first: the app keeps working offline, changes made offline upload when the connection returns, and if two devices edited the same data the newest edit wins. The public demo link never requires a login.
-
-Server code lives in `functions/` (Cloudflare Pages Functions) and stores data in Cloudflare D1. Setup:
-
-```bash
-npx wrangler d1 create astromed
-npx wrangler d1 execute astromed --file=schema.sql --remote
-```
-
-1. Put the database id from the first command in `wrangler.toml`.
-2. In the Pages project settings, bind the D1 database as `DB`.
-3. Set `SITE_URL` (your public URL, no trailing slash), `MAIL_FROM` (a sender verified at [Resend](https://resend.com)) and the secret `RESEND_API_KEY`.
-
-Without the `DB` binding the sign-in section shows an error and everything else works as before. This is health data: connections use HTTPS, but treat the demo as a prototype, not a medical record system.
+Create a Pages project from this repo (private repos work). Framework preset: Vite. Build command: `pnpm build`. Build output directory: `dist`. Then open the `*.pages.dev` URL in a private window to confirm it loads. The site is static and needs no server or database.
 
 ### Tests
 
@@ -65,7 +48,7 @@ pnpm test
 
 `node tools/shot.mjs --serve dist --out shot.png` (after `pnpm build`) loads the built site in headless Chrome, saves a screenshot and lists console errors and failed requests.
 
-Data is stored in your browser (`localStorage`) and stays on the device unless you choose to sign in. Use **Settings > Export / Import my data** to back up or move a record.
+Data is stored in your browser (`localStorage`) and stays on this device. Use **Export my data** and **Import data** in the profile to back up or move a record.
 
 ## Data sources
 
