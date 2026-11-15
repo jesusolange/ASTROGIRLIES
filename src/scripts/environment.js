@@ -1,12 +1,13 @@
-/* Environment logic: places, conditions, illustrative reference ranges and the message delay to Earth.
+/* Cabin readings: places, thresholds, illustrative reference ranges and the stored log.
    Reference ranges are our design choice for this prototype, not a medical standard. */
+
+import { comm } from "./mission.js";
 
 export const KEYS = { state: "astromed-env", log: "astromed-env-log" };
 
 export const PLACES = {
   iss: {
-    name: "ISS", icon: "🛰️", img: "assets/environment/iss.png", tag: "Low Earth orbit", rad: 20,
-    demo: { temp: 22, pressure: 101.3, humidity: 45, co2: 2500, noise: 55, radiation: 20 },
+    name: "ISS", img: "assets/environment/iss.png", tag: "Low Earth orbit", rad: 20,
     facts: [
       "Microgravity shifts fluids and unloads bones and muscles: keep up your daily exercise.",
       "About 16 sunrises a day can disturb your sleep rhythm. Protect your sleep window.",
@@ -15,8 +16,7 @@ export const PLACES = {
     ]
   },
   rover: {
-    name: "Rover", icon: "🚙", img: "assets/environment/rover.png", tag: "Pressurized rover", rad: null,
-    demo: { temp: 21, pressure: 101, humidity: 40, co2: 3200, noise: 62, radiation: 30 },
+    name: "Rover", img: "assets/environment/rover.png", tag: "Pressurized rover", rad: null,
     facts: [
       "Very small cabin: little personal space and a high risk of tension with crewmates.",
       "Vibration, noise and motion can add fatigue and affect sleep.",
@@ -25,8 +25,7 @@ export const PLACES = {
     ]
   },
   moon: {
-    name: "Moon", icon: "🌙", img: "assets/environment/moon.png", tag: "Surface base", rad: 60,
-    demo: { temp: 21, pressure: 70, humidity: 40, co2: 2800, noise: 52, radiation: 60 },
+    name: "Moon", img: "assets/environment/moon.png", tag: "Surface base", rad: 60,
     facts: [
       "About one sixth of Earth’s gravity: keep resistance training to protect bones and muscles.",
       "Fine lunar dust is abrasive and can irritate eyes and lungs. Clean suits before entering.",
@@ -35,8 +34,7 @@ export const PLACES = {
     ]
   },
   mars: {
-    name: "Mars", icon: "🔴", img: "assets/environment/mars.png", tag: "Surface base", rad: 27,
-    demo: { temp: 21, pressure: 70, humidity: 40, co2: 2800, noise: 50, radiation: 27 },
+    name: "Mars", img: "assets/environment/mars.png", tag: "Surface base", rad: 27,
     facts: [
       "About 38% of Earth’s gravity: strength and aerobic training stay essential.",
       "A one-way signal takes roughly 3 to 22 minutes, so you must decide many things on your own.",
@@ -46,9 +44,7 @@ export const PLACES = {
   },
   transit: {
     name: "In transit", tag: "Deep space cruise", rad: 76.7,
-    icon: null,
     // 1.84 mSv/day is the MSL RAD cruise measurement used in radiation.js; shown here in µSv/h.
-    demo: { temp: 22, pressure: 101.3, humidity: 45, co2: 2500, noise: 55, radiation: 76.7 },
     facts: [
       "Microgravity on the way to Mars unloads bones and muscles: keep your daily resistance and aerobic training.",
       "Radiation is higher than in low Earth orbit: NASA's Curiosity rover measured about 1.84 mSv per day on the cruise to Mars (NASA/JPL, MSL RAD), which is the same figure shown in Radiation.",
@@ -57,8 +53,7 @@ export const PLACES = {
     ]
   },
   other: {
-    name: "Other place", icon: "📍", tag: "Name your location", rad: null,
-    demo: { temp: 21, pressure: 101, humidity: 45, co2: 2000, noise: 55, radiation: 10 },
+    name: "Other place", tag: "Name your location", rad: null,
     facts: [
       "Choose a name for your location and record the conditions around you.",
       "Alerts for radiation use your own previous readings here as a baseline.",
@@ -156,23 +151,6 @@ export function findingsFrom(state, log) {
   }).filter((entry) => entry.level !== "info");
 }
 
-export function commFor(place) {
-  return place && COMM[place] ? { place, ...COMM[place] } : null;
-}
-
-// ISS / Moon: general knowledge (about 1.3 s Moon one way). Mars: NASA NTRS 20220013418 (about 3 to 22 min one way; solar conjunction blackout).
-export const COMM = {
-  iss: { t: "Almost live", one: "< 1 s", rt: "about 1 s", bar: 6, tip: "You can talk with the ground team in real time. Short pauses can happen when a relay satellite changes." },
-  rover: { t: "Depends on the planet", one: "Local radio: instant", rt: "To Earth: same as the Moon or Mars", bar: 40, tip: "Talk to your crewmates is live. The delay to Earth is the one of the planet you drive on." },
-  moon: { t: "A short pause", one: "about 1.3 s", rt: "about 2.6 s", bar: 22, tip: "Conversation works, with a small pause after each sentence. Say “over” when you finish." },
-  mars: { t: "Long wait", one: "3 to 22 min", rt: "6 to 44 min", bar: 100, tip: "No live talk. Send complete messages (what, when, what you need), keep a list of questions, and decide routine things yourself. About every 2 years the Sun blocks the signal for around 2 weeks (solar conjunction)." },
-  transit: { t: "Long wait", one: "3 to 22 min", rt: "6 to 44 min", bar: 100, tip: "No live talk during the cruise. Send complete messages (what, when, what you need), keep a list of questions, and decide routine things yourself." }
-};
-
-export function formatTime(iso) {
-  return new Date(iso).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
-}
-
 const read = (key, fallback) => (typeof window !== "undefined" && window.AstroMedStore ? window.AstroMedStore.store.get(key, fallback) : fallback);
 const write = (key, value) => { if (typeof window !== "undefined" && window.AstroMedStore) window.AstroMedStore.store.set(key, value); };
 
@@ -184,19 +162,12 @@ function logRecord() {
   return Array.isArray(log) ? log : [];
 }
 
-export function render() {}
-
 export function label() {
   return labelFrom(stateRecord());
 }
 
 export function findings() {
   return findingsFrom(stateRecord(), logRecord());
-}
-
-export function comm() {
-  const state = read(KEYS.state, null);
-  return state && COMM[state.place] ? { place: state.place, ...COMM[state.place] } : null;
 }
 
 export function rule(key, value) {
@@ -218,5 +189,6 @@ export function deleteReading(time) {
 }
 
 if (typeof window !== "undefined") {
-  window.AstroMedEnv = { render, rule, comm, findings, label, FIELDS };
+  // `comm` now lives in mission.js; the older sections still read it here.
+  window.AstroMedEnv = { rule, comm, findings, label, FIELDS };
 }

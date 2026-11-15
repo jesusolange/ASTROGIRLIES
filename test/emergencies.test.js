@@ -314,15 +314,17 @@ test("N-telopeptide ranges follow sex and menopause", async () => {
 
 test("the section markup lives in Preact components and the module builds no HTML", () => {
   const page = read("src", "components", "App.jsx");
+  const area = read("src", "components", "shell", "AreaView.jsx");
   const view = read("src", "components", "emergencies", "EmergenciesView.jsx");
   const script = read("src", "scripts", "emergencies.js");
-  assert.match(page, /<section id="emergenciesPage" class="am-page" hidden><EmergenciesView \/>/);
+  assert.match(area, /<EmergenciesView \/>/);
+  assert.doesNotMatch(page, /AstroMedNav/);
   assert.match(view, /import "\.\/emergencies\.css"/);
   assert.match(view, /openCard\.value/);
   assert.match(view, /indexCards/);
   assert.match(view, /<EmergencyCard/);
   const nav = read("src", "lib", "nav.js");
-  assert.match(nav, /id: "emergencies"/);
+  assert.match(nav, /emergency/);
   assert.match(script, /window\.AstroMedEmergencies = \{ open, situations, findings \}/);
   assert.doesNotMatch(script, /innerHTML|insertAdjacentHTML|querySelector|localStorage/);
 });

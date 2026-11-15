@@ -182,33 +182,3 @@ function analyze() {
 }
 
 window.AstroMedData = { getCheckups, SYSTEM_META, rule: (k, v) => (window.AstroMedEnv && window.AstroMedEnv.rule(k, v)) || (METRIC_RULES[k] || (() => GENERIC))(v), analyze, KEYS, load };
-
-/* ==========================================
-   PAGES STILL BUILT FROM STRINGS BY THEIR OWN MODULES
-   They are listed in src/lib/nav.js; these pages only need a container.
-   Remove an entry here when that section becomes a component.
-========================================== */
-
-function mountLegacyPages() {
-  const main = document.querySelector(".content");
-  if (!main) return;
-  ["environment", "nutrition", "radiation"].forEach((id) => {
-    if (document.getElementById(`${id}Page`)) return;
-    const section = document.createElement("section");
-    section.id = `${id}Page`;
-    section.className = "am-page";
-    section.hidden = true;
-    main.appendChild(section);
-  });
-  if (window.AstroMedNav && window.AstroMedNav.apply) window.AstroMedNav.apply();
-}
-
-function renderLegacySection(event) {
-  const id = event.detail && event.detail.id;
-  if (id === "environment" && window.AstroMedEnv) window.AstroMedEnv.render();
-  else if (id === "nutrition" && window.AstroMedNutrition) window.AstroMedNutrition.render();
-  else if (id === "radiation" && window.AstroMedRadiation) window.AstroMedRadiation.render();
-}
-
-document.addEventListener("DOMContentLoaded", mountLegacyPages);
-document.addEventListener("astromed-section", renderLegacySection);

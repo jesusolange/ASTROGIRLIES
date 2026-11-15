@@ -19,7 +19,6 @@ import "./radiation.js";
 import "./progress.js";
 import "./readiness.js";
 import "./theme.js";
-import "./riskmap.js";
 import "./today.js";
 import "./vision.js";
 import "./emergencies.js";

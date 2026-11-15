@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  PLACES, FIELDS, COMM, evaluate, baselineFor, labelFrom, findingsFrom, commFor
+  PLACES, FIELDS, evaluate, baselineFor, labelFrom, findingsFrom
 } from "../src/scripts/environment.js";
 
 test("temperature follows the stated bands", () => {
@@ -87,13 +87,7 @@ test("findings keep ok and warn rows but drop the first-baseline info row", () =
   assert.equal(findingsFrom({ place: "rover", readings: { radiation: 10 }, time: "now" }, []).length, 0);
 });
 
-test("message delay is defined for every place and absent otherwise", () => {
-  assert.equal(commFor(null), null);
-  assert.equal(commFor("unknown"), null);
-  assert.equal(commFor("other"), null);
-  assert.equal(commFor("mars").one, "3 to 22 min");
-  assert.equal(commFor("transit").bar, 100);
-  assert.equal(Object.keys(COMM).length, 5);
+test("every reading field and the cruise dose rate stay in place", () => {
   assert.equal(FIELDS.length, 6);
   assert.equal(PLACES.transit.rad, 76.7);
 });

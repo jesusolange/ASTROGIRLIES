@@ -45,3 +45,21 @@ test("alsoTell words the second step for the current link", () => {
 test("alsoTell uses the flight surgeon by default", () => {
   assert.match(Mission.alsoTell(undefined, Mission.link({ place: "mars" }, null)), /^Also tell the flight surgeon;/);
 });
+
+test("the message delay follows the destination in the profile", () => {
+  assert.equal(Mission.comm({ missionType: "mars-planetary" }).place, "mars");
+  assert.equal(Mission.comm({ missionType: "leo-long" }).place, "iss");
+  assert.equal(Mission.comm({ missionType: "lunarSurface-short" }).place, "moon");
+  assert.equal(Mission.comm({ missionType: "not-a-mission" }), null);
+  assert.equal(Mission.comm(null), null);
+  assert.equal(Mission.comm({}), null);
+});
+
+test("a delay is defined for every place and absent otherwise", () => {
+  assert.equal(Mission.commFor(null), null);
+  assert.equal(Mission.commFor("unknown"), null);
+  assert.equal(Mission.commFor("other"), null);
+  assert.equal(Mission.commFor("mars").one, "3 to 22 min");
+  assert.equal(Mission.commFor("transit").bar, 100);
+  assert.equal(Object.keys(Mission.COMM).length, 5);
+});
