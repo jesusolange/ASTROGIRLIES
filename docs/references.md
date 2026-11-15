@@ -102,7 +102,7 @@ an "AI-generated" badge, and their alt text ends in "(AI-generated illustration)
 
 | File | Title | Author | Licence |
 |---|---|---|---|
-| `public/assets/emergency/chest.jpg` | Chest: needle point and chest drain point | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/emergency/chest.jpg` | Chest: the two chest drain sites | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/emergency/drain.jpg` | Chest drain: tip at the top for air, low for fluid | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/emergency/belly-rovsing.jpg` | Abdomen with the McBurney, Lanz and Blumberg points | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/emergency/belly-murphy.jpg` | Abdomen with the Murphy point | AstroGirlies team | AI-generated illustration, made for this project |
@@ -110,6 +110,10 @@ an "AI-generated" badge, and their alt text ends in "(AI-generated illustration)
 | `public/assets/ARED.png` (also `public/assets/exercise/ared.png`) | ARED resistance machine in use | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/T2.png` (also `public/assets/exercise/t2.png`) | T2 treadmill in use | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/CEVIS.png` (also `public/assets/exercise/cevis.png`) | CEVIS exercise bike in use | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/environment/iss.png` | International Space Station | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/environment/moon.png` | Moon | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/environment/mars.png` | Mars | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/environment/rover.png` | Pressurized rover | AstroGirlies team | AI-generated illustration, made for this project |
 
 
 ## Fonts and libraries

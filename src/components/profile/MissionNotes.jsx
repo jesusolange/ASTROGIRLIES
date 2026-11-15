@@ -2,6 +2,7 @@ import { MISSION_TYPES } from "../../scripts/risks.js";
 import { PLACES } from "../../scripts/environment.js";
 import { link } from "../../scripts/mission.js";
 import { openSources } from "../sources/open.js";
+import AiImage from "../ui/AiImage.jsx";
 
 const PLACE_BY_DRM = { leo: "iss", lunarOrbit: "moon", lunarSurface: "moon", mars: "mars" };
 
@@ -32,9 +33,9 @@ export default function MissionNotes({ missionType }) {
         <p class="pf-delay">{delaySentence(value)}</p>
       </div>
       <figure class="pf-place">
-        <img src={`/${info.img}`} alt={`${info.name} destination`} loading="lazy" decoding="async" />
+        <AiImage src={`/${info.img}`} alt={`${info.name} destination`} ai />
         <figcaption>
-          {info.name} · AstroGirlies team ·{" "}
+          {info.name} · AI-generated illustration ·{" "}
           <button type="button" class="pf-source-link" onClick={() => openSources(`place-${place}`)}>Sources</button>
         </figcaption>
       </figure>

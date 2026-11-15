@@ -34,8 +34,8 @@ export const MODELS = [
 
 // The destination pictures in public/assets/environment/, shown in the profile's Mission section.
 export const PLACE_IMAGES = [
-  { id: "place-iss", title: "ISS", author: "AstroGirlies team", licence: "Project", url: null },
-  { id: "place-moon", title: "Moon", author: "AstroGirlies team", licence: "Project", url: null },
-  { id: "place-mars", title: "Mars", author: "AstroGirlies team", licence: "Project", url: null },
-  { id: "place-rover", title: "Pressurized rover", author: "AstroGirlies team", licence: "Project", url: null }
+  { id: "place-iss", title: "ISS", author: "AI-generated illustration, made for this project", licence: "Project", url: null },
+  { id: "place-moon", title: "Moon", author: "AI-generated illustration, made for this project", licence: "Project", url: null },
+  { id: "place-mars", title: "Mars", author: "AI-generated illustration, made for this project", licence: "Project", url: null },
+  { id: "place-rover", title: "Pressurized rover", author: "AI-generated illustration, made for this project", licence: "Project", url: null }
 ];

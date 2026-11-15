@@ -4,7 +4,7 @@
 > on Space Missions". AstroMed is a health self-monitoring app for astronauts on missions in low Earth orbit, at
 > the Moon or at Mars, where help from Earth is delayed or out of reach.
 
-**Live site:** _add the public URL here once deployed._
+**Live site:** https://astrogirlies.pages.dev · **Demo video:** https://youtu.be/v9RPcG16UKM
 
 AstroMed is a screening and self-monitoring aid. It is not a medical device and does not give a diagnosis.
 
