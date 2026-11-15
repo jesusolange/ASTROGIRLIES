@@ -115,5 +115,12 @@ These names are fixed so parallel tickets can rely on them before the other side
   `error`), `SourceLink`, `Dialog`, and `toast({ text, undo })` from `src/lib/ui.js`.
 - **Emergency data** (`src/data/emergencies.js`, T25): each card may carry `crewOnly: true`; every card has
   `topic` matching a row in `topics.js` where one exists.
+- **Emergency exports, as merged (T25):** `src/data/emergencies.js` exports `CARDS`, `CARD_BY_ID`,
+  `resolveCardId(id)`, `indexCards(crew)`, `situations(crew)`, `VITALS_REFERENCE`, `BLOOD_LOSS`, `STORM_STEPS`,
+  `STORM_NOTE`. `src/data/slow-risks.js` exports `BONE_LOSS`, `ANEMIA`, `SLOW_RISKS`, `SLOW_RISK_BY_ID`,
+  `NTX_RANGES`. `src/data/sources.js` exports `SOURCES`, `SOURCE_BY_ID`, `sourcesFor(cardId)`. Read these files
+  for the field names; do not change their shapes.
+- **Mission, as merged (T23):** `src/scripts/mission.js` exports `crewSize`, `hasCrew`, `link`, `alsoTell`,
+  `readComm`, `profileRecord`; each takes the profile or link as an optional argument for tests.
 - **Routes** (`src/lib/nav.js`, T26): `go(path)`, `route` signal `{ area, id }`, `openEmergency(id)`,
   `openCard(id)`.
