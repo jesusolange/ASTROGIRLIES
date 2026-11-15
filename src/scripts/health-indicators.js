@@ -136,7 +136,7 @@ export const SCALES = {
       { to: 38.6, level: "review" },
       { to: Infinity, level: "alert" }
     ],
-    note: "Oral temperature, demo reference."
+    note: "Oral temperature, reference band."
   },
   glucose: {
     min: 40,
@@ -151,7 +151,7 @@ export const SCALES = {
       { to: 250, level: "review" },
       { to: Infinity, level: "alert" }
     ],
-    note: "Fasting reference (8 h). Demo values, not a diagnosis."
+    note: "Fasting reference (8 h). Screening aid, not a diagnosis."
   },
   urineOutput: {
     min: 0,

@@ -1,5 +1,5 @@
 /* Vision (SANS) self-check: comparison against the astronaut's own baseline.
-   Screening aid, not a diagnosis. Change thresholds are our design choice, pending medical review. */
+   Screening aid, not a diagnosis. Change thresholds are our design choice. */
 
 import { rankedRisks, currentMission } from "./risks.js";
 
@@ -34,7 +34,7 @@ export const NEAR_LINES = [
 
 export const SYMPTOMS = [
   { id: "near-blur", label: "New blur when reading at near" },
-  { id: "blind-spot", label: "A blind spot or dark patch in my central vision" },
+  { id: "blind-spot", label: "A blind spot or dark patch in central vision" },
   { id: "headache", label: "Headache together with a change in vision" },
   { id: "double", label: "Double vision" },
   { id: "sudden-loss", label: "Sudden loss or sudden drop in vision" },
@@ -45,7 +45,7 @@ export const RULES = {
   recheckDays: 7,
   nearLineLossForChange: 2,
   urgentSymptoms: ["blind-spot", "sudden-loss"],
-  pendingReview: "Design choice, pending review by the team's medic.",
+  pendingReview: "Design choice for this app, not a medical standard.",
   actions: {
     urgent: {
       level: "urgent",

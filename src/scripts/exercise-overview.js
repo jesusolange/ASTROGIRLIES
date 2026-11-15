@@ -1,6 +1,13 @@
 /* Weekly exercise overview: pure aggregation of stored sessions.
    Observations are not diagnoses or medical alerts. */
 
+import { alsoTell } from "./mission.js";
+
+const tell = (who) => {
+  const sentence = alsoTell(who);
+  return sentence ? ` ${sentence}` : "";
+};
+
 export const TYPE_NAMES = { ared: "Strength (ARED)", cevis: "Bike (CEVIS)", t2: "Treadmill (T2)" };
 const TYPES = ["ared", "t2", "cevis"];
 const DAY_MS = 86400000;
@@ -101,7 +108,7 @@ export function buildOverview(data, now = new Date()) {
     if (soreness.some((n) => n >= 7)) {
       insights.push({
         title: "Higher soreness reported",
-        message: "One or more sessions recorded soreness of 7/10 or greater. Reduce the load or skip the affected movement until it settles, and check associated symptoms and recent trends. If Earth contact exists, also tell the flight surgeon about persistent, unusual or severe discomfort.",
+        message: "One or more sessions recorded soreness of 7/10 or greater. Reduce the load or skip the affected movement until it settles, and check associated symptoms and recent trends." + tell("the flight surgeon about persistent, unusual or severe discomfort"),
         review: true
       });
     }

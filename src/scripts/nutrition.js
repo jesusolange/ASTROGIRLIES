@@ -2,6 +2,8 @@
    (Nutritional Requirements for Exploration Missions up to 365 days) and
    NASA-STD-3001 Tech Brief OCHMO-TB-013. A self-monitoring aid, not medical advice. */
 
+import { alsoTell } from "./mission.js";
+
 export const KEY = "astromed-nutrition";
 export const FIELDS = ["kcal", "carb", "prot", "fat", "fiber", "sodium", "veg", "fluid"];
 export const MEALS = ["Breakfast", "Lunch", "Dinner", "Snack"];
@@ -169,14 +171,19 @@ export function summaryFor(state, prof, now = new Date()) {
   return { ratio: avg("ratio"), fluid: avg("fluid"), days: rows.length };
 }
 
+const appetiteTell = () => {
+  const sentence = alsoTell();
+  return sentence ? ` If you have no appetite, ${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}` : "";
+};
+
 export function findingsFor(s) {
   if (!s) return [];
   const out = [];
   const pct = Math.round(s.ratio * 100);
-  if (s.ratio < 0.6) out.push({ level: "alert", title: "Nutrition · very low calories", saw: `You ate about ${pct}% of your calorie goal (average of the last ${s.days} logged day${s.days > 1 ? "s" : ""}).`, todo: "Add an extra snack and a larger meal today. Low food intake in space leads to weight and muscle loss. If Earth contact exists, also tell the flight surgeon if you have no appetite." });
+  if (s.ratio < 0.6) out.push({ level: "alert", title: "Nutrition · very low calories", saw: `You ate about ${pct}% of your calorie goal (average of the last ${s.days} logged day${s.days > 1 ? "s" : ""}).`, todo: "Add an extra snack and a larger meal today. Low food intake in space leads to weight and muscle loss." + appetiteTell() });
   else if (s.ratio < 0.8) out.push({ level: "review", title: "Nutrition · low calories", saw: `You ate about ${pct}% of your calorie goal (average of the last ${s.days} logged day${s.days > 1 ? "s" : ""}).`, todo: "Add a snack or a bigger meal. Eating enough protects bones, muscles and the immune system." });
   else if (s.ratio > 1.2) out.push({ level: "review", title: "Nutrition · calories above goal", saw: `You ate about ${pct}% of your calorie goal.`, todo: "Look at portion sizes and snacks. Keep exercising every day." });
-  else out.push({ level: "ok", title: "Nutrition · calories", saw: `You ate about ${pct}% of your calorie goal.`, todo: "Good balance. Keep it up." });
+  else out.push({ level: "ok", title: "Nutrition · calories", saw: `You ate about ${pct}% of your calorie goal.`, todo: "Keep the balance." });
   if (s.fluid != null && s.fluid > 0 && s.fluid < 0.6) out.push({ level: "review", title: "Nutrition · low fluids", saw: `You drank about ${Math.round(s.fluid * 100)}% of your fluid goal.`, todo: "Drink water through the day. Fluids shift in space and thirst can be weak." });
   return out;
 }
@@ -237,13 +244,13 @@ export async function lookupFood(code, lib) {
   const trimmed = String(code || "").trim();
   if (!trimmed) return { note: "" };
   const hit = lib.find((f) => f.code === trimmed);
-  if (hit) return { food: hit, note: "Found in My foods. Check the amount." };
+  if (hit) return { food: hit, note: "Found in saved foods. Check the amount." };
   const online = typeof navigator === "undefined" || navigator.onLine;
-  if (!online) return { note: "No internet. Type the name and calories once. I will remember this code." };
+  if (!online) return { note: "No internet, so barcode lookup is unavailable. Enter the food by hand or import a CSV list." };
   const found = await offLookup(trimmed);
   if (found && !found.none) return { food: found, note: `Found online (${found.kcal} kcal per 100 ${found.unit}). Check the amount.` };
   if (found) return { name: found.name, note: "Name found, but no calories. Type them from the label." };
-  return { note: "Not found. Type the name and calories once. I will remember this code." };
+  return { note: "Not found. Enter the name and calories by hand, or import a CSV list." };
 }
 
 /* ---------- public object and navigation ---------- */

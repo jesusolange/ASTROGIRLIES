@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {
   targets, totalsOf, dayEntries, factor, unitLabel, buildEntry, status,
   weekRows, summaryFor, findingsFor, addToLibrary, parseFoodList, mergeFoodList,
-  isoDay, blankNutrition, waterEntry
+  isoDay, blankNutrition, waterEntry, lookupFood
 } from "../src/scripts/nutrition.js";
 
 const profile = { age: 40, sex: "m", weightKg: 80, heightCm: 180, startDate: "2026-11-01" };
@@ -144,4 +144,11 @@ test("food lists load from CSV and JSON and merge by name", () => {
   const merged = mergeFoodList(csv, [{ ...json[0], name: "Oats", kcal: 160 }]);
   assert.equal(merged.length, 1);
   assert.equal(merged[0].kcal, 160);
+});
+
+test("without a network the barcode lookup names manual entry and CSV import", async () => {
+  const result = await lookupFood("1234567890123", []);
+  assert.match(result.note, /no internet/i);
+  assert.match(result.note, /by hand/i);
+  assert.match(result.note, /CSV/i);
 });

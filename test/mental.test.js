@@ -53,7 +53,26 @@ test("a flagged answer with a low score is shown as needing attention, not healt
 
   const guide = Mental.guideFor(entry);
   assert.match(guide.meaning, /needs attention whatever the total score is/i);
-  assert.equal(guide.todo[0], "Tell the crew medical officer or the commander now.");
+  assert.equal(guide.todo[0], "Move away from airlock controls, tools, medicines and anything else you could use to hurt yourself.");
+  assert.ok(guide.todo.every((line) => !/crewmate|flight surgeon/i.test(line)));
+});
+
+test("the urgent response adds a crewmate and Earth only when the mission has them", () => {
+  const alone = Mental.suicidalResponse({ crew: false, link: { kind: "none" } });
+  assert.equal(alone.actions[0], "Move away from airlock controls, tools, medicines and anything else you could use to hurt yourself.");
+  assert.ok(alone.actions.every((line) => !/crewmate|flight surgeon/i.test(line)));
+
+  const crewed = Mental.suicidalResponse({ crew: true, link: { kind: "delayed", oneWay: "3 to 22 min", roundTrip: "6 to 44 min" } });
+  assert.ok(crewed.actions.some((line) => /stay with a crewmate/i.test(line)));
+  assert.ok(crewed.actions.some((line) => /^Also tell the flight surgeon; a reply takes about 6 to 44 minutes\.$/.test(line)));
+  assert.match(crewed.text, /^You answered .* Move away from airlock controls/);
+});
+
+test("depression actions keep the solo step first when Earth is reachable", () => {
+  const todo = Mental.depActions("Severe depression symptoms", { crew: true, link: { kind: "live" } });
+  assert.match(todo[0], /^Write down how you feel/);
+  assert.ok(todo.some((line) => /stay with a crewmate/i.test(line)));
+  assert.ok(todo.some((line) => /the link is live/i.test(line)));
 });
 
 test("an unflagged low score keeps its healthy band", () => {

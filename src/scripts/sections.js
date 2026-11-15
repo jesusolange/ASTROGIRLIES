@@ -7,6 +7,12 @@
 
 import { analyzeMental } from "./mental.js";
 import { ntxRange } from "./health-indicators.js";
+import { alsoTell } from "./mission.js";
+
+const tell = (who) => {
+  const sentence = alsoTell(who);
+  return sentence ? ` ${sentence}` : "";
+};
 
 const KEYS = {
   mental: "astromed-mental",
@@ -57,26 +63,26 @@ function getCheckups() {
 const R = (level, saw, todo) => ({ level, saw, todo });
 
 const METRIC_RULES = {
-  hr: v => v < 60 ? R("review", "Heart rate below 60 bpm.", "Rest, hydrate and note any dizziness or fatigue. If you are not a trained athlete or feel unwell, measure again after 10 minutes and stay seated until you feel steady. If Earth contact exists, also tell the flight surgeon.")
-    : v > 100 ? R("review", "Heart rate above 100 bpm.", "Rest 5–10 minutes, breathe slowly and measure again. If it stays high or you have chest discomfort, sit down, avoid exertion and measure every 10 minutes. If Earth contact exists, also tell the flight surgeon.")
-    : R("ok", "Heart rate within the demo reference.", "Keep your routine and measure at a similar time each day."),
+  hr: v => v < 60 ? R("review", "Heart rate below 60 bpm.", "Rest, hydrate and note any dizziness or fatigue. If you are not a trained athlete or feel unwell, measure again after 10 minutes and stay seated until you feel steady." + tell())
+    : v > 100 ? R("review", "Heart rate above 100 bpm.", "Rest 5–10 minutes, breathe slowly and measure again. If it stays high or you have chest discomfort, sit down, avoid exertion and measure every 10 minutes." + tell())
+    : R("ok", "Heart rate within the reference band.", "Keep your routine and measure at a similar time each day."),
   sys: v => v < 90 ? R("review", "Systolic pressure is low.", "Hydrate, stand up slowly and note any dizziness or fainting.")
-    : v < 120 ? R("ok", "Systolic pressure within the demo reference.", "Keep up exercise and hydration.")
+    : v < 120 ? R("ok", "Systolic pressure within the reference band.", "Keep up exercise and hydration.")
     : v <= 180 ? R("review", "Systolic pressure above the reference.", "Re-measure after 5 minutes of rest, limit salt and keep a record of repeated high readings.")
-    : R("alert", "Systolic pressure very high.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion and note headache, vision changes or chest pain. If Earth contact exists, also tell the flight surgeon."),
+    : R("alert", "Systolic pressure very high.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion and note headache, vision changes or chest pain." + tell()),
   dia: v => v < 60 ? R("review", "Diastolic pressure is low.", "Hydrate and note any dizziness.")
-    : v < 80 ? R("ok", "Diastolic pressure within the demo reference.", "Keep up exercise and hydration.")
+    : v < 80 ? R("ok", "Diastolic pressure within the reference band.", "Keep up exercise and hydration.")
     : v <= 120 ? R("review", "Diastolic pressure above the reference.", "Re-measure after rest and keep a record of repeated high readings.")
-    : R("alert", "Diastolic pressure very high.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion and record the reading. If Earth contact exists, also tell the flight surgeon."),
-  resp: v => v < 12 || v >= 19 ? R("review", "Breathing rate outside the demo reference.", "Measure again at rest, check cabin air and CO₂ alerts, and report shortness of breath.")
-    : R("ok", "Breathing rate within the demo reference.", "Keep it up."),
-  spo2: v => v < 92 ? R("alert", "Oxygen saturation is low.", "Check your sensor, sit down and breathe slowly. Re-measure; if it stays low, stop activity and keep the cabin air clean. If Earth contact exists, also tell the flight surgeon immediately.")
+    : R("alert", "Diastolic pressure very high.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion and record the reading." + tell()),
+  resp: v => v < 12 || v >= 19 ? R("review", "Breathing rate outside the reference band.", "Measure again at rest, check cabin air and CO₂ alerts, and report shortness of breath.")
+    : R("ok", "Breathing rate within the reference band.", "Keep the routine."),
+  spo2: v => v < 92 ? R("alert", "Oxygen saturation is low.", "Check your sensor, sit down and breathe slowly. Re-measure; if it stays low, stop activity and keep the cabin air clean." + tell())
     : v < 95 ? R("review", "Oxygen saturation slightly low.", "Re-measure at rest with warm hands and check cabin air quality.")
-    : R("ok", "Oxygen saturation within the demo reference.", "Keep it up."),
+    : R("ok", "Oxygen saturation within the reference band.", "Keep the routine."),
   sleep: v => v < 6 ? R("review", "You slept less than 6 hours.", "Protect your sleep window, dim lights and limit screens and caffeine before bed.")
     : v > 9 ? R("review", "You slept more than 9 hours.", "Long sleep can signal fatigue or low mood. Watch the trend and mention it if it continues.")
     : R("ok", "Sleep duration looks healthy.", "Keep a steady schedule."),
-  mood: v => v <= 4 ? R("review", "Your self-reported mood is low.", "Take the Mental Health check-in and talk to someone you trust.")
+  mood: v => v <= 4 ? R("review", "Your self-reported mood is low.", "Take the Mental Health check-in and write down what you notice." + tell())
     : R("ok", "Self-reported mood is fine.", "Keep tracking it."),
   fluidIntake: v => v < 1500 ? R("review", "Fluid intake is low.", "Drink regularly during the day and follow your hydration plan.")
     : R("ok", "Fluid intake looks fine.", "Keep following your hydration plan."),
@@ -85,24 +91,24 @@ const METRIC_RULES = {
   exercise: v => v < 30 ? R("review", "Exercise time is low.", "Crew members train about 2 hours a day to protect bones and muscles. Log a session in Exercise & Recovery.")
     : R("ok", "Exercise time looks fine.", "Keep following your plan.")
 };
-METRIC_RULES.glucose = v => v < 54 ? R("alert", "Blood glucose is very low.", "Eat or drink 15 g of fast carbohydrate now, re-measure in 15 minutes and stay still until it rises. If Earth contact exists, also tell the flight surgeon.")
+METRIC_RULES.glucose = v => v < 54 ? R("alert", "Blood glucose is very low.", "Eat or drink 15 g of fast carbohydrate now, re-measure in 15 minutes and stay still until it rises." + tell())
   : v < 70 ? R("review", "Blood glucose is low.", "Take 15 g of fast carbohydrate, re-measure in 15 minutes and note what you ate and when you trained.")
-  : v <= 99 ? R("ok", "Blood glucose within the demo reference.", "Keep regular meals and hydration.")
+  : v <= 99 ? R("ok", "Blood glucose within the reference band.", "Keep regular meals and hydration.")
   : v <= 125 ? R("review", "Blood glucose above the fasting reference.", "Measure again fasting (8 hours without food). Review meals and training, and record it if it repeats.")
-  : v <= 250 ? R("review", "Blood glucose is high.", "Re-measure, drink water and avoid sugary food. Keep a record of repeated high readings. If Earth contact exists, also tell the flight surgeon.")
-  : R("alert", "Blood glucose is very high.", "Drink water, avoid sugary food and re-measure. Keep a record of the readings. If Earth contact exists, also tell the flight surgeon.");
+  : v <= 250 ? R("review", "Blood glucose is high.", "Re-measure, drink water and avoid sugary food. Keep a record of repeated high readings." + tell())
+  : R("alert", "Blood glucose is very high.", "Drink water, avoid sugary food and re-measure. Keep a record of the readings." + tell());
 METRIC_RULES.pulse = METRIC_RULES.hr;
 METRIC_RULES.ntx = v => {
   const range = ntxRange((window.AstroMedProfile && window.AstroMedProfile.get()) || {});
   const r = [range.low, range.high];
-  if (v > r[1]) return R("review", `N-telopeptide is above the usual range (${r[0]}–${r[1]}). Bone may be breaking down faster.`, "Take vitamin D and keep resistive exercise. Repeat the test and record the trend. If Earth contact exists, also ask the flight surgeon about a bisphosphonate.");
-  if (v < r[0]) return R("review", `N-telopeptide is below the usual range (${r[0]}–${r[1]}).`, "Repeat the test and record the result. If Earth contact exists, also tell the flight surgeon.");
+  if (v > r[1]) return R("review", `N-telopeptide is above the usual range (${r[0]}–${r[1]}). Bone may be breaking down faster.`, "Take vitamin D and keep resistive exercise. Repeat the test and record the trend." + tell("the flight surgeon about a bisphosphonate"));
+  if (v < r[0]) return R("review", `N-telopeptide is below the usual range (${r[0]}–${r[1]}).`, "Repeat the test and record the result." + tell());
   return R("ok", `N-telopeptide is in the usual range (${r[0]}–${r[1]}).`, "Keep your resistive exercise and vitamin D.");
 };
 METRIC_RULES.bodyTemp = v => v < 36 ? R("review", "Body temperature is low.", "Warm up, check your suit or cabin temperature and measure again.")
-  : v <= 37.8 ? R("ok", "Body temperature within the demo reference.", "Keep your routine.")
+  : v <= 37.8 ? R("ok", "Body temperature within the reference band.", "Keep your routine.")
   : v <= 38.5 ? R("review", "Mild fever range.", "Rest, hydrate and re-measure in 1 hour. Record it if it persists or you have other symptoms.")
-  : R("alert", "High temperature.", "Rest, drink water and cool the cabin. Re-measure in 15 minutes and avoid exertion. If Earth contact exists, also tell the flight surgeon.");
+  : R("alert", "High temperature.", "Rest, drink water and cool the cabin. Re-measure in 15 minutes and avoid exertion." + tell());
 
 const GENERIC = R("info", "Value saved.", "Compare it with your personal baseline and trend over the next days.");
 
@@ -158,7 +164,7 @@ function analyze() {
       ? { level: "review", title: "Training this week", saw: `${week.length} session(s) logged in the last 7 days.`,
           todo: "Try to train most days. Exercise protects bones and muscles and also helps mood and sleep." }
       : { level: "ok", title: "Training this week", saw: `${week.length} sessions logged in the last 7 days.`,
-          todo: "Great consistency. Keep following your plan." });
+          todo: "Keep following your plan." });
     if (week.length && missing.length) out.exercise.push({
       level: "review", title: "Training variety",
       saw: `No ${missing.join(", ")} session in the last 7 days.`,
@@ -168,7 +174,7 @@ function analyze() {
     out.exercise.push({
       level: "review", title: "Training",
       saw: "No exercise sessions logged yet.",
-      todo: "Log your next session in Exercise & Recovery so I can follow your recovery."
+      todo: "Log your next session in Exercise & Recovery so your recovery can be followed."
     });
   }
 

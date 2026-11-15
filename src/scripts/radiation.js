@@ -5,6 +5,8 @@
    DOSIS 3D on the ISS); NASA Human Research Program, Space Radiation.
    Status bands (50% / 80% of the limit) are illustrative design choices. */
 
+import { alsoTell } from "./mission.js";
+
 export const KEY = "astromed-radiation";
 export const LIMIT = 600;
 export const SPE_LIMIT = 250;
@@ -92,14 +94,19 @@ export function status() {
   return { career: c.career, pct: c.pct, level: c.level, rate: c.rate, projected: c.projected, projLevel: c.projLevel, hasData: state.entries.length > 0 || state.prior > 0 };
 }
 
+const tell = (who) => {
+  const sentence = alsoTell(who);
+  return sentence ? ` ${sentence}` : "";
+};
+
 export function findings() {
   const st = status();
   if (!st.hasData) return [];
   const out = [];
   const todo = {
     ok: "Keep logging your dose. Know where your storm shelter is.",
-    review: "Spend more time in the best-shielded space and plan lower-dose activities yourself. If Earth contact exists, also tell the flight surgeon.",
-    alert: "Stay in the best-shielded space and stop non-essential activity today. If Earth contact exists, also tell the flight surgeon and the radiation team."
+    review: "Spend more time in the best-shielded space and plan lower-dose activities yourself." + tell(),
+    alert: "Stay in the best-shielded space and stop non-essential activity today." + tell("the flight surgeon and the radiation team")
   };
   out.push({ level: st.level, title: "Radiation · career dose", saw: `${st.career.toFixed(1)} mSv used of ${LIMIT} mSv (${st.pct.toFixed(1)}%).`, todo: todo[st.level] });
   if (st.projLevel && st.projLevel !== "ok") {
@@ -107,7 +114,7 @@ export function findings() {
       level: st.projLevel,
       title: "Radiation · mission forecast",
       saw: `At your recent rate you would reach about ${Math.round(st.projected)} mSv by the end of the mission.`,
-      todo: "Lower your daily dose now: more time in the best-shielded space and fewer non-essential activities. If Earth contact exists, also tell the flight surgeon."
+      todo: "Lower your daily dose now: more time in the best-shielded space and fewer non-essential activities." + tell()
     });
   }
   return out;

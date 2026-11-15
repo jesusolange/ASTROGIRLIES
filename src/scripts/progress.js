@@ -87,8 +87,8 @@ export function statsFor(list, now = Date.now()) {
 export function arrow(cur, prev) {
   if (cur == null || prev == null || prev === 0) return { txt: "—", cls: "flat" };
   const delta = ((cur - prev) / Math.abs(prev)) * 100;
-  if (Math.abs(delta) < 1) return { txt: "→ 0%", cls: "flat" };
-  return { txt: `${delta > 0 ? "↑" : "↓"} ${Math.abs(delta).toFixed(1)}%`, cls: delta > 0 ? "up" : "down" };
+  if (Math.abs(delta) < 1) return { txt: "no change", cls: "flat" };
+  return { txt: `${delta > 0 ? "+" : "-"}${Math.abs(delta).toFixed(1)}%`, cls: delta > 0 ? "up" : "down" };
 }
 
 export function chartBounds(values, band) {

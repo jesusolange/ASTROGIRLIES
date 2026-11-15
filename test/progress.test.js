@@ -9,9 +9,9 @@ const at = (offset) => new Date(Date.now() - offset * DAY).toISOString();
 test("the change arrow compares this week with last week", () => {
   assert.deepEqual(Progress.arrow(null, 10), { txt: "—", cls: "flat" });
   assert.deepEqual(Progress.arrow(10, null), { txt: "—", cls: "flat" });
-  assert.deepEqual(Progress.arrow(100, 100), { txt: "→ 0%", cls: "flat" });
-  assert.deepEqual(Progress.arrow(110, 100), { txt: "↑ 10.0%", cls: "up" });
-  assert.deepEqual(Progress.arrow(90, 100), { txt: "↓ 10.0%", cls: "down" });
+  assert.deepEqual(Progress.arrow(100, 100), { txt: "no change", cls: "flat" });
+  assert.deepEqual(Progress.arrow(110, 100), { txt: "+10.0%", cls: "up" });
+  assert.deepEqual(Progress.arrow(90, 100), { txt: "-10.0%", cls: "down" });
 });
 
 test("window statistics keep the last seven days apart from the week before", () => {

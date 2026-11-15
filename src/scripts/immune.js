@@ -1,6 +1,8 @@
 // Immune watch logic: daily symptom check, saliva and blood test notes, findings and section registration.
 // No reference range is applied to the test values: the page shows them against your own earlier results.
 // This is a self-monitoring aid, not a diagnosis.
+import { alsoTell } from "./mission.js";
+
 const KEY = "astromed-immune";
 const read = (key, fallback) => globalThis.AstroMedStore.store.get(key, fallback);
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -11,10 +13,15 @@ export const SYMPTOMS = [
   ["rash", "Skin rash or itching"], ["sores", "Cold sores or mouth sores"], ["tired", "Very tired, more than usual"], ["heal", "Cuts or sores heal slowly"]
 ];
 export const EMPTY_IMMUNE = { log: {}, tests: [] };
+const tell = () => {
+  const sentence = alsoTell();
+  return sentence ? ` ${sentence}` : "";
+};
+
 export const ACTIONS = {
-  ok: "No warning signs today. Keep sleeping, eating and training well to support your defenses.",
-  review: "Rest more, drink water and watch for changes, and repeat this check tomorrow. If symptoms last more than 2 days, keep resting and drinking and follow your emergency plan if breathing or chest symptoms start. If Earth contact exists, also tell the flight surgeon.",
-  alert: "Rest, drink water and measure your temperature again after 30 minutes; keep your tasks light and follow your emergency plan if breathing or chest symptoms start. If Earth contact exists, also tell the flight surgeon."
+  get ok() { return "No warning signs today. Keep sleeping, eating and training well to support your defenses."; },
+  get review() { return "Rest more, drink water and watch for changes, and repeat this check tomorrow. If symptoms last more than 2 days, keep resting and drinking and follow your emergency plan if breathing or chest symptoms start." + tell(); },
+  get alert() { return "Rest, drink water and measure your temperature again after 30 minutes; keep your tasks light and follow your emergency plan if breathing or chest symptoms start." + tell(); }
 };
 const LABEL = Object.fromEntries(SYMPTOMS);
 
