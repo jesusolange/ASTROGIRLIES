@@ -1,112 +1,113 @@
 "use strict";
-const { test, afterEach } = require("node:test");
+const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const Flow = require("../src/scripts/checkup-flow.js");
 
-afterEach(() => Flow.reset());
+function fakeStore() {
+  const map = new Map();
+  return {
+    get(key, fallback) {
+      return map.has(key) ? JSON.parse(map.get(key)) : fallback;
+    },
+    set(key, value) {
+      map.set(key, JSON.stringify(value));
+      return true;
+    }
+  };
+}
 
-test("the step order follows the 3D guide", () => {
+const DAY = new Date(2026, 10, 15, 10, 0, 0);
+
+test("the body systems keep the stored record part keys", () => {
   assert.deepEqual(Flow.STEP_IDS, ["brain", "lungs", "heart", "kidneys", "hand", "bones", "muscles"]);
-  assert.equal(Flow.currentStep.value, "brain");
+  Flow.STEP_IDS.forEach((part) => {
+    assert.ok(Flow.SYSTEMS[part], part);
+    assert.ok(Flow.SYSTEMS[part].fields.length > 0, part);
+  });
 });
 
-test("selecting a part moves the shared current step", () => {
-  Flow.select("kidneys");
-  assert.equal(Flow.currentStep.value, "kidneys");
-  Flow.select("not-a-part");
-  assert.equal(Flow.currentStep.value, "kidneys");
+test("a heart rate of 500 is refused with the accepted range", () => {
+  const outcome = Flow.saveCard("heart", { hr: "500" }, { store: fakeStore() });
+  assert.ok(outcome.error);
+  assert.equal(outcome.error.field, "hr");
+  assert.match(outcome.error.message, /0 to 250 bpm/);
 });
 
-test("complete marks the part and advances to the next undone step in list order", () => {
-  assert.equal(Flow.complete("brain"), "lungs");
-  assert.equal(Flow.complete("lungs"), "heart");
-  assert.deepEqual(Flow.doneParts.value, ["brain", "lungs"]);
-  assert.equal(Flow.currentStep.value, "heart");
+test("a blank field is skipped but one measurement is required", () => {
+  const empty = Flow.validateValues(Flow.SYSTEMS.heart.fields, { hr: "", sys: "" });
+  assert.equal(empty.error.field, "hr");
+  assert.match(empty.error.message, /at least one measurement/i);
+  const partial = Flow.validateValues(Flow.SYSTEMS.heart.fields, { hr: "76", sys: "" });
+  assert.deepEqual(partial.values, { hr: 76 });
 });
 
-test("complete skips steps that are already done and wraps once", () => {
-  assert.equal(Flow.complete("brain"), "lungs");
-  assert.equal(Flow.complete("lungs"), "heart");
-  assert.equal(Flow.complete("heart"), "kidneys");
-  assert.equal(Flow.complete("brain"), "kidneys");
-  Flow.complete("kidneys");
-  Flow.complete("hand");
-  Flow.complete("bones");
-  assert.equal(Flow.complete("muscles"), null);
-});
+test("saving writes the stored record shape and undo removes it", () => {
+  const store = fakeStore();
+  const outcome = Flow.saveCard("heart", { hr: "76", sys: "118" }, { store, now: DAY });
+  const saved = Flow.readRecords(store);
+  assert.equal(saved.length, 1);
+  assert.deepEqual(Object.keys(saved[0]).sort(), ["part", "source", "time", "values"]);
+  assert.deepEqual(saved[0].values, { hr: 76, sys: 118 });
+  assert.equal(saved[0].source, "manual");
 
-test("the flow is complete only when every listed step is done", () => {
-  Flow.STEP_IDS.forEach((part) => Flow.complete(part));
-  assert.equal(Flow.flowComplete.value, true);
-  assert.equal(Flow.currentStep.value, null);
-  assert.equal(Flow.next(), null);
-});
-
-test("hydrate marks today's saved systems done and ignores other days", () => {
-  const now = new Date("2026-11-14T12:00:00.000Z");
-  Flow.hydrate([
-    { part: "brain", time: "2026-11-14T09:00:00.000Z", values: {} },
-    { part: "heart", time: "2026-11-13T09:00:00.000Z", values: {} }
-  ], now);
-  assert.deepEqual(Flow.doneParts.value, ["brain"]);
-  assert.equal(Flow.currentStep.value, "lungs");
-});
-
-const record = (part, time, value) => ({
-  part,
-  time,
-  values: { hr: value },
-  source: "manual"
+  outcome.undo();
+  assert.equal(Flow.readRecords(store).length, 0);
 });
 
 test("a second save for the same system in the same minute replaces the first", () => {
-  const first = record("heart", "2026-11-14T12:00:10.000Z", 76);
-  const second = record("heart", "2026-11-14T12:00:50.000Z", 88);
-  const list = Flow.upsertRecord(Flow.upsertRecord([], first), second);
-  assert.equal(list.length, 1);
-  assert.equal(list[0].values.hr, 88);
-  assert.equal(list[0].time, "2026-11-14T12:00:50.000Z");
+  const store = fakeStore();
+  Flow.saveCard("heart", { hr: "76" }, { store, now: DAY });
+  Flow.saveCard("heart", { hr: "88" }, { store, now: new Date(DAY.getTime() + 40000) });
+  const saved = Flow.readRecords(store);
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].values.hr, 88);
 });
 
-test("a save in the next minute adds a new reading", () => {
-  const list = Flow.upsertRecord(
-    Flow.upsertRecord([], record("heart", "2026-11-14T12:00:50.000Z", 76)),
-    record("heart", "2026-11-14T12:01:05.000Z", 88)
-  );
-  assert.equal(list.length, 2);
-  assert.equal(list[0].values.hr, 88);
+test("undo keeps a record it replaced in the same minute", () => {
+  const store = fakeStore();
+  Flow.saveCard("heart", { hr: "76" }, { store, now: DAY });
+  const second = Flow.saveCard("heart", { hr: "88" }, { store, now: new Date(DAY.getTime() + 1000) });
+  second.undo();
+  const saved = Flow.readRecords(store);
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].values.hr, 76);
 });
 
-test("two systems saved in the same minute are both kept", () => {
-  const list = Flow.upsertRecord(
-    Flow.upsertRecord([], record("heart", "2026-11-14T12:00:10.000Z", 76)),
-    record("lungs", "2026-11-14T12:00:20.000Z", 16)
-  );
-  assert.equal(list.length, 2);
-  assert.deepEqual(list.map((item) => item.part).sort(), ["heart", "lungs"]);
+test("done today and the summary follow the record's day", () => {
+  const store = fakeStore();
+  Flow.saveCard("heart", { hr: "76", sys: "118" }, { store, now: DAY });
+  const records = Flow.readRecords(store);
+  assert.equal(Flow.doneToday("heart", records, DAY), true);
+  assert.equal(Flow.doneToday("heart", records, new Date(2026, 10, 16, 9, 0, 0)), false);
+  assert.equal(Flow.summaryFor("heart", records, DAY), "Heart rate 76 bpm \u00b7 Systolic BP 118 mmHg");
+  assert.equal(Flow.summaryFor("lungs", records, DAY), "");
 });
 
-test("upsert keeps newest first and respects the stored record shape", () => {
-  const list = Flow.upsertRecord([], record("brain", "2026-11-14T12:00:00.000Z", 7));
-  assert.deepEqual(Object.keys(list[0]).sort(), ["part", "source", "time", "values"]);
+test("the result level comes from the reference bands and never guesses a normal", () => {
+  assert.equal(Flow.resultFor("heart", { hr: 76 }).level, "ok");
+  assert.equal(Flow.resultFor("heart", { hr: 130 }).level, "warn");
+  assert.equal(Flow.resultFor("lungs", { spo2: 90 }).level, "urgent");
+  assert.equal(Flow.resultFor("heart", { hrv: 40 }).level, null);
+});
+
+test("the result prefers the flight-surgeon wording from the shared rules", () => {
+  const ruleFor = (key) => (key === "hr" ? { level: "alert", saw: "Heart rate very high.", todo: "Sit down and rest." } : null);
+  const result = Flow.resultFor("heart", { hr: 140 }, ruleFor);
+  assert.equal(result.level, "urgent");
+  assert.match(result.saw, /Heart rate very high/);
+  assert.equal(result.todo, "Sit down and rest.");
+});
+
+test("findings list only values outside a reference band", () => {
+  const findings = Flow.findingsFromRecords([
+    { part: "heart", time: DAY.toISOString(), values: { hr: 130 } },
+    { part: "lungs", time: DAY.toISOString(), values: { spo2: 98 } }
+  ]);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].level, "warn");
+  assert.match(findings[0].title, /130 bpm/);
+});
+
+test("the record key is unchanged so Progress and the report keep reading it", () => {
   assert.equal(Flow.RECORDS_KEY, "astrotwin-gui-v2-records");
-});
-
-test("readValues accepts values inside the field range and names the first invalid field", () => {
-  const fields = [
-    { key: "hr", label: "Heart rate", min: 0, max: 250, unit: "bpm" },
-    { key: "sys", label: "Systolic BP", min: 0, max: 300, unit: "mmHg" }
-  ];
-  assert.deepEqual(Flow.readValues(fields, { hr: "76", sys: "118" }).values, { hr: 76, sys: 118 });
-  assert.match(Flow.readValues(fields, { hr: "76", sys: "400" }).error, /systolic bp/i);
-  assert.match(Flow.readValues(fields, { hr: "", sys: "118" }).error, /heart rate/i);
-});
-
-test("draftFor starts every field empty so the astronaut enters each value", () => {
-  const draft = Flow.draftFor("heart", [{
-    part: "heart",
-    time: "2026-11-14T12:00:00.000Z",
-    values: { hr: 90, sys: 120, dia: 80, hrv: 40 }
-  }]);
-  assert.deepEqual(draft.values, { hr: "", sys: "", dia: "", hrv: "" });
 });

@@ -1,9 +1,7 @@
-/* The daily checkup: one ordered list of body systems, the current step and the done set.
-   The form and the 3D guide both read the signals in this module, so selecting or saving in one
-   place immediately moves the other. Record helpers keep the stored shape used by Protocols,
-   Progress and the PDF report: { part, values, time, source }. */
+/* The body checks: one system per card, its fields and the stored record shape.
+   Records keep { part, values, time, source } so Progress, the report and the CSV export read the
+   same data. Only values the astronaut enters are saved. */
 
-import { computed, signal } from "@preact/signals";
 import { bandFor, scaleFor } from "./health-indicators.js";
 
 export const RECORDS_KEY = "astrotwin-gui-v2-records";
@@ -103,62 +101,30 @@ export function systemFor(part) {
   return SYSTEMS[part] || null;
 }
 
-export function stepNumber(part) {
-  return STEP_IDS.indexOf(part) + 1;
+function defaultStore() {
+  const root = typeof window !== "undefined" ? window : globalThis;
+  return root.AstroMedStore && root.AstroMedStore.store ? root.AstroMedStore.store : null;
 }
 
-export function nextUndone(done, after = null, ids = STEP_IDS) {
-  const doneSet = done instanceof Set ? done : new Set(done || []);
-  const start = after ? ids.indexOf(after) + 1 : 0;
-  for (let index = start; index < ids.length; index += 1) {
-    if (!doneSet.has(ids[index])) return ids[index];
+function keepRecord(record) {
+  return Boolean(record && record.part && record.values);
+}
+
+export function readRecords(store = defaultStore()) {
+  try {
+    const saved = store ? store.get(RECORDS_KEY, []) : [];
+    return Array.isArray(saved) ? saved.filter(keepRecord) : [];
+  } catch (error) {
+    console.warn("Local storage unavailable", error);
+    return [];
   }
-  for (let index = 0; index < start; index += 1) {
-    if (!doneSet.has(ids[index])) return ids[index];
-  }
-  return null;
 }
 
-export const currentStep = signal(STEP_IDS[0]);
-export const doneParts = signal([]);
-export const flowComplete = computed(() => STEP_IDS.every((id) => doneParts.value.includes(id)));
-
-export function select(part) {
-  if (SYSTEMS[part]) currentStep.value = part;
-}
-
-export function complete(part) {
-  if (!SYSTEMS[part]) return currentStep.value;
-  const done = doneParts.value.includes(part) ? doneParts.value : [...doneParts.value, part];
-  doneParts.value = done;
-  currentStep.value = nextUndone(done, part);
-  return currentStep.value;
-}
-
-export function next() {
-  currentStep.value = nextUndone(doneParts.value, currentStep.value);
-  return currentStep.value;
-}
-
-export function reset() {
-  doneParts.value = [];
-  currentStep.value = STEP_IDS[0];
-}
-
-export function isDone(part) {
-  return doneParts.value.includes(part);
-}
-
-export function hydrate(records, now = new Date()) {
-  const today = now.toDateString();
-  const done = new Set();
-  (Array.isArray(records) ? records : []).forEach((record) => {
-    if (!record || !SYSTEMS[record.part]) return;
-    const when = new Date(record.time);
-    if (when.toDateString() === today) done.add(record.part);
-  });
-  doneParts.value = STEP_IDS.filter((id) => done.has(id));
-  currentStep.value = nextUndone(doneParts.value);
+export function writeRecords(records, store = defaultStore()) {
+  if (!store) return false;
+  const list = (Array.isArray(records) ? records : []).filter(keepRecord);
+  store.set(RECORDS_KEY, list);
+  return true;
 }
 
 export function minuteKey(time) {
@@ -183,31 +149,147 @@ export function recordsFor(records, part) {
   return (Array.isArray(records) ? records : []).filter((record) => record && record.part === part);
 }
 
+function sameDay(time, now) {
+  return new Date(time).toDateString() === new Date(now).toDateString();
+}
+
+export function latestToday(records, part, now = new Date()) {
+  return (Array.isArray(records) ? records : []).find((record) => (
+    record && record.part === part && record.time && sameDay(record.time, now)
+  )) || null;
+}
+
+export function doneToday(part, records = readRecords(), now = new Date()) {
+  return Boolean(latestToday(records, part, now));
+}
+
 // Every field starts empty. Only what the astronaut enters this time is saved.
-export function draftFor(part) {
+export function emptyDraft(part) {
   const system = SYSTEMS[part];
-  if (!system) return { values: {} };
   const values = {};
-  system.fields.forEach((field) => { values[field.key] = ""; });
+  if (system) system.fields.forEach((field) => { values[field.key] = ""; });
   return { values };
 }
 
-export function readValues(fields, draft) {
+export function draftFor(part) {
+  return emptyDraft(part);
+}
+
+export function describeValues(system, values = {}) {
+  if (!system) return "";
+  return system.fields
+    .filter((field) => values[field.key] != null && values[field.key] !== "")
+    .map((field) => `${field.label} ${values[field.key]} ${field.unit}`)
+    .join(" · ");
+}
+
+export function summaryFor(part, records = readRecords(), now = new Date()) {
+  const system = SYSTEMS[part];
+  const latest = latestToday(records, part, now);
+  if (!system || !latest) return "";
+  return describeValues(system, latest.values);
+}
+
+// Check every non-empty field against the accepted range of its input. An empty field is skipped,
+// but at least one measurement is needed before the card can be saved.
+export function validateValues(fields, draft = {}) {
   const values = {};
   for (const field of fields) {
     const raw = draft[field.key];
     const text = raw == null ? "" : String(raw).trim();
+    if (text === "") continue;
     const value = Number(text);
-    if (text === "" || !Number.isFinite(value) || value < field.min || value > field.max) {
-      return { error: `Enter a valid ${field.label.toLowerCase()} between ${field.min} and ${field.max} ${field.unit}.` };
+    if (!Number.isFinite(value) || value < field.min || value > field.max) {
+      return { error: { field: field.key, message: `Enter a value from ${field.min} to ${field.max} ${field.unit}.` } };
     }
     values[field.key] = value;
+  }
+  if (Object.keys(values).length === 0) {
+    const first = fields[0];
+    return { error: { field: first.key, message: "Enter at least one measurement." } };
   }
   return { values };
 }
 
+export function readValues(fields, draft) {
+  return validateValues(fields, draft);
+}
+
 export function bandForField(key, value) {
   return bandFor(scaleFor(key), value);
+}
+
+const LEVEL_ORDER = { alert: 3, review: 2, ok: 1, info: 0 };
+const CARD_LEVEL = { alert: "urgent", review: "warn", ok: "ok", info: null };
+
+function levelOf(entry) {
+  if (entry.rule && entry.rule.level) return entry.rule.level;
+  const band = entry.band.level;
+  if (band === "alert") return "alert";
+  if (band === "review") return "review";
+  if (band === "normal") return "ok";
+  return "info";
+}
+
+// The card's result: the recorded values, the highest level among them, and one action.
+// A value without a reference band is recorded but never called normal.
+export function resultFor(part, values, ruleFor = null) {
+  const system = SYSTEMS[part];
+  if (!system) return { level: null, saw: "", todo: "" };
+  const entries = system.fields
+    .filter((field) => values[field.key] != null)
+    .map((field) => {
+      const rule = typeof ruleFor === "function" ? ruleFor(field.key, values[field.key]) : null;
+      return { field, value: values[field.key], rule, band: bandForField(field.key, values[field.key]) };
+    });
+
+  const ranked = entries.map((entry) => ({ ...entry, level: levelOf(entry) }))
+    .sort((a, b) => (LEVEL_ORDER[b.level] || 0) - (LEVEL_ORDER[a.level] || 0));
+  const worst = ranked[0] || null;
+  const abnormal = worst && (worst.level === "alert" || worst.level === "review");
+  const recorded = describeValues(system, values);
+
+  let saw = recorded ? `${recorded}.` : "";
+  if (abnormal && worst.rule && worst.rule.saw) saw = `${saw} ${worst.rule.saw}`.trim();
+
+  let todo;
+  if (abnormal) {
+    todo = (worst.rule && worst.rule.todo)
+      || "Repeat the measurement after a few minutes of rest and compare it with your baseline.";
+  } else if (worst && worst.level === "ok") {
+    todo = (worst.rule && worst.rule.todo) || "Keep your routine and repeat this check tomorrow.";
+  } else {
+    todo = (worst && worst.rule && worst.rule.todo)
+      || "Compare it with your personal baseline and the trend over the next days.";
+  }
+
+  return { level: worst ? CARD_LEVEL[worst.level] : null, saw, todo };
+}
+
+// Validate, store and return the result plus an undo that removes exactly the record just written.
+export function saveCard(part, draft, options = {}) {
+  const system = SYSTEMS[part];
+  if (!system) {
+    return { error: { field: undefined, message: "This check is not available." } };
+  }
+  const checked = validateValues(system.fields, draft || {});
+  if (checked.error) return { error: checked.error };
+
+  const store = options.store || defaultStore();
+  const now = options.now ? new Date(options.now) : new Date();
+  const records = readRecords(store);
+  const record = { part, values: checked.values, time: now.toISOString(), source: "manual" };
+  const key = minuteKey(record.time);
+  const replaced = records.find((item) => item && item.part === part && minuteKey(item.time) === key) || null;
+  writeRecords(upsertRecord(records, record), store);
+
+  const undo = () => {
+    const current = readRecords(store);
+    const cleaned = current.filter((item) => !(item && item.part === part && item.time === record.time));
+    writeRecords(replaced ? upsertRecord(cleaned, replaced) : cleaned, store);
+  };
+
+  return { result: resultFor(part, checked.values, options.ruleFor), undo };
 }
 
 export function findingsFromRecords(records, ruleFor) {

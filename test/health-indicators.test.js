@@ -82,3 +82,12 @@ test("the value snapped from a position follows the field's step", () => {
   assert.equal(valueFromPosition(33.3, scaleFor("weightKg"), 0.1), 79.9);
   assert.equal(valueFromPosition(50, null, 1), null);
 });
+
+test("the vital-sign gauges use the emergency reference's normal ranges", () => {
+  const { vitalRangeFor } = require("../src/scripts/health-indicators.js");
+  assert.deepEqual(vitalRangeFor("hr"), { low: 60, high: 100, unit: "/min" });
+  assert.deepEqual(vitalRangeFor("resp"), { low: 12, high: 18, unit: "/min" });
+  assert.deepEqual(vitalRangeFor("spo2"), { low: 95, high: 100, unit: "%" });
+  assert.equal(vitalRangeFor("sys"), null);
+  assert.equal(vitalRangeFor("glucose"), null);
+});

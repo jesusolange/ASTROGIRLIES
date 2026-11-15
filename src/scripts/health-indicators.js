@@ -2,6 +2,7 @@
    The bands are a screening aid and our design choice, not a diagnosis.
    Colours are supplied by the --am-* tokens through the returned CSS string. */
 
+import { VITALS_REFERENCE } from "../data/emergencies.js";
 import { ntxRange as doctorNtxRange } from "./emergencies.js";
 
 export const SCALES = {
@@ -196,6 +197,16 @@ export const SCALES = {
     note: "Training load is not a strength diagnosis."
   }
 };
+
+// The normal ranges for the three vital signs the emergency reference defines, keyed by checkup metric.
+// These numbers come from VITALS_REFERENCE so the gauge and the emergency guide agree.
+const VITAL_KEYS = { hr: "pulse", resp: "resp", spo2: "spo2" };
+
+export function vitalRangeFor(key) {
+  const name = VITAL_KEYS[key];
+  const range = name ? VITALS_REFERENCE.normal[name] : null;
+  return range ? { low: range.low, high: range.high, unit: range.unit } : null;
+}
 
 const LEVEL_COLOUR = {
   normal: "var(--am-ok)",
