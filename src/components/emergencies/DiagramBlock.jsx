@@ -51,7 +51,10 @@ function SplitFlow({ block }) {
           <div key={option.title}>
             <div class={`emg-tag ${option.tone}`}>{option.title}</div>
             <div class={`emg-mini${option.one ? " one" : ""}`}>
-              {option.items.map((item) => <span key={item}>{item}</span>)}
+              {option.items.map((item) => {
+                const text = typeof item === "string" ? item : item.text;
+                return <span key={text}>{text}</span>;
+              })}
             </div>
           </div>
         ))}

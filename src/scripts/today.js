@@ -18,10 +18,7 @@ export const FINDING_CARDS = [
   { card: "back", test: /back pain|kidney stone/i },
   { card: "calf", test: /calf|clot|\bdvt\b|leg vein/i },
   { card: "fracture", test: /fracture|broken bone/i },
-  { card: "bleeding", test: /bleed|wound/i },
-  { card: "bone", test: /bone density|n-telopeptide|bone breakdown|bones weaken/i },
-  { card: "anemia", test: /an(a)?emi|red blood cell/i },
-  { card: "vitals", test: /heart rate|blood pressure|systolic|diastolic|pulse|shock index/i }
+  { card: "bleeding", test: /bleed|wound/i }
 ];
 
 export function cardForFinding(finding) {

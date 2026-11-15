@@ -3,13 +3,21 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { CARDS, GROUPS, cardsInGroup, resolveCardId, situations } = require("../src/data/emergencies.js");
+const {
+  CARDS, CARD_BY_ID, resolveCardId, indexCards, situations,
+  STORM_STEPS, STORM_NOTE, VITALS_REFERENCE, BLOOD_LOSS,
+} = require("../src/data/emergencies.js");
+const {
+  SLOW_RISKS, SLOW_RISK_BY_ID, BONE_LOSS, ANEMIA, NTX_RANGES,
+} = require("../src/data/slow-risks.js");
+const { SOURCES, SOURCE_BY_ID, sourcesFor } = require("../src/data/sources.js");
 
 const root = path.join(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
-const REQUIRED_IDS = [
-  "vitals", "gcs", "breath", "belly", "back", "calf", "fever", "storm", "bone", "anemia",
-  "vision-change", "bleeding", "fracture", "self-harm", "cabin-air",
+
+const KEPT_IDS = [
+  "breath", "bleeding", "gcs", "cabin-air", "vision-change", "storm",
+  "belly", "fever", "back", "calf", "fracture",
 ];
 
 function blocksOf(card) {
@@ -25,20 +33,50 @@ function blocksOf(card) {
   return out;
 }
 
-test("the doctor's cards and the kept first-response cards are all present once", () => {
-  assert.deepEqual(CARDS.map((card) => card.id), REQUIRED_IDS);
-  assert.equal(CARDS.length, new Set(REQUIRED_IDS).size);
-});
+function itemTexts(items) {
+  return items.map((item) => (typeof item === "string" ? item : item.text));
+}
 
-test("the emergency content is grouped in the required order", () => {
-  assert.deepEqual(GROUPS.map((group) => group.id), ["first", "feel", "space", "slow", "general"]);
-  assert.deepEqual(cardsInGroup("general").map((card) => card.id), ["vision-change", "bleeding", "fracture", "self-harm", "cabin-air"]);
-});
+function stepsOf(card) {
+  return blocksOf(card).filter((block) => block.type === "steps").flatMap((block) => itemTexts(block.items));
+}
 
-test("cards the doctor's guide replaces are no longer situations", () => {
-  for (const id of ["chest-pain", "trouble-breathing", "headache-confusion", "flank-pain"]) {
-    assert.equal(CARDS.some((card) => card.id === id), false, id);
+function listItemsOf(card) {
+  return blocksOf(card).filter((block) => block.type === "list").flatMap((block) => itemTexts(block.items));
+}
+
+test("the eleven kept cards and the shared self-harm card are present once", () => {
+  assert.deepEqual(CARDS.map((card) => card.id), [...KEPT_IDS, "self-harm"]);
+  assert.equal(CARDS.length, new Set(CARDS.map((card) => card.id)).size);
+  for (const id of ["bone", "anemia", "vitals"]) {
+    assert.equal(CARD_BY_ID.has(id), false, id);
   }
+  assert.equal(SLOW_RISK_BY_ID.has("bone"), true);
+  assert.equal(SLOW_RISK_BY_ID.has("anemia"), true);
+});
+
+test("crew one sees ten index cards and a crew sees eleven", () => {
+  const solo = indexCards(1).map((card) => card.id);
+  assert.equal(solo.length, 10);
+  assert.equal(solo.includes("gcs"), false);
+  assert.equal(solo.includes("self-harm"), false);
+  assert.deepEqual(solo, ["breath", "bleeding", "cabin-air", "vision-change", "storm", "belly", "fever", "back", "calf", "fracture"]);
+
+  for (const crew of [2, 6]) {
+    const withCrew = indexCards(crew).map((card) => card.id);
+    assert.equal(withCrew.length, 11, `crew ${crew}`);
+    assert.equal(withCrew.includes("gcs"), true);
+    assert.equal(withCrew.includes("self-harm"), false);
+  }
+  assert.equal(situations(1).length, 10);
+  assert.equal(situations(6).length, 11);
+});
+
+test("self-harm stays as data shared with mental health", () => {
+  const card = CARD_BY_ID.get("self-harm");
+  assert.equal(card.sharedWith, "mental");
+  assert.equal(card.topic, "mental");
+  assert.deepEqual(card.link, { check: "mental" });
 });
 
 test("old ids still open the right card", () => {
@@ -52,40 +90,185 @@ test("old ids still open the right card", () => {
   assert.ok(situations().some((situation) => situation.id === "storm"));
 });
 
-test("every card has a title, a sign, a tone and a tag", () => {
+test("every card has a title, a sign, a topic, a tone, a block and source ids", () => {
   for (const card of CARDS) {
     assert.ok(card.title.length > 0, `${card.id}: title`);
     assert.ok(card.sign.length > 0, `${card.id}: sign`);
-    assert.ok(["bad", "mid", "info"].includes(card.tone), `${card.id}: tone`);
-    assert.ok(card.tag.length > 0, `${card.id}: tag`);
+    assert.ok(Object.hasOwn(card, "topic"), `${card.id}: topic`);
+    assert.ok(["bad", "info"].includes(card.tone), `${card.id}: tone`);
+    assert.ok(card.tag == null || card.tag.length > 0, `${card.id}: tag`);
     assert.ok(card.blocks.length > 0, `${card.id}: blocks`);
+    assert.ok(Array.isArray(card.sourceIds), `${card.id}: sourceIds`);
+    assert.ok(["minutes", "hours"].includes(card.actWithin), `${card.id}: actWithin`);
+    assert.equal(card.source, undefined, `${card.id}: old source`);
+    assert.equal(card.sourceLink, undefined, `${card.id}: old sourceLink`);
+  }
+});
+
+test("the index is ordered by time to act and only minutes keep the danger tone", () => {
+  const cards = indexCards(6);
+  const firstSlow = cards.findIndex((card) => card.actWithin === "hours");
+  assert.ok(firstSlow > 0);
+  assert.ok(cards.slice(0, firstSlow).every((card) => card.actWithin === "minutes"));
+  assert.ok(cards.slice(firstSlow).every((card) => card.actWithin === "hours"));
+  for (const card of CARDS) {
+    assert.equal(card.tone === "bad", card.actWithin === "minutes", card.id);
+  }
+});
+
+test("a tag is the stated time to act, never Red flag", () => {
+  assert.equal(CARD_BY_ID.get("cabin-air").tag, "Now");
+  assert.equal(CARD_BY_ID.get("vision-change").tag, "Now");
+  assert.equal(CARD_BY_ID.get("storm").tag, "In a few hours");
+  assert.equal(CARD_BY_ID.get("breath").tag, undefined);
+  for (const card of CARDS) {
+    assert.doesNotMatch(String(card.tag), /red flag/i);
   }
 });
 
 test("the kept first-response cards keep steps, preparation and escalation triggers", () => {
-  for (const card of cardsInGroup("general")) {
+  for (const id of ["bleeding", "vision-change", "fracture", "cabin-air", "self-harm"]) {
+    const card = CARD_BY_ID.get(id);
     assert.ok(card.steps.length >= 4, `${card.id}: steps`);
     assert.ok(card.prepare.length >= 2, `${card.id}: prepare`);
     assert.ok(card.escalate.length >= 3, `${card.id}: escalate`);
   }
+  assert.equal(CARD_BY_ID.get("fracture").tag, undefined);
 });
 
-test("the doctor's doses, thresholds and CHECK notes are unchanged", () => {
-  const all = CARDS.map((card) => blocksOf(card));
-  const text = JSON.stringify(all);
-  assert.match(text, /Aciclovir for oral and genital herpes: adults and children 12 years and older, 200 mg every 4 hours, 5 times a day, for 7 days\./);
-  assert.match(text, /To stop it coming back: usual dose 200 mg \(one tablet\) 4 times a day\. Space the doses about 6 hours apart\./);
-  assert.match(text, /CHECK with the doctor: these doses are for oral and genital herpes\. Zoster \(shingles\) usually needs a different dose\./);
-  assert.match(text, /CHECK with the doctor: the notes say 3 weeks of blood thinner\. Guidelines usually say at least 3 months\./);
-  assert.match(text, /CHECK: the doctor asked for changes to this card\. Waiting for her details\./);
-  assert.match(text, /Fever: 38\.5 °C or more/);
-  assert.match(text, /NASA: keep at or above 95% \(hip, spine\) and 90% \(femoral neck\)\./);
+test("removed cards leave the emergency data and the moved text keeps its length", () => {
+  assert.deepEqual(SLOW_RISKS.map((card) => card.id), ["bone", "anemia"]);
+  assert.deepEqual(stepsOf(BONE_LOSS), [
+    "Take vitamin D.",
+    "If vitamin D does not help, take a bisphosphonate (ask your flight surgeon).",
+    "Keep up resistive exercise (ARED).",
+  ]);
+  assert.equal(stepsOf(BONE_LOSS).length, 3);
+  assert.equal(listItemsOf(ANEMIA).length, 5);
+  assert.equal(BONE_LOSS.crewOnly, undefined);
+  assert.equal(ANEMIA.topic, null);
 });
 
-test("the solar storm steps exist once as data and keep the storm limit", () => {
-  const { STORM_STEPS, STORM_NOTE } = require("../src/data/emergencies.js");
+test("the bone card keeps its gauge and N-telopeptide reference text", () => {
+  const gauge = blocksOf(BONE_LOSS).find((block) => block.type === "gauge");
+  assert.equal(
+    gauge.text,
+    "Bone density (DXA) compared with your value before the mission (100%). NASA: keep at or above 95% (hip, spine) and 90% (femoral neck). Typical loss is about 1–1.5% per month without countermeasures.",
+  );
+  assert.deepEqual(NTX_RANGES, [
+    { min: 21, max: 83, label: "Men" },
+    { min: 17, max: 94, label: "Women before menopause" },
+    { min: 36, max: 124, label: "Women after menopause" },
+  ]);
+});
+
+test("the anaemia card keeps every observation", () => {
+  assert.deepEqual(listItemsOf(ANEMIA), [
+    "Lower red cell mass, reticulocytes, haemoglobin and erythropoietin (EPO).",
+    "EPO falls as central venous pressure rises.",
+    "Haptoglobin was not lower: the cells break down outside the blood vessels.",
+    "Little movement and bone load can push marrow stem cells to make bone or fat instead of blood.",
+    "Microgravity also changes the structure and function of red cells.",
+  ]);
+});
+
+test("the vitals reference keeps its numbers and quick check", () => {
+  assert.deepEqual(VITALS_REFERENCE.bars, [
+    { label: "Pulse", min: 30, max: 160, lo: 60, hi: 100, unit: "per min" },
+    { label: "Breathing", min: 5, max: 35, lo: 12, hi: 18, unit: "per min" },
+    { label: "Oxygen (SpO₂)", min: 80, max: 100, lo: 95, hi: 100, unit: "%" },
+  ]);
+  assert.deepEqual(VITALS_REFERENCE.chips, [
+    { tone: "ok", text: "Blood pressure: 120/80 mmHg" },
+    { tone: "bad", text: "Fever: 38.5 °C or more" },
+  ]);
+  assert.equal(VITALS_REFERENCE.note, "Always compare with the astronaut's own usual values.");
+  assert.deepEqual(VITALS_REFERENCE.quickCheck, { type: "vitals" });
+  assert.equal(VITALS_REFERENCE.bars.length + VITALS_REFERENCE.chips.length, 5);
+});
+
+test("the blood loss and shock table moves into the bleeding card whole", () => {
+  const table = blocksOf(CARD_BY_ID.get("bleeding")).find((block) => block.type === "bloodTable");
+  assert.ok(table, "bleeding carries the table");
+  assert.deepEqual(table.table, BLOOD_LOSS);
+  assert.equal(BLOOD_LOSS.head.length, 4);
+  assert.equal(BLOOD_LOSS.rows.length, 9);
+});
+
+test("no removed phrase or developer note is left in the emergency data", () => {
+  const text = read("src", "data", "emergencies.js");
+  for (const phrase of [
+    "not yet reviewed", "pending review", "SOURCE-NEEDED", "Source: Notes.",
+    "Readiness", "Mental Health check-in", "Red flag", "General first response", "Slow risks in space",
+  ]) {
+    assert.equal(text.includes(phrase), false, phrase);
+  }
+  assert.doesNotMatch(text, /\bCHECK\b/);
+  const vision = JSON.stringify(CARD_BY_ID.get("vision-change"));
+  assert.equal(vision.includes("Design choice"), false);
+  assert.equal(vision.includes("design choice"), false);
+});
+
+test("the fever card links to the immune check and the self-harm card to mental health", () => {
+  const feverSteps = blocksOf(CARD_BY_ID.get("fever")).find((block) => block.type === "steps");
+  assert.deepEqual(feverSteps.link, { check: "immune" });
+  assert.equal(feverSteps.items.length, 2);
+  const selfHarmSteps = blocksOf(CARD_BY_ID.get("self-harm")).find((block) => block.type === "steps");
+  assert.deepEqual(selfHarmSteps.link, { check: "mental" });
+  assert.equal(itemTexts(selfHarmSteps.items).includes("Do not wait for the result to get help."), true);
+});
+
+test("flight-surgeon steps carry the tell marker", () => {
+  const back = JSON.stringify(CARD_BY_ID.get("back"));
+  assert.match(back, /"tell":"flight-surgeon"/);
+  const bone = JSON.stringify(BONE_LOSS);
+  assert.match(bone, /"tell":"flight-surgeon"/);
+});
+
+test("no pictograph characters remain inside the medic's text", () => {
+  const text = read("src", "data", "emergencies.js");
+  assert.doesNotMatch(text, /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}]/u);
+});
+
+test("every card topic matches the topic table where one exists", () => {
+  const expected = {
+    "vision-change": "vision", fever: "immune", storm: "radiation",
+    breath: "heart", "cabin-air": null, "self-harm": "mental",
+  };
+  const known = new Set(["bones", "kidneys", "immune", "radiation", "mental", "sleep", "vision", "nutrition", "heart", "exercise"]);
+  for (const [id, topic] of Object.entries(expected)) {
+    assert.equal(CARD_BY_ID.get(id).topic, topic, id);
+  }
+  for (const card of [...CARDS, ...SLOW_RISKS]) {
+    assert.ok(card.topic === null || known.has(card.topic), `${card.id}: ${card.topic}`);
+  }
+  assert.equal(BONE_LOSS.topic, "bones");
+});
+
+test("every source id resolves and usedBy agrees with the cards", () => {
+  assert.ok(SOURCES.length > 0);
+  for (const source of SOURCES) {
+    assert.ok(source.id && source.title && source.author && source.licence, source.id);
+    assert.ok(source.url === null || /^https?:\/\//.test(source.url), source.id);
+    assert.ok(Array.isArray(source.usedBy), source.id);
+    for (const id of source.usedBy) {
+      assert.ok(CARD_BY_ID.has(id) || SLOW_RISK_BY_ID.has(id), `${source.id}: ${id}`);
+    }
+  }
+  for (const card of [...CARDS, ...SLOW_RISKS]) {
+    for (const id of card.sourceIds) {
+      assert.ok(SOURCE_BY_ID.has(id), `${card.id}: ${id}`);
+      assert.ok(SOURCE_BY_ID.get(id).usedBy.includes(card.id), `${id} lists ${card.id}`);
+    }
+  }
+  assert.deepEqual(sourcesFor("storm").map((source) => source.id), ["nasa-std-3001-4031", "mission-protocol"]);
+  assert.match(`${SOURCE_BY_ID.get("nasa-std-3001-4031").title} ${STORM_NOTE}`, /250 mSv|NASA-STD-3001/);
+});
+
+test("the solar storm steps and source are kept", () => {
   assert.deepEqual(STORM_STEPS.map((step) => step.title), ["1 · Storm alert", "2 · Go inside", "3 · Safe room", "4 · Call ground"]);
   assert.match(STORM_NOTE, /NASA's limit for one storm is 250 mSv\./);
+  assert.equal(CARD_BY_ID.get("storm").sourceIds.includes("nasa-std-3001-4031"), true);
   const radiation = read("src", "scripts", "radiation.js");
   assert.match(radiation, /AstroMedEmergencies\.open\("solar-storm"\)/);
   assert.doesNotMatch(radiation, /Storm alert/);
@@ -97,11 +280,13 @@ test("Glasgow Coma Scale scoring bands", async () => {
   assert.equal(gcsScore([4, 5, 6]).total, 15);
   assert.equal(gcsScore([4, 5, 6]).level, "ok");
   assert.equal(gcsScore([3, 3, 3]).level, "mid");
+  assert.equal(gcsScore([3, 3, 3]).tell, "flight-surgeon");
   assert.equal(gcsScore([2, 2, 2]).level, "bad");
+  assert.equal(gcsScore([2, 2, 2]).tell, "flight-surgeon");
   assert.match(gcsScore([4, 5, 6]).message, /Mild or normal/);
 });
 
-test("vital chips and the shock index follow the doctor's ranges", async () => {
+test("vital chips and the shock index follow the reference values", async () => {
   const { shockIndex, vitalChips } = await import("../src/scripts/emergencies.js");
   assert.equal(shockIndex(60, 120), 0.5);
   assert.equal(shockIndex(0, 120), null);
@@ -134,6 +319,7 @@ test("the section markup lives in Preact components and the module builds no HTM
   assert.match(page, /<section id="emergenciesPage" class="am-page" hidden><EmergenciesView \/>/);
   assert.match(view, /import "\.\/emergencies\.css"/);
   assert.match(view, /openCard\.value/);
+  assert.match(view, /indexCards/);
   assert.match(view, /<EmergencyCard/);
   const nav = read("src", "lib", "nav.js");
   assert.match(nav, /id: "emergencies"/);

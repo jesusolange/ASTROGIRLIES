@@ -11,7 +11,7 @@ export default function Tile({ card }) {
       <span class="emg-ic"><CardIcon name={card.icon} /></span>
       <b>{card.title}</b>
       <small>{card.sign}</small>
-      <em>{card.tag}</em>
+      {card.tag && <em>{card.tag}</em>}
     </button>
   );
 }

@@ -34,7 +34,10 @@ export default function Block({ block }) {
     case "gauge":
       return <DiagramBlock block={block} />;
     case "steps":
-      return <ol class="emg-steps">{block.items.map((item) => <li key={item}>{item}</li>)}</ol>;
+      return <ol class="emg-steps">{block.items.map((item) => {
+        const text = typeof item === "string" ? item : item.text;
+        return <li key={text}>{text}</li>;
+      })}</ol>;
     case "list":
       return <ul class="emg-list-plain">{block.items.map((item) => <li key={item}>{item}</li>)}</ul>;
     case "ntx":
