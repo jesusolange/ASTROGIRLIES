@@ -6,7 +6,10 @@ Read `docs/tickets.md` (the decisions at the top are binding) and `docs/decision
 
 ## 1. Product hard rules
 
-- The user is the astronaut, alone. No doctor view, no "call a doctor", no "send to your doctor".
+- The user is the astronaut. No doctor view. Every action first says what the astronaut can do alone. Sending a
+  report or telling the flight surgeon is allowed as an extra step, worded for the mission's link to Earth
+  (`window.AstroMedEnv.comm()`: live near Earth, a short pause at the Moon, a 6 to 44 minute round trip at Mars,
+  none during solar conjunction). See `docs/decisions.md`.
 - Every indicator ends in a concrete action the astronaut can take.
 - Every section follows Record, History, What to do.
 - Numbers and thresholds come from a named source (NASA-STD-3001, Human Research Roadmap, a cited paper) or are
