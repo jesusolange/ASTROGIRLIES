@@ -1,9 +1,11 @@
 // A saliva or blood result, entered free-form: sample, test name, value, typed unit and an optional note.
 // Props: form (CheckCard form state).
+import { unitOptions } from "../../scripts/immune.js";
 import Field from "../ui/Field.jsx";
 
 export default function LabCard({ form }) {
   const values = form.values;
+  const units = unitOptions(values.name);
   return (
     <div class="im-lab">
       <p class="im-lead">
@@ -39,10 +41,11 @@ export default function LabCard({ form }) {
             onInput={(event) => form.set("value", event.currentTarget.value)}
           />
         </Field>
-        <Field label="Unit" id="im-unit" error={form.errorFor("unit")} help="Typed freely, for example µg/dL.">
+        <Field label="Unit" id="im-unit" error={form.errorFor("unit")} help="Choose a usual unit or type your own.">
           <input
             id="im-unit"
             type="text"
+            list="im-unit-options"
             maxlength="20"
             placeholder="µg/dL"
             value={values.unit || ""}
@@ -51,6 +54,9 @@ export default function LabCard({ form }) {
           />
         </Field>
       </div>
+      <datalist id="im-unit-options">
+        {units.map((unit) => <option value={unit} key={unit} />)}
+      </datalist>
       <Field label="Note (optional)" id="im-note">
         <input
           id="im-note"

@@ -225,3 +225,34 @@ test("an urgent symptom in either eye makes the day urgent", () => {
   assert.equal(a.level, "urgent");
   assert.deepEqual(a.urgent, ["blind-spot"]);
 });
+
+test("symptoms save alone and the day combines once both eyes are ready", () => {
+  const map = new Map();
+  const previous = globalThis.window;
+  globalThis.window = {
+    AstroMedStore: {
+      store: {
+        get: (key, fallback) => (map.has(key) ? JSON.parse(map.get(key)) : fallback),
+        set: (key, value) => { map.set(key, JSON.stringify(value)); return true; }
+      }
+    }
+  };
+  try {
+    const now = new Date(2026, 10, 15, 12);
+    Session.saveSymptoms(["near-blur"], now);
+    assert.equal(Session.cardDone("vision-symptoms", now), true);
+    assert.equal(Session.partsReady(Session.readProgress(now)), false);
+    assert.equal(Session.finishIfComplete(now), null);
+
+    Session.savePart("left", { grid: { distortion: false, marks: [] }, near: 4 }, now);
+    Session.savePart("right", { grid: { distortion: false, marks: [] }, near: 4 }, now);
+    assert.equal(Session.partsReady(Session.readProgress(now)), true);
+    const entries = Session.finishIfComplete(now);
+    assert.equal(entries.length, 2);
+    assert.deepEqual(entries.map((entry) => entry.symptoms), [["near-blur"], ["near-blur"]]);
+    assert.equal(Session.doneToday(now), true);
+  } finally {
+    if (previous === undefined) delete globalThis.window;
+    else globalThis.window = previous;
+  }
+});

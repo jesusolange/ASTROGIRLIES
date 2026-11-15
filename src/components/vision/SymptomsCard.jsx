@@ -13,7 +13,7 @@ export default function SymptomsCard({ form }) {
         items={[
           "Think about today and tick anything you noticed in either eye.",
           "Leave a box clear if you did not notice it.",
-          "Save to see today's result for both eyes."
+          "Save to record today's symptoms. The grid and near chart add the eye measurements."
         ]}
       />
 

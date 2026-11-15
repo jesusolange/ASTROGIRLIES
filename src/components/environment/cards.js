@@ -2,8 +2,9 @@
 import { h } from "preact";
 import { openEmergency } from "../../lib/nav.js";
 import {
-  FIELDS, PLACES, overallLevel, profilePlace, readingLog, readingState, readingsResult, record, recordedToday
+  FIELDS, overallLevel, profilePlace, readingLog, readingState, readingsResult, record, recordedToday
 } from "../../scripts/environment.js";
+import CabinAside from "./CabinAside.jsx";
 import CabinCard from "./CabinCard.jsx";
 import CabinResult from "./CabinResult.jsx";
 import "./environment.css";
@@ -50,18 +51,34 @@ function cabinSummary() {
     .join(" · ");
 }
 
+// Today's recorded readings fill the form again, so returning to the card never shows an empty
+// entry next to an existing record for the same day.
+function savedValues() {
+  if (!recordedToday()) return {};
+  const readings = readingState().readings || {};
+  const values = {};
+  FIELDS.forEach((field) => {
+    if (Number.isFinite(readings[field.key])) values[field.key] = readings[field.key];
+  });
+  return values;
+}
+
 export const cards = [
   {
     id: "cabin",
     topic: "environment",
     title: "Cabin conditions",
-    get illustration() {
-      const info = PLACES[profilePlace()];
-      return info && info.img ? `/${info.img}` : null;
+    get initialValues() {
+      return savedValues();
     },
     Component: CabinCard,
+    Aside: CabinAside,
     isDone: () => recordedToday(),
     summary: cabinSummary,
-    save: saveCabin
+    // A saved day has one record: the card opens with those readings and no Save button, so Back
+    // from the cabin-air card cannot start a second entry.
+    get save() {
+      return recordedToday() ? undefined : saveCabin;
+    }
   }
 ];

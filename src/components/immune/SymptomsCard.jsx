@@ -21,7 +21,7 @@ export default function SymptomsCard({ form }) {
         options={OPTIONS}
         value={selected}
         onChange={(next) => form.set("symptoms", next)}
-        label="Symptoms today"
+        label="Infection signs today"
         idBase="im-sym"
       />
       <div class={`im-status im-${current.level}`} role="status" aria-live="polite">

@@ -1,10 +1,48 @@
 /* Cabin conditions: the reading form and its result. Colours come only from the --am-* tokens. */
 
+.env-aside {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.env-aside img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--am-radius-small);
+  border: 1px solid var(--am-border);
+}
+
+.env-aside-name {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+@media (max-width: 700px) {
+  .ui-card-aside:has(.env-aside) {
+    display: none;
+  }
+}
+
 .env-lead {
   margin: 0 0 16px;
   color: var(--am-text-muted);
   font-size: 13px;
   line-height: 1.6;
+}
+
+.env-saved-note {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  color: var(--am-text);
+  background: var(--am-field-bg);
+  border-left: 4px solid var(--am-ok);
+  border-radius: var(--am-radius-small);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .env-grid {

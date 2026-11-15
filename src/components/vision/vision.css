@@ -53,11 +53,9 @@
 
 .vs-grid-block { display: grid; justify-items: start; gap: 4px; }
 .vs-grid-wrap {
-  max-width: 100%;
-  max-height: 70vh;
+  width: max-content;
   margin-top: 6px;
   padding: 8px;
-  overflow: auto;
   background: var(--am-bg-raised);
   border: 1px solid var(--am-border);
   border-radius: var(--am-radius-small);

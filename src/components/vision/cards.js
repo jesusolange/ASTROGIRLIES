@@ -4,11 +4,11 @@ import { h } from "preact";
 import { openEmergency } from "../../lib/nav.js";
 import { emergencyFor } from "../../data/topics.js";
 import {
-  CALIBRATION, CARD_MM, EYE_LABEL, NEAR_LINES, calibration, readData, saveCalibration
+  CALIBRATION, CARD_MM, EYE_LABEL, NEAR_LINES, RULES, calibration, readData, saveCalibration, symptomLabel
 } from "../../scripts/vision.js";
 import {
-  assessmentSummary, assessmentToday, cardDone, finish, readProgress, restore, savePart,
-  saveSymptoms, snapshot
+  assessmentSummary, assessmentToday, cardDone, finish, finishIfComplete, partsReady, readProgress, restore,
+  savePart, saveSymptoms, snapshot
 } from "./session.js";
 import "./vision.css";
 import CalibrationCard from "./CalibrationCard.jsx";
@@ -58,6 +58,7 @@ function saveGrid(eye) {
     const marks = Array.isArray(values.marks) ? values.marks : [];
     const grid = { distortion: values.gridAnswer === "changed", marks };
     savePart(eye, { grid });
+    finishIfComplete();
     const count = marks.length;
     return {
       result: {
@@ -78,6 +79,7 @@ function saveNear(eye) {
     }
     const before = snapshot();
     savePart(eye, { near: values.near });
+    finishIfComplete();
     const line = NEAR_LINES[values.near];
     return {
       result: {
@@ -91,29 +93,57 @@ function saveNear(eye) {
 }
 
 function saveSymptomsCard(values) {
-  const progress = readProgress();
-  const ready = (part) => Boolean(part && part.grid && Number.isInteger(part.near));
-  if (!ready(progress.left) || !ready(progress.right)) {
-    return { error: { field: "symptoms", message: "Record the grid and the near chart for both eyes first." } };
-  }
   const before = snapshot();
-  saveSymptoms(Array.isArray(values.symptoms) ? values.symptoms : []);
-  finish();
-  const assessment = assessmentToday(readData());
-  if (!assessment) return { error: { field: "symptoms", message: "The result could not be saved. Try again." } };
-  const actions = assessment.level === "warn" || assessment.level === "urgent"
-    ? [{
-        label: "Sudden change in vision",
-        variant: assessment.level === "urgent" ? "danger" : "primary",
-        onClick: () => openEmergency(emergencyFor("vision"))
-      }]
-    : [];
+  const symptoms = Array.isArray(values.symptoms) ? values.symptoms : [];
+  saveSymptoms(symptoms);
+  const marked = symptoms.length
+    ? `You marked: ${symptoms.map(symptomLabel).join(", ")}.`
+    : "You marked no symptoms today.";
+
+  if (partsReady(readProgress())) {
+    finish();
+    const assessment = assessmentToday(readData());
+    if (!assessment) return { error: { field: "symptoms", message: "The result could not be saved. Try again." } };
+    const actions = assessment.level === "warn" || assessment.level === "urgent"
+      ? [{
+          label: "Sudden change in vision",
+          variant: assessment.level === "urgent" ? "danger" : "primary",
+          onClick: () => openEmergency(emergencyFor("vision"))
+        }]
+      : [];
+    return {
+      result: {
+        level: assessment.level,
+        saw: `${assessmentSummary(assessment)} The change thresholds are our design choice, not a medical standard.`,
+        todo: assessment.todo,
+        actions
+      },
+      undo: () => restore(before)
+    };
+  }
+
+  const urgent = symptoms.filter((id) => RULES.urgentSymptoms.includes(id));
+  if (urgent.length) {
+    return {
+      result: {
+        level: "urgent",
+        saw: `${marked} The change thresholds are our design choice, not a medical standard.`,
+        todo: RULES.actions.urgent.todo,
+        actions: [{
+          label: "Sudden change in vision",
+          variant: "danger",
+          onClick: () => openEmergency(emergencyFor("vision"))
+        }]
+      },
+      undo: () => restore(before)
+    };
+  }
+
   return {
     result: {
-      level: assessment.level,
-      saw: `${assessmentSummary(assessment)} The change thresholds are our design choice, not a medical standard.`,
-      todo: assessment.todo,
-      actions
+      level: "info",
+      saw: `${marked} The change thresholds are our design choice, not a medical standard.`,
+      todo: "Complete the grid and the near chart for both eyes to see today's combined vision result."
     },
     undo: () => restore(before)
   };

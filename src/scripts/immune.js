@@ -19,6 +19,32 @@ export const SYMPTOMS = [
   ["fever", "Fever or chills"], ["throat", "Sore throat"], ["cough", "Cough or runny nose"],
   ["rash", "Skin rash or itching"], ["sores", "Cold sores or mouth sores"], ["tired", "Very tired, more than usual"], ["heal", "Cuts or sores heal slowly"]
 ];
+
+// The usual units for a named lab test. The name stays free-form, so an unknown name gets the
+// general list and the astronaut can always type a unit of their own.
+export const LAB_UNITS = ["µg/dL", "nmol/L", "mg/dL", "mmol/L", "U/mL", "cells/µL", "pg/mL", "mg/L", "ng/mL"];
+
+const UNIT_HINTS = [
+  { match: /cortisol/i, units: ["µg/dL", "nmol/L"] },
+  { match: /glucose|sugar/i, units: ["mg/dL", "mmol/L"] },
+  { match: /insulin/i, units: ["µU/mL", "pmol/L"] },
+  { match: /c-?reactive|crp/i, units: ["mg/L", "mg/dL"] },
+  { match: /interleukin|il-?6|tnf/i, units: ["pg/mL"] },
+  { match: /\biga\b/i, units: ["µg/mL", "mg/dL"] },
+  { match: /\bigg\b/i, units: ["mg/dL", "g/L"] },
+  { match: /epstein|ebv|cmv|viral/i, units: ["U/mL", "copies/mL"] },
+  { match: /leu[ck]ocyte|white|wbc/i, units: ["cells/µL", "10³/µL"] },
+  { match: /lymphocyte/i, units: ["cells/µL", "%"] },
+  { match: /vitamin\s*d|25-?oh/i, units: ["ng/mL", "nmol/L"] },
+  { match: /ferritin/i, units: ["ng/mL", "µg/L"] },
+  { match: /d-?dimer/i, units: ["µg/mL", "mg/L"] }
+];
+
+export function unitOptions(name = "") {
+  const text = String(name).trim();
+  const found = UNIT_HINTS.find((entry) => entry.match.test(text));
+  return (found ? found.units : LAB_UNITS).slice();
+}
 export const EMPTY_IMMUNE = { log: {}, tests: [] };
 const tell = () => {
   const sentence = alsoTell();

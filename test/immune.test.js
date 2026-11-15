@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ACTIONS, SYMPTOMS, assess, testRows } from "../src/scripts/immune.js";
+import { ACTIONS, LAB_UNITS, SYMPTOMS, assess, testRows, unitOptions } from "../src/scripts/immune.js";
 
 test("symptoms follow the same bands whether saved or live", () => {
   assert.equal(assess([]).level, "ok");
@@ -35,4 +35,15 @@ test("the test rows compare each result with the previous one of the same name a
   assert.equal(rows[0].before, 10);
   assert.equal(rows[1].id, "b");
   assert.equal(rows[1].before, null);
+});
+
+test("the unit combobox offers the usual units for the chosen test", () => {
+  assert.deepEqual(unitOptions("Cortisol"), ["µg/dL", "nmol/L"]);
+  assert.deepEqual(unitOptions("fasting glucose"), ["mg/dL", "mmol/L"]);
+  assert.ok(unitOptions("CRP").includes("mg/L"));
+  assert.ok(unitOptions("Epstein-Barr virus").includes("U/mL"));
+  assert.ok(unitOptions("white cell count").includes("cells/µL"));
+  assert.deepEqual(unitOptions("an unknown test"), LAB_UNITS);
+  assert.deepEqual(unitOptions(""), LAB_UNITS);
+  assert.equal(LAB_UNITS.length, 9);
 });

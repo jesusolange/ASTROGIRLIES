@@ -39,6 +39,18 @@ export function saveSymptoms(ids, now = new Date()) {
   return next;
 }
 
+// Both eyes have a grid answer and a near line. The day's result is combined only when that is true.
+export function partsReady(progress = readProgress()) {
+  const ready = (part) => Boolean(part && part.grid && Number.isInteger(part.near));
+  return ready(progress.left) && ready(progress.right);
+}
+
+// The last card that completes the day writes the combined result, whichever part it was.
+export function finishIfComplete(now = new Date()) {
+  const progress = readProgress(now);
+  return partsReady(progress) && progress.symptoms !== null ? finish(now) : null;
+}
+
 // Both eyes are written together as one result per eye for the day, in the stored record shape.
 export function finish(now = new Date()) {
   const progress = readProgress(now);

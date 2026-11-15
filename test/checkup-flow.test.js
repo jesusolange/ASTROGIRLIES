@@ -111,3 +111,18 @@ test("findings list only values outside a reference band", () => {
 test("the record key is unchanged so Progress and the report keep reading it", () => {
   assert.equal(Flow.RECORDS_KEY, "astrotwin-gui-v2-records");
 });
+
+test("the kidneys card uses the profile weight instead of asking for it", () => {
+  const profile = { weightKg: 64 };
+  const fields = Flow.fieldsFor("kidneys", profile);
+  assert.equal(fields.some((field) => field.key === "weightKg"), false);
+  assert.equal(Flow.fieldsFor("kidneys", null).some((field) => field.key === "weightKg"), true);
+  assert.equal(Flow.profileWeight(profile), 64);
+  assert.equal(Flow.profileWeight({}), null);
+
+  const draft = Flow.withProfileWeight("kidneys", { urineOutput: "1500" }, profile);
+  assert.equal(draft.weightKg, 64);
+  assert.equal(Flow.withProfileWeight("heart", { hr: "76" }, profile).weightKg, undefined);
+  assert.equal(Flow.withProfileWeight("kidneys", { weightKg: "70" }, profile).weightKg, "70");
+  assert.equal(Flow.withProfileWeight("kidneys", { urineOutput: "1500" }, {}).weightKg, undefined);
+});

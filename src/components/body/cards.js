@@ -4,8 +4,10 @@ import { h } from "preact";
 import { openEmergency } from "../../lib/nav.js";
 import { emergencyFor } from "../../data/topics.js";
 import { EQUIP } from "../../data/devices.js";
-import { saveCard, doneToday, summaryFor } from "../../scripts/checkup-flow.js";
+import { get as getProfile } from "../../scripts/profile.js";
+import { saveCard, doneToday, summaryFor, withProfileWeight } from "../../scripts/checkup-flow.js";
 import BodyCard from "./BodyCard.jsx";
+import BodyAside from "./BodyAside.jsx";
 
 function ruleFor(key, value) {
   const data = typeof window !== "undefined" ? window.AstroMedData : null;
@@ -26,16 +28,22 @@ function componentFor(spec) {
   return function BodyCardFor(props) {
     return h(BodyCard, {
       part: spec.part,
-      focus: spec.focus,
       devices: spec.devices.map((key) => EQUIP[key]).filter(Boolean),
       ...props
     });
   };
 }
 
+function asideFor(spec) {
+  return function BodyAsideFor(props) {
+    return h(BodyAside, { part: spec.part, focus: spec.focus, ...props });
+  };
+}
+
 function saveFor(spec) {
   return function save(values) {
-    const outcome = saveCard(spec.part, values, { ruleFor });
+    const draft = withProfileWeight(spec.part, values, getProfile());
+    const outcome = saveCard(spec.part, draft, { ruleFor });
     if (outcome.error) return outcome;
     const emergency = emergencyFor(spec.topic);
     if (emergency && (outcome.result.level === "warn" || outcome.result.level === "urgent")) {
@@ -50,6 +58,7 @@ export const cards = SPECS.map((spec) => ({
   topic: spec.topic,
   title: spec.title,
   Component: componentFor(spec),
+  Aside: asideFor(spec),
   save: saveFor(spec),
   isDone: () => doneToday(spec.part),
   summary: () => summaryFor(spec.part)

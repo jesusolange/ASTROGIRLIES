@@ -71,7 +71,7 @@ export const cards = [
   {
     id: "immune-symptoms",
     topic: "immune",
-    title: "Symptoms today",
+    title: "Infection signs today",
     Component: SymptomsCard,
     isDone: () => status().saved,
     summary: symptomsSummary,

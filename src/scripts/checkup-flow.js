@@ -101,6 +101,30 @@ export function systemFor(part) {
   return SYSTEMS[part] || null;
 }
 
+// The profile holds the body weight, so the kidneys card does not ask for it again.
+export function profileWeight(profile) {
+  const kg = Number(profile && profile.weightKg);
+  return Number.isFinite(kg) && kg > 0 ? kg : null;
+}
+
+export function fieldsFor(part, profile) {
+  const system = SYSTEMS[part];
+  if (!system) return [];
+  if (part === "kidneys" && profileWeight(profile) != null) {
+    return system.fields.filter((field) => field.key !== "weightKg");
+  }
+  return system.fields;
+}
+
+export function withProfileWeight(part, values, profile) {
+  const draft = { ...(values || {}) };
+  const weight = profileWeight(profile);
+  if (part !== "kidneys" || weight == null) return draft;
+  const entered = draft.weightKg == null ? "" : String(draft.weightKg).trim();
+  if (entered === "") draft.weightKg = weight;
+  return draft;
+}
+
 function defaultStore() {
   const root = typeof window !== "undefined" ? window : globalThis;
   return root.AstroMedStore && root.AstroMedStore.store ? root.AstroMedStore.store : null;
