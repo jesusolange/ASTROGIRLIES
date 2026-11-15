@@ -55,7 +55,7 @@ The full list with links and licences is in the app (Profile > Sources) and in `
   and the four destination pictures (ISS, Moon, Mars, rover). Their alt text also says "AI-generated illustration".
 - **Research:** an AI research agent found and quoted the NASA iron requirement (JSC-67378) and the Sprint Study
   exercise schedule; both are cited with their source documents.
-- **Demo video:** _say whether AI was used in the video; AI-generated images or video in it need a visible
-  watermark._
+- **Demo video:** AI was used to make the demo video; its AI-generated images and footage carry a visible
+  watermark, as the Space Apps rules require.
 - No AI makes decisions inside the app: every threshold and rating comes from a named source or is labelled as our
   design choice.
