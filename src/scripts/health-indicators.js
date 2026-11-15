@@ -2,6 +2,8 @@
    The bands are a screening aid and our design choice, not a diagnosis.
    Colours are supplied by the --am-* tokens through the returned CSS string. */
 
+import { ntxRange as doctorNtxRange } from "./emergencies.js";
+
 export const SCALES = {
   hr: {
     min: 30,
@@ -207,8 +209,48 @@ export const BAND_TEXT = {
   alert: "Outside reference band - act now"
 };
 
-export function scaleFor(key) {
-  return SCALES[key] || null;
+// N-telopeptide ranges come from the team doctor's rules, shared with Emergencies.
+// Without a sex the app shows the women-before-menopause range and says why on screen.
+export function ntxRange(profile) {
+  const range = doctorNtxRange(profile);
+  const sex = profile && (profile.sex === "m" || profile.sex === "f") ? profile.sex : "x";
+  const key = sex === "x" ? "unset" : sex === "m" ? "male" : profile.meno === "post" ? "post" : "pre";
+  return {
+    low: range.min,
+    high: range.max,
+    key,
+    label: key === "unset" ? "sex not set, women before menopause" : range.label.toLowerCase()
+  };
+}
+
+function currentProfile() {
+  if (typeof window === "undefined" || !window.AstroMedProfile) return null;
+  try {
+    return window.AstroMedProfile.get();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+function ntxScale(profile) {
+  const range = ntxRange(profile || currentProfile());
+  return {
+    ...SCALES.ntx,
+    zones: [
+      { to: range.low, level: "review" },
+      { to: range.high + 1e-9, level: "normal" },
+      { to: Infinity, level: "review" }
+    ],
+    range,
+    rangeLabel: `${range.low} to ${range.high} nmol/mmol creatinine (${range.label})`
+  };
+}
+
+export function scaleFor(key, profile = null) {
+  const scale = SCALES[key] || null;
+  if (!scale) return null;
+  return key === "ntx" ? ntxScale(profile) : scale;
 }
 
 export function clampPercent(value) {

@@ -1,6 +1,6 @@
 import IndicatorGauge from "./IndicatorGauge.jsx";
 
-export default function IndicatorList({ fields, values }) {
+export default function IndicatorList({ fields, values, profile }) {
   return (
     <section class="che-gauges" aria-label="Health indicators">
       <div class="che-gauges-head">
@@ -8,7 +8,7 @@ export default function IndicatorList({ fields, values }) {
         <span>Read-only gauge · value shown against its reference band</span>
       </div>
       {fields.map((field) => (
-        <IndicatorGauge key={field.key} field={field} raw={values[field.key]} />
+        <IndicatorGauge key={field.key} field={field} raw={values[field.key]} profile={profile} />
       ))}
       <p class="che-gauge-foot">
         Reference bands are a screening aid and our design choice, not a diagnosis.

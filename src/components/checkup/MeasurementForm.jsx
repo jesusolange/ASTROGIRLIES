@@ -1,6 +1,7 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import Button from "../ui/Button.jsx";
 import IndicatorList from "./IndicatorList.jsx";
+import { get as getProfile } from "../../scripts/profile.js";
 import { SYSTEMS, complete, draftFor, readValues, upsertRecord } from "../../scripts/checkup-flow.js";
 
 export default function MeasurementForm({ part, records, saveRecords }) {
@@ -8,10 +9,21 @@ export default function MeasurementForm({ part, records, saveRecords }) {
   const initial = draftFor(part, records);
   const [draft, setDraft] = useState(initial.values);
   const [simulated, setSimulated] = useState(initial.simulated);
+  const [profile, setProfile] = useState(getProfile);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const filledUnchanged = simulated
     && system.fields.every((field) => Number(draft[field.key]) === field.typical);
+
+  useEffect(() => {
+    const update = () => setProfile(getProfile());
+    document.addEventListener("astromed-profile-changed", update);
+    document.addEventListener("astromed-profile-apply", update);
+    return () => {
+      document.removeEventListener("astromed-profile-changed", update);
+      document.removeEventListener("astromed-profile-apply", update);
+    };
+  }, []);
 
   const update = (key, value) => {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -59,6 +71,7 @@ export default function MeasurementForm({ part, records, saveRecords }) {
 
       <p class="che-desc">{system.description}</p>
 
+
       <div class="che-fields">
         {system.fields.map((field) => (
           <label class="che-field" key={field.key} for={`che-${part}-${field.key}`}>
@@ -80,7 +93,7 @@ export default function MeasurementForm({ part, records, saveRecords }) {
         ))}
       </div>
 
-      <IndicatorList fields={system.fields} values={draft} />
+      <IndicatorList fields={system.fields} values={draft} profile={profile} />
 
       <div class="che-buttons">
         <Button id="saveData" className="che-save" onClick={save}>Save measurements</Button>

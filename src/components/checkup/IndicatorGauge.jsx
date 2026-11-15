@@ -1,7 +1,7 @@
 import { bandFor, gradientFor, position, scaleFor } from "../../scripts/health-indicators.js";
 
-export default function IndicatorGauge({ field, raw }) {
-  const scale = scaleFor(field.key);
+export default function IndicatorGauge({ field, raw, profile }) {
+  const scale = scaleFor(field.key, profile);
   const text = raw == null ? "" : String(raw).trim();
   const value = text === "" ? null : Number(text);
   const valid = value != null && Number.isFinite(value);
@@ -26,7 +26,10 @@ export default function IndicatorGauge({ field, raw }) {
           ))}
         </div>
       ) : null}
-      <p class="che-gauge-band">{band.text}</p>
+      <p class="che-gauge-band">
+        {scale && scale.rangeLabel ? `Reference range: ${scale.rangeLabel}. ` : null}
+        {band.text}
+      </p>
     </div>
   );
 }

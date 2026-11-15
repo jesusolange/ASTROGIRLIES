@@ -6,6 +6,7 @@
 ============================================== */
 
 import { analyzeMental } from "./mental.js";
+import { ntxRange } from "./health-indicators.js";
 
 const KEYS = {
   mental: "astromed-mental",
@@ -92,8 +93,8 @@ METRIC_RULES.glucose = v => v < 54 ? R("alert", "Blood glucose is very low.", "E
   : R("alert", "Blood glucose is very high.", "Drink water, avoid sugary food and re-measure. Keep a record of the readings. If Earth contact exists, also tell the flight surgeon.");
 METRIC_RULES.pulse = METRIC_RULES.hr;
 METRIC_RULES.ntx = v => {
-  const p = (window.AstroMedProfile && window.AstroMedProfile.get()) || {};
-  const r = p.sex === "m" ? [21, 83] : p.sex === "f" ? (p.meno === "post" ? [36, 124] : [17, 94]) : [17, 94];
+  const range = ntxRange((window.AstroMedProfile && window.AstroMedProfile.get()) || {});
+  const r = [range.low, range.high];
   if (v > r[1]) return R("review", `N-telopeptide is above the usual range (${r[0]}–${r[1]}). Bone may be breaking down faster.`, "Take vitamin D and keep resistive exercise. Repeat the test and record the trend. If Earth contact exists, also ask the flight surgeon about a bisphosphonate.");
   if (v < r[0]) return R("review", `N-telopeptide is below the usual range (${r[0]}–${r[1]}).`, "Repeat the test and record the result. If Earth contact exists, also tell the flight surgeon.");
   return R("ok", `N-telopeptide is in the usual range (${r[0]}–${r[1]}).`, "Keep your resistive exercise and vitamin D.");
