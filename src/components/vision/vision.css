@@ -9,6 +9,21 @@
 .vs-note { color: var(--am-warn) !important; font-size: 12px !important; }
 .vs-muted { color: var(--am-text-muted); }
 
+/* ---------- shared figure ---------- */
+
+.am-figure {
+  display: grid; gap: 8px; width: min(100%, 620px); margin: 16px auto;
+  padding: 12px; background: var(--am-bg-raised);
+  border: 1px solid var(--am-border); border-radius: var(--am-radius-small);
+}
+.am-figure img {
+  display: block; width: 100%; height: auto;
+  background: var(--am-surface); border-radius: var(--am-radius-small);
+}
+.am-figure figcaption { display: grid; gap: 4px; color: var(--am-text-muted); font-size: 12px; line-height: 1.5; }
+.am-figure-caption { color: var(--am-text); }
+.am-figure-credit { color: var(--am-accent); font-weight: 700; }
+
 /* ---------- record ---------- */
 
 .vs-eyes {

@@ -8,6 +8,7 @@ import NearTest from "./NearTest.jsx";
 import SymptomList from "./SymptomList.jsx";
 import ResultCard from "./ResultCard.jsx";
 import LatestResults from "./LatestResults.jsx";
+import Figure from "../ui/Figure.jsx";
 
 const blank = () => ({ gridAnswer: null, marks: [], near: null, symptoms: [] });
 
@@ -68,6 +69,8 @@ export default function RecordSection({ data, save }) {
           <li>2. <b>Near vision.</b> Keep the screen {VIEW.nearDistanceCm} cm away and pick the smallest line whose openings you can read.</li>
           <li>3. <b>Symptoms.</b> Tick anything you noticed today.</li>
         </ol>
+
+        <Figure id="eye-cross-section" caption="The eye in cross-section, showing the retina and optic nerve." />
 
         <Calibration calibration={calibration} onCalibrate={calibrate} />
         <GridTest ppmm={calibration ? calibration.ppmm : null} eye={eye} draft={draft} onChange={update} />

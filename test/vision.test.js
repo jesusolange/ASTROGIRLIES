@@ -53,21 +53,21 @@ test("urgent symptoms map to the urgent action whatever the baseline says", () =
   for (const symptom of ["blind-spot", "sudden-loss"]) {
     const a = Vision.assess({ result: result({ symptoms: [symptom] }), baseline: clean });
     assert.equal(a.level, "urgent");
-    assert.match(a.todo, /crew medical officer/);
-    assert.match(a.todo, /Emergencies/);
+    assert.match(a.todo, /Open Emergencies/);
+    assert.match(a.todo, /sudden change in vision/);
     assert.deepEqual(a.urgent, [symptom]);
   }
   const first = Vision.assess({ result: result({ symptoms: ["blind-spot"] }), baseline: null });
   assert.equal(first.level, "urgent");
 });
 
-test("two lost lines or more maps to repeat tomorrow and tell the crew medical officer", () => {
+test("two lost lines or more maps to repeat tomorrow and note what changed", () => {
   const baseline = result({ near: { line: 4 } });
   const two = Vision.assess({ result: result({ near: { line: 2 } }), baseline });
   assert.equal(two.level, "warn");
   assert.equal(two.reason, "change");
   assert.match(two.todo, /Repeat the check tomorrow/);
-  assert.match(two.todo, /crew medical officer/);
+  assert.match(two.todo, /note what changed/);
 
   const three = Vision.assess({ result: result({ near: { line: 1 } }), baseline });
   assert.equal(three.level, "warn");

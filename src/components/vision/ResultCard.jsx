@@ -3,6 +3,12 @@ import { EYE_LABEL, changeSummary, describeResult } from "../../scripts/vision.j
 const fmt = (iso) => new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 const hasEmergencies = () => !!(window.AstroMedNav && window.AstroMedNav.has && window.AstroMedNav.has("emergencies"));
 
+function openVisionEmergency() {
+  const emergencies = window.AstroMedEmergencies;
+  if (emergencies && typeof emergencies.open === "function" && emergencies.open("vision-change")) return;
+  window.AstroMedNav.show("emergencies");
+}
+
 export default function ResultCard({ row }) {
   const assessment = row.assessment;
   return (
@@ -19,7 +25,7 @@ export default function ResultCard({ row }) {
         <button
           type="button"
           class="am-btn vs-emergency"
-          onClick={() => window.AstroMedNav.show("emergencies")}
+          onClick={openVisionEmergency}
         >Open Emergencies</button>
       )}
       <p class="vs-fine">Screening aid, not a diagnosis. The change thresholds are a design choice pending review by the team's medic.</p>

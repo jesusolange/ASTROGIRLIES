@@ -50,17 +50,17 @@ export const RULES = {
     urgent: {
       level: "urgent",
       title: "Urgent vision change",
-      todo: "Contact the crew medical officer now and open Emergencies. Do not wait for the next scheduled check."
+      todo: "Open Emergencies and follow the steps for a sudden change in vision now. Stop tasks that need sharp vision and do not wait for the next scheduled check."
     },
     change: {
       level: "warn",
       title: "Change against your own baseline",
-      todo: "Repeat the check tomorrow and tell the crew medical officer. Note what changed and in which eye."
+      todo: "Repeat the check tomorrow and note what changed and in which eye. Keep tasks that need sharp vision light until it settles."
     },
     firstFinding: {
       level: "warn",
       title: "Finding on your first check",
-      todo: "Repeat the check tomorrow and tell the crew medical officer at your next contact so the finding can be reviewed."
+      todo: "Repeat the check tomorrow and note what you saw so a change can be compared."
     },
     baseline: {
       level: "ok",

@@ -2,6 +2,34 @@
 // The page itself is Preact components under src/components/today/.
 import "./immune.js";
 import { intervalFor, isDue, daysSince, lastDoneFor } from "./missions.js";
+import { lastResult as lastVisionResult } from "./vision.js";
+
+// Which emergency card a finding's subject belongs to. The first match wins; card ids come from
+// src/data/emergencies.js. A finding with no matching card still opens the guide without a card.
+export const FINDING_CARDS = [
+  { card: "self-harm", test: /thoughts of death or suicide|harming myself|self-harm/i },
+  { card: "vision-change", test: /vision|blind spot|retina|\beye\b/i },
+  { card: "storm", test: /solar particle|solar storm|storm shelter|dose rate is far above/i },
+  { card: "cabin-air", test: /cabin temperature|cabin pressure|cabin air|carbon dioxide|co\u2082|\bco2\b|smoke|humidity|air is (extremely )?(dry|humid)/i },
+  { card: "fever", test: /temperature|fever|infection|viral|bacterial/i },
+  { card: "breath", test: /oxygen|breath|respiratory|short of breath|chest tight/i },
+  { card: "gcs", test: /awake|confus|glasgow|\bgcs\b/i },
+  { card: "belly", test: /belly|abdominal|appendix|gallbladder/i },
+  { card: "back", test: /back pain|kidney stone/i },
+  { card: "calf", test: /calf|clot|\bdvt\b|leg vein/i },
+  { card: "fracture", test: /fracture|broken bone/i },
+  { card: "bleeding", test: /bleed|wound/i },
+  { card: "bone", test: /bone density|n-telopeptide|bone breakdown|bones weaken/i },
+  { card: "anemia", test: /an(a)?emi|red blood cell/i },
+  { card: "vitals", test: /heart rate|blood pressure|systolic|diastolic|pulse|shock index/i }
+];
+
+export function cardForFinding(finding) {
+  if (!finding) return null;
+  const text = `${finding.title || ""} ${finding.saw || ""}`;
+  const match = FINDING_CARDS.find((entry) => entry.test.test(text));
+  return match ? match.card : null;
+}
 
 const CHECKS = {
   nutrition: { label: "Log breakfast, lunch and dinner", section: "nutrition" },
@@ -34,12 +62,26 @@ export function openCheck(area) {
 
 export const ratingOf = (area) => (area.risk && area.risk.ops ? `${area.risk.ops.l}\u00d7${area.risk.ops.c}` : "not rated");
 
+// Daily checkup findings live behind AstroMedData.analyze(); they are not exposed as their own global.
+function checkupFindings() {
+  const data = typeof window !== "undefined" ? window.AstroMedData : null;
+  if (!data || typeof data.analyze !== "function") return [];
+  try {
+    const analysis = data.analyze();
+    return [...(analysis.urgent || []), ...(analysis.checkup || [])];
+  } catch (error) {
+    console.error("today checkup findings", error);
+    return [];
+  }
+}
+
 export function urgentFindings() {
   const sources = [
     window.AstroMedMental, window.AstroMedReadiness && window.AstroMedReadiness.findings,
     window.AstroMedReadiness && window.AstroMedReadiness.immuneFindings,
     window.AstroMedRadiation, window.AstroMedEnv, window.AstroMedNutrition,
-    window.AstroMedMissions, window.AstroMedVision, window.AstroMedEmergencies
+    window.AstroMedMissions, window.AstroMedVision, window.AstroMedEmergencies,
+    checkupFindings
   ];
   const out = [];
   sources.forEach((source) => {
@@ -54,13 +96,24 @@ export function urgentFindings() {
   return out;
 }
 
+// The Vision results store a full timestamp; the queue works in local days like the other checks.
+function localDay(iso) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function lastVisionDay() {
+  const last = lastVisionResult();
+  return last && last.date ? localDay(last.date) : null;
+}
+
 export function buildQueue(readiness) {
   return readiness.areas.map((area) => {
     if (area.reference || !area.risk) return null;
     const check = checkFor(area);
     if (!check || !exists(check.section)) return null;
-    if (area.key === "vision" && window.AstroMedVision && typeof window.AstroMedVision.isDue === "function" && !window.AstroMedVision.isDue()) return null;
-    const last = lastDoneFor(area.key);
+    const last = area.key === "vision" ? lastVisionDay() : lastDoneFor(area.key);
     const interval = intervalFor(area.score);
     if (!isDue(last, interval.days)) return null;
     return { area, check, last, interval };

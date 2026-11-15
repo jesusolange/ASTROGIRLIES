@@ -3,6 +3,8 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const Missions = require("../src/scripts/missions.js");
 const Risks = require("../src/scripts/risks.js");
+const Today = require("../src/scripts/today.js");
+const emergencyData = require("../src/data/emergencies.js");
 
 const day = (offset) => {
   const d = new Date();
@@ -44,4 +46,32 @@ test("days since a completion is counted in whole local days", () => {
   assert.equal(Missions.daysSince(day(0)), 0);
   assert.equal(Missions.daysSince(day(-3)), 3);
   assert.equal(Missions.daysSince(null), Infinity);
+});
+
+test("a high body temperature finding opens the fever emergency card", () => {
+  const finding = {
+    title: "Temperature & Glucose \u00b7 Oral body temperature: 39.2",
+    saw: "High temperature.",
+    todo: "Open Emergencies."
+  };
+  assert.equal(Today.cardForFinding(finding), "fever");
+  assert.ok(emergencyData.CARD_BY_ID.has("fever"));
+});
+
+test("vision, self-harm and cabin-air findings map to their emergency cards", () => {
+  assert.equal(Today.cardForFinding({ title: "Right eye: Urgent vision change", saw: "New blind spot." }), "vision-change");
+  assert.equal(Today.cardForFinding({ title: "Thoughts of death or suicide", saw: "You wished you were dead." }), "self-harm");
+  assert.equal(Today.cardForFinding({ title: "Environment \u00b7 CO\u2082: 6000 ppm", saw: "CO\u2082 is high." }), "cabin-air");
+  assert.equal(Today.cardForFinding({ title: "Environment \u00b7 Cabin temperature: 40 \u00b0C", saw: "Cabin is very hot." }), "cabin-air");
+});
+
+test("every mapped card id exists in the emergency guide", () => {
+  for (const entry of Today.FINDING_CARDS) {
+    assert.ok(emergencyData.CARD_BY_ID.has(entry.card), `unknown emergency card ${entry.card}`);
+  }
+});
+
+test("a finding with no matching subject has no emergency card", () => {
+  assert.equal(Today.cardForFinding({ title: "Fitness \u00b7 VO\u2082max dropped", saw: "VO\u2082max went from 40 to 30." }), null);
+  assert.equal(Today.cardForFinding(null), null);
 });

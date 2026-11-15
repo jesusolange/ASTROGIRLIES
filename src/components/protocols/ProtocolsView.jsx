@@ -1,15 +1,17 @@
-// Protocols: the saved results in one place, and the medical report for the ground team.
+// Protocols: the saved results in one place and the astronaut's own mission health report.
 import "../../scripts/storage.js";
 import { useEffect, useState } from "preact/hooks";
 import { currentSection } from "../../lib/nav.js";
 import { protocolRows } from "../../scripts/mental.js";
 import { toast } from "../../lib/ui.js";
+import { reportLead, sendHint } from "./report-wording.js";
 import "./protocols.css";
 
 export default function ProtocolsView() {
   const [report, setReport] = useState(null);
   const [revision, setRevision] = useState(0);
   const section = currentSection.value;
+  const comm = window.AstroMedEnv && typeof window.AstroMedEnv.comm === "function" ? window.AstroMedEnv.comm() : null;
 
   useEffect(() => {
     const api = window.AstroMedStore && window.AstroMedStore.store;
@@ -40,7 +42,7 @@ export default function ProtocolsView() {
     <div data-revision={revision}>
       <div class="am-heading">
         <h2>Protocols</h2>
-        <p>Your saved results and the medical report for the ground team.</p>
+        <p>Your saved results and your mission health report.</p>
       </div>
 
       <section class="am-panel">
@@ -55,19 +57,19 @@ export default function ProtocolsView() {
       </section>
 
       <section class="am-panel am-consult">
-        <h3>Prepare a medical report for the ground team</h3>
-        <p>I will generate a PDF report from your saved results. It stays on this device until you download it and share it with the ground medical team.</p>
+        <h3>Prepare your mission health report</h3>
+        <p>{reportLead(comm)}</p>
         <button type="button" class="am-btn" onClick={generate}>{report ? "Update my report" : "Yes, generate my report"}</button>
       </section>
 
       {report ? (
         <section class="am-panel">
           <h3>Your report is ready</h3>
-          <p>Generated {new Date().toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} from your latest data. Share it with the ground medical team.</p>
+          <p>Generated {new Date().toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} from your latest data. Keep it as your record. {sendHint(comm)}</p>
           <div class="am-actions">
             <a class="am-btn" href={report.url} download={report.filename}>Download PDF</a>
           </div>
-          <iframe class="am-report" title="Medical report preview" src={report.url}></iframe>
+          <iframe class="am-report" title="Mission health report preview" src={report.url}></iframe>
         </section>
       ) : null}
     </div>
