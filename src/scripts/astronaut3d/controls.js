@@ -1,46 +1,56 @@
-export function bindControls(canvas, { state, picking, startSpin, selectPart }) {
-  canvas.addEventListener("pointerdown", (event) => {
-    state.dragging = true;
-    state.moved = false;
-    state.pointerStartX = event.clientX;
-    state.lastX = event.clientX;
-    canvas.setPointerCapture?.(event.pointerId);
-  });
+const TURN_STEP = Math.PI / 8;
 
-  canvas.addEventListener("pointermove", (event) => {
-    if (state.dragging && state.mode === "body") {
-      if (Math.abs(event.clientX - state.pointerStartX) > 4) state.moved = true;
-      if (state.moved) state.dragAngle += (event.clientX - state.lastX) * 0.01;
-      state.lastX = event.clientX;
+// Drag or arrow keys turn the camera around the body; a click without dragging picks a part.
+export function bindControls(canvas, { picking, turnBy, onClick, onEnter }) {
+  const drag = { active: false, moved: false, startX: 0, lastX: 0 };
+
+  const down = (event) => {
+    drag.active = true;
+    drag.moved = false;
+    drag.startX = event.clientX;
+    drag.lastX = event.clientX;
+    canvas.setPointerCapture?.(event.pointerId);
+  };
+
+  const move = (event) => {
+    if (drag.active) {
+      if (Math.abs(event.clientX - drag.startX) > 4) drag.moved = true;
+      if (drag.moved) turnBy(-(event.clientX - drag.lastX) * 0.01);
+      drag.lastX = event.clientX;
       canvas.style.cursor = "grabbing";
       return;
     }
     picking.aim(event);
-    canvas.style.cursor = state.mode === "intro"
-      ? "pointer"
-      : state.mode === "body"
-        ? (picking.pick() ? "pointer" : "grab")
-        : "default";
-  });
+    canvas.style.cursor = picking.pick() ? "pointer" : "grab";
+  };
 
-  canvas.addEventListener("pointerup", (event) => {
-    const moved = state.moved;
-    state.dragging = false;
-    state.moved = false;
+  const up = (event) => {
+    const moved = drag.moved;
+    drag.active = false;
+    drag.moved = false;
+    canvas.style.cursor = "grab";
     if (moved) return;
     picking.aim(event);
-    if (state.mode === "intro") {
-      startSpin();
-    } else if (state.mode === "body") {
-      const part = picking.pick();
-      if (part) selectPart(part, true);
-    }
-  });
+    onClick(picking.pick());
+  };
 
-  canvas.addEventListener("keydown", (event) => {
-    if ((event.key === "Enter" || event.key === " ") && state.mode === "intro") {
-      event.preventDefault();
-      startSpin();
-    }
-  });
+  const key = (event) => {
+    if (event.key === "ArrowLeft") turnBy(-TURN_STEP);
+    else if (event.key === "ArrowRight") turnBy(TURN_STEP);
+    else if (event.key === "Enter" || event.key === " ") onEnter();
+    else return;
+    event.preventDefault();
+  };
+
+  canvas.addEventListener("pointerdown", down);
+  canvas.addEventListener("pointermove", move);
+  canvas.addEventListener("pointerup", up);
+  canvas.addEventListener("keydown", key);
+
+  return () => {
+    canvas.removeEventListener("pointerdown", down);
+    canvas.removeEventListener("pointermove", move);
+    canvas.removeEventListener("pointerup", up);
+    canvas.removeEventListener("keydown", key);
+  };
 }

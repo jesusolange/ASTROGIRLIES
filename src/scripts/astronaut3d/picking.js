@@ -1,6 +1,6 @@
 import { Raycaster, Vector2 } from "three";
 
-export function createPicking(canvas, camera, getTargets, isAllowed) {
+export function createPicking(canvas, camera, getTargets) {
   const raycaster = new Raycaster();
   const pointer = new Vector2();
 
@@ -13,12 +13,29 @@ export function createPicking(canvas, camera, getTargets, isAllowed) {
     raycaster.setFromCamera(pointer, camera);
   }
 
+  function partOf(object) {
+    let node = object;
+    while (node && !node.userData.part) node = node.parent;
+    return node ? node.userData.part : null;
+  }
+
+  function visible(object) {
+    let node = object;
+    while (node) {
+      if (!node.visible) return false;
+      node = node.parent;
+    }
+    return true;
+  }
+
+  // The see-through skeleton surrounds the organs, so an organ behind it wins over the bones.
   function pick() {
-    const hits = raycaster
-      .intersectObjects(getTargets(), false)
-      .filter((hit) => hit.object.visible !== false)
-      .filter((hit) => isAllowed(hit.object.userData.part));
-    return hits.length ? hits[0].object.userData.part : null;
+    const parts = raycaster
+      .intersectObjects(getTargets(), true)
+      .filter((item) => visible(item.object))
+      .map((item) => partOf(item.object))
+      .filter(Boolean);
+    return parts.find((part) => part !== "bones") || parts[0] || null;
   }
 
   return { aim, pick };

@@ -1,78 +1,73 @@
-import {
-  AdditiveBlending,
-  Color,
-  DoubleSide,
-  MeshBasicMaterial,
-  MeshPhysicalMaterial,
-  MeshStandardMaterial,
-  ShaderMaterial,
-} from "three";
+import { Color, FrontSide } from "three";
 
-export const PALETTE = {
-  suit: 0xf4f6fa,
-  visor: 0x9aa6ba,
-  dark: 0x1d232e,
-  belt: 0x2b5fb0,
-  skin: 0xff6a3d,
-  gold: 0xd9a441,
-  glow: 0x66e0ff,
-  active: 0xff2d3f,
-  done: 0x2fe08a,
-  xray: 0x4aa8ff,
-  floor: 0x4aa0ff,
-  brain: 0xc9728a,
-  brainStem: 0xe6a3b4,
-  lungs: 0xe8a0a8,
-  lungsDeep: 0xf6e2e2,
-  heart: 0xc9162f,
-  artery: 0xd72b3f,
-  vein: 0x3b6fd0,
-  heartDark: 0xa8112a,
-  valve: 0xf0b24a,
-  kidney: 0x8f2a3e,
-  adrenal: 0xe8c14a,
-  ureter: 0xf1d36b,
-  skinLight: 0xe8b79a,
-  muscle: 0xb5524a,
-  bone: 0xf0e8d2,
-};
-
-export function physical(color, options = {}) {
-  return new MeshPhysicalMaterial({ color, roughness: 0.5, metalness: 0.05, ...options });
-}
-
-export function standard(color, options = {}) {
-  return new MeshStandardMaterial({ color, roughness: 0.5, metalness: 0, ...options });
-}
-
-export function basic(options = {}) {
-  return new MeshBasicMaterial(options);
-}
-
-export function xray(color) {
-  return new ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    side: DoubleSide,
-    blending: AdditiveBlending,
-    uniforms: { opacity: { value: 1 }, c: { value: new Color(color) } },
-    vertexShader: `
-      varying vec3 vN;
-      varying vec3 vV;
-      void main() {
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        vN = normalize(normalMatrix * normal);
-        vV = normalize(-mv.xyz);
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
-      uniform vec3 c;
-      uniform float opacity;
-      varying vec3 vN;
-      varying vec3 vV;
-      void main() {
-        float f = pow(1.0 - abs(dot(vN, vV)), 2.2);
-        gl_FragColor = vec4(c * (0.12 + 1.5 * f), (0.07 + 0.75 * f) * opacity);
-      }`,
+export function eachMaterial(root, visit) {
+  root.traverse((node) => {
+    if (!node.isMesh) return;
+    const list = Array.isArray(node.material) ? node.material : [node.material];
+    list.forEach((material) => material && visit(material, node));
   });
+}
+
+// Every loaded model gets its own materials so glow and fading never leak between parts.
+export function ownMaterials(root) {
+  root.traverse((node) => {
+    if (!node.isMesh) return;
+    node.material = Array.isArray(node.material)
+      ? node.material.map((material) => material.clone())
+      : node.material.clone();
+  });
+  eachMaterial(root, (material) => {
+    material.userData.baseOpacity = material.opacity;
+    material.userData.baseTransparent = material.transparent;
+    material.userData.baseDepthWrite = material.depthWrite;
+    material.userData.baseSide = material.side;
+    if (material.color) material.userData.baseColor = material.color.clone();
+    if (material.emissive) {
+      material.userData.baseEmissive = material.emissive.clone();
+      material.userData.baseEmissiveIntensity = material.emissiveIntensity;
+    }
+  });
+}
+
+export function setOpacity(root, opacity) {
+  eachMaterial(root, (material) => {
+    const see = opacity < 1;
+    material.transparent = see || material.userData.baseTransparent;
+    material.depthWrite = see ? false : material.userData.baseDepthWrite;
+    material.side = see ? FrontSide : material.userData.baseSide;
+    material.opacity = material.userData.baseOpacity * opacity;
+  });
+}
+
+// Paints the model in one colour, or restores its own colours when color is null.
+export function setTint(root, color) {
+  eachMaterial(root, (material) => {
+    if (!material.color) return;
+    material.color.copy(color || material.userData.baseColor);
+  });
+}
+
+export function setGlow(root, color, intensity) {
+  eachMaterial(root, (material) => {
+    if (!material.emissive) return;
+    if (intensity > 0) {
+      material.emissive.copy(color);
+      material.emissiveIntensity = intensity;
+    } else {
+      material.emissive.copy(material.userData.baseEmissive || new Color(0));
+      material.emissiveIntensity = material.userData.baseEmissiveIntensity ?? 1;
+    }
+  });
+}
+
+// Reads a colour token from the element the stage is mounted in, so the accent follows the theme.
+export function tokenColor(element, name, fallback) {
+  const value = getComputedStyle(element).getPropertyValue(name).trim();
+  const color = new Color();
+  try {
+    color.setStyle(value || fallback);
+  } catch {
+    color.setStyle(fallback);
+  }
+  return color;
 }

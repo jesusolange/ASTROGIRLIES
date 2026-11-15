@@ -1,46 +1,31 @@
 import "../../styles/astronaut3d.css";
-import { PART_ORDER } from "./layout.js";
+import { PARTS, VIEWS } from "./layout.js";
 import { createStage } from "./stage.js";
 
-const listeners = new Set();
 let stage = null;
 
-function emit(part) {
-  listeners.forEach((listener) => {
-    try {
-      listener(part);
-    } catch (error) {
-      console.error(error);
-    }
-  });
+// Draws the astronaut inside `element`. onSelect(part) runs when the astronaut clicks a part on the model.
+// Returns false when WebGL is not available, so the caller can leave the space to the cards.
+export function mount(element, { onSelect } = {}) {
+  unmount();
+  if (!element) return false;
+  stage = createStage(element, { onSelect });
+  return Boolean(stage);
 }
 
-const AstroMed3D = {
-  select(part) {
-    if (stage) stage.select(part);
-  },
-  markDone(part) {
-    if (stage) stage.markDone(part);
-  },
-  reset() {
-    if (stage) stage.reset();
-  },
-  onSelect(callback) {
-    if (typeof callback !== "function") return () => {};
-    listeners.add(callback);
-    return () => listeners.delete(callback);
-  },
-  parts() {
-    return PART_ORDER.map((part) => part.id);
-  },
-};
+export function unmount() {
+  if (stage) stage.destroy();
+  stage = null;
+}
 
-if (typeof window !== "undefined") window.AstroMed3D = AstroMed3D;
+// Frames one of PARTS (opening the suit), or the whole body when part is null.
+export function focus(part) {
+  if (stage) stage.focus(part);
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.querySelector("#checkupPage .figure-scene");
-  if (!container) return;
-  stage = createStage(container, { onSelect: emit });
-});
+// Turns the view to "front", "side" or "back".
+export function turn(view) {
+  if (stage && view in VIEWS) stage.turn(VIEWS[view]);
+}
 
-export { AstroMed3D };
+export { PARTS };

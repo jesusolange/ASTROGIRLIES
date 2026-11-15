@@ -23,5 +23,5 @@ import "./riskmap.js";
 import "./today.js";
 import "./vision.js";
 import "./emergencies.js";
-import "./astronaut3d/index.js";
+import "./astronaut3d/checkup-bridge.js";
 import "./offline.js";
