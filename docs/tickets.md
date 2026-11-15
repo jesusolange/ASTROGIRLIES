@@ -82,12 +82,12 @@ These replace the earlier tickets (see git history of this file). One spec per t
 
 ## Owner answers, 15 Nov 2026 (binding; they override the ticket text where they differ)
 
-- The group label "General first response (not yet reviewed by the team doctor)" goes, as T25 says. The
+- The group label "General first response (not yet reviewed by the team medicine student)" goes, as T25 says. The
   agent-written cards (bleeding, fracture, vision-change, cabin-air, self-harm) are shown like the others.
-- The doctor's four flight-surgeon lines are worded by the mission's link (`tell: "flight-surgeon"`, T25 and T35).
+- The medic's four flight-surgeon lines are worded by the mission's link (`tell: "flight-surgeon"`, T25 and T35).
 - Belly pain keeps both pictures, one beside each stage: they show different examinations (appendix points; Murphy's
   sign). T35's "one picture" item is withdrawn.
-- The doctor's "Blood loss and shock" table moves from the vitals card into the bleeding card, text unchanged (T25).
+- The medic's "Blood loss and shock" table moves from the vitals card into the bleeding card, text unchanged (T25).
 - Body cards use the 3D model (T31); the old organ PNGs may be deleted when nothing uses them.
 - First-run profile: every field is required (owner, after the batch 1 review); sex keeps "Prefer not to say" as
   an answer, and menopause is asked only for women (T29).

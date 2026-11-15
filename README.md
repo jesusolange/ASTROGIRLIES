@@ -32,7 +32,7 @@ or the `E` key away.
   - **Guides**: space anaemia and bone density loss.
 - **Progress** holds all history: charts per measure with reference bands, a full record table with delete and
   undo, and a formal text-only report to print as PDF.
-- **Emergency** is the team doctor's first-response guide: cards ordered by how fast you must act, searchable by
+- **Emergency** is the team medicine student's first-response guide: cards ordered by how fast you must act, searchable by
   symptom, with step-by-step instructions and pictures, and links to the related checks.
 
 Every result ends in an action the astronaut can take alone. Lines about a crewmate appear only when the mission
@@ -109,7 +109,7 @@ Numbers and thresholds come from a named source or are labelled in the app as ou
   and mineral.
 - Radiation dose rates: DOSIS 3D and Chang'e-4 LND (Zhang et al. 2020), MSL RAD cruise and surface (Zeitlin et
   al. 2013, Hassler et al. 2014). Signal delay to Earth: NASA NTRS 20220013418.
-- First response: the team doctor's notes, the Glasgow Coma Scale, Stop the Bleed and Red Cross first aid steps.
+- First response: the team medicine student's notes, the Glasgow Coma Scale, Stop the Bleed and Red Cross first aid steps.
 
 The full list, with links, is in the app under Profile > Sources and in `docs/references.md`.
 

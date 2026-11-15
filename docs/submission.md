@@ -28,7 +28,7 @@ Space agency partner data:
   in Zhang et al. 2020 (Science Advances).
 
 Medical and scientific references:
-- The team doctor's emergency notes (the Emergency guide).
+- The team medicine student's emergency notes (the Emergency guide).
 - Crucian et al. 2018, virus reactivation in spaceflight; the space anaemia study (PMC10976580); MR089S, bone and
   mineral; the Glasgow Coma Scale; Stop the Bleed; Red Cross first aid steps; Amboss, chest drain.
 
@@ -48,7 +48,7 @@ The full list with links and licences is in the app (Profile > Sources) and in `
 
 - **Code:** the app was written with AI coding assistants: Anthropic's Claude (Claude Code) coordinating and
   reviewing the work, and OpenCode agents running DeepSeek models implementing tickets. The team set the goals,
-  made every product and medical decision, reviewed each change in the running app, and the team doctor wrote and
+  made every product and medical decision, reviewed each change in the running app, and the team medicine student wrote and
   reviewed the medical content.
 - **Images:** eleven illustrations are AI-generated and marked "AI-generated" on screen: the five Emergency guide
   pictures (chest, chest drain, two abdomen examinations, dermatome map), the ARED, T2 and CEVIS exercise pictures,
