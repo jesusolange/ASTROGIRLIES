@@ -120,9 +120,11 @@ test("the demo adds VO2max tests and a rewards history", () => {
   const missions = data["astromed-missions"];
   assert.equal(missions.vo2.length, 3);
   assert.equal(Object.keys(missions.auto).length, DAYS);
-  Object.values(missions.auto).forEach((tasks) => assert.deepEqual(tasks, ["env", "checkup", "exercise", "meals", "mental"]));
+  const days = Object.keys(missions.auto).sort();
+  const today = days.pop();
+  days.forEach((day) => assert.deepEqual(missions.auto[day], ["env", "checkup", "exercise", "meals", "mental"]));
+  assert.deepEqual(missions.auto[today], ["env", "exercise", "mental"]);
 });
-
 test("every Progress filter has at least one chart with demo data", () => {
   const api = { get: (key, fallback) => (key in data ? data[key] : fallback) };
   const progress = readProgress(api, data["astromed-profile"]);
