@@ -56,7 +56,7 @@ const CHECKUP_FIELDS = {
     mood: () => [7.4, 0.7]
   },
   lungs: { resp: () => [15.5, 0.9], spo2: () => [98, 0.6] },
-  heart: { hr: () => [76, 5], sys: () => [117, 4], dia: () => [75, 3], hrv: () => [45, 5] },
+  heart: { hr: () => [76, 5], sys: () => [114, 4], dia: () => [75, 3], hrv: () => [45, 5] },
   kidneys: {
     urineOutput: () => [1560, 90],
     collectionHours: () => [24, 0],
@@ -68,8 +68,8 @@ const CHECKUP_FIELDS = {
   muscles: { activity: () => [58, 9], strength: () => [25, 1.8] }
 };
 
-// Left open today so the demo can show these checks being done: bones, kidneys and the meal card.
-const SHOWCASE_TODAY = new Set(["bones", "kidneys", "meals"]);
+// Left open today so the demo can show these daily checks being done: heart, meals and training.
+const SHOWCASE_TODAY = new Set(["heart", "meals", "exercise"]);
 
 function checkupRecords(now, random) {
   const records = [];
@@ -224,7 +224,7 @@ function exerciseData(now, random) {
     { type: "t2", title: "T2", values: () => ({ minutes: 40, distance: round(4.8 + random() * 1.2, 0.1), speed: round(7.2 + random() * 1.2, 0.1), heartRate: Math.round(126 + random() * 12), effort: 5, soreness: 2 }) },
     { type: "cevis", title: "CEVIS", values: () => ({ minutes: 50, cadence: Math.round(80 + random() * 12), power: Math.round(110 + random() * 30), heartRate: Math.round(122 + random() * 14), effort: 5 }) }
   ];
-  for (let index = 0; index < DAYS; index += 1) {
+  for (let index = SHOWCASE_TODAY.has("exercise") ? 1 : 0; index < DAYS; index += 1) {
     const kind = kinds[index % kinds.length];
     sessions.push({ type: kind.type, title: kind.title, values: kind.values(), date: at(now, index, 17).toISOString() });
   }
@@ -266,7 +266,7 @@ function missionsData(now) {
   const auto = {};
   for (let index = DAYS - 1; index >= 0; index -= 1) {
     auto[isoDay(at(now, index, 8))] = index === 0
-      ? REWARD_TASKS.filter((task) => task !== "meals" && task !== "checkup")
+      ? REWARD_TASKS.filter((task) => !["meals", "checkup", "exercise"].includes(task))
       : [...REWARD_TASKS];
   }
   const vo2 = [13, 7, 0].map((daysAgo, index) => ({

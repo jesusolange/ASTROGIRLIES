@@ -29,7 +29,7 @@ test("the builder fills every record type and is deterministic for a seed", () =
   assert.ok(data["astrotwin-gui-v2-records"].length >= DAYS);
   assert.ok(Object.keys(data["astromed-immune"].log).length === DAYS);
   assert.ok(data["astromed-radiation"].entries.length === DAYS);
-  assert.ok(data["astrotwin-exercise-sessions"].length === DAYS);
+  assert.ok(data["astrotwin-exercise-sessions"].length === DAYS - 1);
   assert.ok(data["astromed-env-log"].length === DAYS);
   assert.ok(data["astromed-mental-history"].length > 0);
   assert.ok(data["astromed-vision"].results.length > 0);
@@ -123,7 +123,7 @@ test("the demo adds VO2max tests and a rewards history", () => {
   const days = Object.keys(missions.auto).sort();
   const today = days.pop();
   days.forEach((day) => assert.deepEqual(missions.auto[day], ["env", "checkup", "exercise", "meals", "mental"]));
-  assert.deepEqual(missions.auto[today], ["env", "exercise", "mental"]);
+  assert.deepEqual(missions.auto[today], ["env", "mental"]);
 });
 test("every Progress filter has at least one chart with demo data", () => {
   const api = { get: (key, fallback) => (key in data ? data[key] : fallback) };
