@@ -1,7 +1,7 @@
 // One row per topic: which NASA risks it covers and which emergency card belongs to it.
 // The mapping is our design choice, not NASA's. Cards name their own topic; the deck groups them.
 export const TOPICS = [
-  { id: "heart", label: "Heart", riskIds: [179], emergency: "breath" },
+  { id: "heart", label: "Thorax", riskIds: [179], emergency: "breath" },
   { id: "bones", label: "Bones", riskIds: [77], emergency: null },
   { id: "kidneys", label: "Kidneys", riskIds: [81], emergency: null },
   { id: "immune", label: "Immune", riskIds: [80, 85], emergency: "fever" },
