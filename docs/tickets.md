@@ -91,6 +91,8 @@ These replace the earlier tickets (see git history of this file). One spec per t
 - Body cards use the 3D model (T31); the old organ PNGs may be deleted when nothing uses them.
 - First-run profile: every field is required (owner, after the batch 1 review); sex keeps "Prefer not to say" as
   an answer, and menopause is asked only for women (T29).
+- The destination options keep NASA's category text with its day range (for example "Mars planetary, 730 to
+  1224 days"), and Mission length stays a separate field. The duplication is intended (owner decision).
 - Batch 1 review: the Emergency index plan stands (10 or 11 tiles, Vital signs entry on top, bone loss and
   anaemia as Guides in Check). Points, levels and badges are wanted.
 - Pictograph characters inside the medic's text (for example in the kidney stone flow) are icons, not words: T25
