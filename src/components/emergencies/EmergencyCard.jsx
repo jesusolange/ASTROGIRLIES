@@ -8,7 +8,6 @@ import RichText from "./RichText.jsx";
 
 export default function EmergencyCard({ card }) {
   const danger = card.actWithin === "minutes";
-  const designRest = card.designNote ? card.designNote.replace(/^Design choice\.\s*/, "") : null;
   const sourceId = card.sourceIds && card.sourceIds[0];
   return (
     <article class="emg-card" data-card={card.id}>
@@ -25,7 +24,7 @@ export default function EmergencyCard({ card }) {
       </header>
       <Blocks blocks={card.blocks} />
       <CardLinks card={card} />
-      {designRest ? <p class="em-source em-design"><b>Design choice.</b> <RichText text={designRest} /></p> : null}
+      {card.designNote ? <p class="em-source em-design"><RichText text={card.designNote} /></p> : null}
       {card.disclaimer ? <p class="am-small em-disclaimer"><RichText text={card.disclaimer} /></p> : null}
       {sourceId ? (
         <p class="emg-source-line">

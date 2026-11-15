@@ -62,7 +62,7 @@ const GCS = {
 };
 const GENERAL_NOTE = "When contact with Earth exists, the crew medical officer also informs the flight surgeon.";
 const GENERAL_DISCLAIMER = "This is first-response guidance for a crew member without immediate ground support, not a diagnosis.";
-const GENERAL_DESIGN = "Design choice. These are generic first-aid steps. They are not taken from a specific clinical guideline, so follow your mission protocol and the crew medical officer.";
+const GENERAL_DESIGN = "These are generic first-aid steps. They are not taken from a specific clinical guideline, so follow your mission protocol and the crew medical officer.";
 function firstResponse(card) {
   const { extraBlocks, ...rest } = card;
   return {
@@ -91,7 +91,7 @@ export const CARDS = [
     sign: "Did it start suddenly (by itself)?",
     sourceIds: ["team-doctor-notes", "amboss-chest-drain"],
     blocks: [
-      { type: "stage", n: 1, title: "Check for a collapsed lung (pneumothorax)", diagram: [
+      { type: "stage", n: 1, layout: "compare", title: "Check for a collapsed lung (pneumothorax)", diagram: [
         { type: "images", images: [
           { src: "/assets/emergency/chest.jpg", alt: "Chest with the needle point and the chest drain point" },
           { src: "/assets/emergency/drain.jpg", alt: "Chest drain: tip at the top for air, low for fluid" },
@@ -106,7 +106,7 @@ export const CARDS = [
         "Prepare the channel: open it bluntly with scissors or forceps at the TOP edge of the lower rib of that space.", "Tunnel upwards, open the parietal pleura, feel the pleural space with a finger.",
         "Grab the drain with forceps (no guide rod) and push it in about 20 cm, guided by the finger if possible.", "Tip of the drain: AIR rises, so put it at the top (apex). FLUID flows down, so put it low (caudal).",
       ], no: "Go to step 2." },
-      { type: "stage", n: 2, title: "No lung problem? Think about a heart attack", look: [
+      { type: "stage", n: 2, layout: "compare", title: "No lung problem? Think about a heart attack", look: [
         "ST elevation on the ECG", "Cold sweat",
         "Pain that spreads (to the back, stomach or arm)", "Nausea and tiredness",
       ], todo: ["Aspirin (ASA)", "Heparin", "Metoprolol", "Short-acting opioids"],
@@ -259,6 +259,10 @@ export const CARDS = [
     actWithin: "hours",
     sign: "Fever is 38.5 °C or more.",
     sourceIds: ["team-doctor-notes", "crucian-2018"],
+    checks: {
+      ids: ["immune-symptoms", "temp-glucose"],
+      note: "Record your temperature and symptoms so Home can track them.",
+    },
     blocks: [
       { type: "panel", title: "Viral or bacterial?", blocks: [
         { type: "note", text: "Blood tests help to tell them apart. The red boxes point to bacteria." },
@@ -270,7 +274,7 @@ export const CARDS = [
         ], note: "Simplified map. A dermatome is the skin area of one nerve root." },
       ] },
       { type: "panel", title: "What to do", blocks: [
-        { type: "steps", link: { check: "immune" }, items: [
+        { type: "steps", items: [
           "Aciclovir for oral and genital herpes: adults and children 12 years and older, 200 mg every 4 hours, 5 times a day, for 7 days.", "To stop it coming back: usual dose 200 mg (one tablet) 4 times a day. Space the doses about 6 hours apart.",
         ] },
         { type: "check", text: "These doses are for oral and genital herpes. Zoster (shingles) usually needs a different dose." },

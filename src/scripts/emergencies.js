@@ -143,6 +143,30 @@ export function filterCards(cards, query) {
   return cards.filter((card) => matchesQuery(card, query));
 }
 
+// ---------- Reference bars ----------
+
+export function valuePercent(bar, value) {
+  const width = bar.max - bar.min;
+  const number = Number(value);
+  if (!width || value == null || !Number.isFinite(number)) return null;
+  return Math.max(0, Math.min(100, ((number - bar.min) / width) * 100));
+}
+
+export function rangeMarks(bar) {
+  return [
+    { key: "min", value: bar.min },
+    { key: "low", value: bar.lo },
+    { key: "high", value: bar.hi },
+    { key: "max", value: bar.max },
+  ]
+    .map((mark) => {
+      const percent = valuePercent(bar, mark.value);
+      const anchor = percent === 0 ? "start" : percent === 100 ? "end" : "middle";
+      return { ...mark, percent, anchor };
+    })
+    .filter((mark, index, marks) => mark.percent != null && marks.findIndex((item) => item.value === mark.value) === index);
+}
+
 // ---------- Blocks: generated text ----------
 
 const ARROWS = {

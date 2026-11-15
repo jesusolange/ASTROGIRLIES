@@ -9,11 +9,13 @@ const FIELDS = [
   { key: "temp", label: "Temperature (°C)", step: "0.1" },
 ];
 
-export default function VitalsCheck() {
-  const [values, setValues] = useState({});
+export default function VitalsCheck({ values: controlled, onValues }) {
+  const [local, setLocal] = useState({});
+  const values = controlled || local;
+  const save = onValues || setLocal;
   const chips = vitalChips(values);
   const update = (key, input) => {
-    setValues((old) => ({ ...old, [key]: input.value === "" ? null : Number(input.value) }));
+    save({ ...values, [key]: input.value === "" ? null : Number(input.value) });
   };
   return (
     <>

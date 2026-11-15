@@ -15,10 +15,7 @@ const { SOURCES, SOURCE_BY_ID, sourcesFor } = require("../src/data/sources.js");
 const root = path.join(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
 
-const KEPT_IDS = [
-  "breath", "bleeding", "gcs", "cabin-air", "vision-change", "storm",
-  "belly", "fever", "back", "calf", "fracture",
-];
+const KEPT_IDS = ["breath", "bleeding", "gcs", "cabin-air", "vision-change", "storm", "belly", "fever", "back", "calf", "fracture"];
 
 function blocksOf(card) {
   const out = [];
@@ -151,15 +148,8 @@ test("removed cards leave the emergency data and the moved text keeps its length
 
 test("the bone card keeps its gauge and N-telopeptide reference text", () => {
   const gauge = blocksOf(BONE_LOSS).find((block) => block.type === "gauge");
-  assert.equal(
-    gauge.text,
-    "Bone density (DXA) compared with your value before the mission (100%). NASA: keep at or above 95% (hip, spine) and 90% (femoral neck). Typical loss is about 1–1.5% per month without countermeasures.",
-  );
-  assert.deepEqual(NTX_RANGES, [
-    { min: 21, max: 83, label: "Men" },
-    { min: 17, max: 94, label: "Women before menopause" },
-    { min: 36, max: 124, label: "Women after menopause" },
-  ]);
+  assert.equal(gauge.text, "Bone density (DXA) compared with your value before the mission (100%). NASA: keep at or above 95% (hip, spine) and 90% (femoral neck). Typical loss is about 1–1.5% per month without countermeasures.");
+  assert.deepEqual(NTX_RANGES, [{ min: 21, max: 83, label: "Men" }, { min: 17, max: 94, label: "Women before menopause" }, { min: 36, max: 124, label: "Women after menopause" }]);
 });
 
 test("the anaemia card keeps every observation", () => {
@@ -173,15 +163,8 @@ test("the anaemia card keeps every observation", () => {
 });
 
 test("the vitals reference keeps its numbers and quick check", () => {
-  assert.deepEqual(VITALS_REFERENCE.bars, [
-    { label: "Pulse", min: 30, max: 160, lo: 60, hi: 100, unit: "per min" },
-    { label: "Breathing", min: 5, max: 35, lo: 12, hi: 18, unit: "per min" },
-    { label: "Oxygen (SpO₂)", min: 80, max: 100, lo: 95, hi: 100, unit: "%" },
-  ]);
-  assert.deepEqual(VITALS_REFERENCE.chips, [
-    { tone: "ok", text: "Blood pressure: 120/80 mmHg" },
-    { tone: "bad", text: "Fever: 38.5 °C or more" },
-  ]);
+  assert.deepEqual(VITALS_REFERENCE.bars, [{ label: "Pulse", min: 30, max: 160, lo: 60, hi: 100, unit: "per min" }, { label: "Breathing", min: 5, max: 35, lo: 12, hi: 18, unit: "per min" }, { label: "Oxygen (SpO₂)", min: 80, max: 100, lo: 95, hi: 100, unit: "%" }]);
+  assert.deepEqual(VITALS_REFERENCE.chips, [{ tone: "ok", text: "Blood pressure: 120/80 mmHg" }, { tone: "bad", text: "Fever: 38.5 °C or more" }]);
   assert.equal(VITALS_REFERENCE.note, "Always compare with the astronaut's own usual values.");
   assert.deepEqual(VITALS_REFERENCE.quickCheck, { type: "vitals" });
   assert.equal(VITALS_REFERENCE.bars.length + VITALS_REFERENCE.chips.length, 5);
@@ -197,21 +180,24 @@ test("the blood loss and shock table moves into the bleeding card whole", () => 
 
 test("no removed phrase or developer note is left in the emergency data", () => {
   const text = read("src", "data", "emergencies.js");
-  for (const phrase of [
-    "not yet reviewed", "pending review", "SOURCE-NEEDED", "Source: Notes.",
-    "Readiness", "Mental Health check-in", "Red flag", "General first response", "Slow risks in space",
-  ]) {
+  for (const phrase of ["not yet reviewed", "pending review", "SOURCE-NEEDED", "Source: Notes.", "Readiness", "Mental Health check-in", "Red flag", "General first response", "Slow risks in space"]) {
     assert.equal(text.includes(phrase), false, phrase);
   }
   assert.doesNotMatch(text, /\bCHECK\b/);
-  const vision = JSON.stringify(CARD_BY_ID.get("vision-change"));
-  assert.equal(vision.includes("Design choice"), false);
-  assert.equal(vision.includes("design choice"), false);
+  for (const card of [...CARDS, ...SLOW_RISKS]) {
+    assert.equal(JSON.stringify(card).includes("Design choice"), false, card.id);
+    assert.equal(JSON.stringify(card).includes("design choice"), false, card.id);
+  }
 });
 
-test("the fever card links to the immune check and the self-harm card to mental health", () => {
-  const feverSteps = blocksOf(CARD_BY_ID.get("fever")).find((block) => block.type === "steps");
-  assert.deepEqual(feverSteps.link, { check: "immune" });
+test("the fever card links to the symptom and temperature checks, and self-harm to mental health", () => {
+  const fever = CARD_BY_ID.get("fever");
+  assert.deepEqual(fever.checks, {
+    ids: ["immune-symptoms", "temp-glucose"],
+    note: "Record your temperature and symptoms so Home can track them.",
+  });
+  const feverSteps = blocksOf(fever).find((block) => block.type === "steps");
+  assert.equal(feverSteps.link, undefined);
   assert.equal(feverSteps.items.length, 2);
   const selfHarmSteps = blocksOf(CARD_BY_ID.get("self-harm")).find((block) => block.type === "steps");
   assert.deepEqual(selfHarmSteps.link, { check: "mental" });
@@ -231,10 +217,7 @@ test("no pictograph characters remain inside the medic's text", () => {
 });
 
 test("every card topic matches the topic table where one exists", () => {
-  const expected = {
-    "vision-change": "vision", fever: "immune", storm: "radiation",
-    breath: "heart", "cabin-air": null, "self-harm": "mental",
-  };
+  const expected = { "vision-change": "vision", fever: "immune", storm: "radiation", breath: "heart", "cabin-air": null, "self-harm": "mental" };
   const known = new Set(["bones", "kidneys", "immune", "radiation", "mental", "sleep", "vision", "nutrition", "heart", "exercise"]);
   for (const [id, topic] of Object.entries(expected)) {
     assert.equal(CARD_BY_ID.get(id).topic, topic, id);
@@ -316,6 +299,7 @@ test("the section markup lives in Preact components and the module builds no HTM
   const page = read("src", "components", "App.jsx");
   const area = read("src", "components", "shell", "AreaView.jsx");
   const view = read("src", "components", "emergencies", "EmergenciesView.jsx");
+  const vitals = read("src", "components", "emergencies", "VitalsReference.jsx");
   const index = read("src", "components", "emergencies", "EmergencyIndex.jsx");
   const script = read("src", "scripts", "emergencies.js");
   assert.match(area, /<EmergenciesView \/>/);
@@ -323,6 +307,11 @@ test("the section markup lives in Preact components and the module builds no HTM
   assert.match(view, /import "\.\/emergencies\.css"/);
   assert.match(view, /<EmergencyIndex/);
   assert.match(view, /<EmergencyCard/);
+  assert.match(view, /<VitalsReference/);
+  assert.match(vitals, /VitalsCheck/);
+  assert.match(vitals, /VITALS_REFERENCE/);
+  assert.match(vitals, /RangeBar/);
+  assert.match(index, /openEmergency\("vitals"\)/);
   assert.match(index, /indexCards/);
   assert.match(index, /SearchBox/);
   assert.match(index, /VitalEntry/);
@@ -360,6 +349,16 @@ test("search matches titles, symptoms, terms and the shared self-harm card", asy
   assert.equal(matchesQuery(ANEMIA, "anemia"), true);
   assert.deepEqual(filterCards(indexCards(6), "calf").map((card) => card.id), ["calf"]);
   assert.equal(filterCards(indexCards(6), "zzz").length, 0);
+});
+
+test("the vital-sign scale places every number at its position", async () => {
+  const { rangeMarks, valuePercent } = await import("../src/scripts/emergencies.js");
+  const pulse = VITALS_REFERENCE.bars[0];
+  assert.deepEqual(rangeMarks(pulse).map((mark) => [mark.value, Math.round(mark.percent), mark.anchor]),
+    [[30, 0, "start"], [60, 23, "middle"], [100, 54, "middle"], [160, 100, "end"]]);
+  assert.deepEqual(rangeMarks(VITALS_REFERENCE.bars[2]).map((mark) => mark.value), [80, 95, 100]);
+  assert.equal(Math.round(valuePercent(pulse, 80)), 38);
+  assert.equal(valuePercent(pulse, 200), 100);
 });
 
 test("the blood loss table is one row per class with words, not arrows", async () => {

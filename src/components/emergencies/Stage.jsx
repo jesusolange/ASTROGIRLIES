@@ -8,7 +8,7 @@ export default function Stage({ block }) {
     <section class="am-panel emg-panel emg-stage">
       <div class="emg-sh"><i>{block.n}</i><h4><RichText text={block.title} /></h4></div>
       {block.ask ? <p class="emg-ask"><RichText text={block.ask} /></p> : null}
-      <div class={`emg-stage-body${block.diagram ? "" : " one"}`}>
+      <div class={`emg-stage-body${block.diagram ? "" : " one"}${block.layout === "compare" ? " compare" : ""}`}>
         {block.diagram ? (
           <div class="emg-stage-figure">
             {block.diagram.map((child, index) => <Block block={child} key={index} />)}

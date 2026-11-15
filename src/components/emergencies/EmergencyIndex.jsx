@@ -15,7 +15,7 @@ import VitalEntry from "./VitalEntry.jsx";
 const VITAL = {
   id: "vitals",
   title: "Check vital signs",
-  sign: "Pulse, breathing, oxygen and temperature, judged as you type.",
+  sign: "Reference values and a quick check you can do now.",
 };
 
 function toEntry(card, kind) {
@@ -32,7 +32,8 @@ function toEntry(card, kind) {
 }
 
 function openEntry(entry) {
-  if (entry.kind === "emergency") openEmergency(entry.id);
+  if (entry.kind === "vital") openEmergency("vitals");
+  else if (entry.kind === "emergency") openEmergency(entry.id);
   else openCard(entry.id);
 }
 

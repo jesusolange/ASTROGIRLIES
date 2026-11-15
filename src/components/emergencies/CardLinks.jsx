@@ -17,23 +17,34 @@ function collectLinks(blocks, out = []) {
   return out;
 }
 
+function addCard(deck, id, seen, buttons) {
+  const known = findCard(deck, id);
+  if (!known || seen.has(known.id)) return;
+  seen.add(known.id);
+  buttons.push({ id: known.id, label: known.title });
+}
+
 export default function CardLinks({ card }) {
   const deck = allCards();
   const blockLinks = new Set(collectLinks(card.blocks));
   const seen = new Set();
   const buttons = [];
 
-  for (const topic of topicsFor(card.id)) {
-    const checks = cardsForTopic(topic.id, deck);
-    if (!checks.length && CHECK_IDS.includes(topic.id) && !seen.has(topic.id)) {
-      seen.add(topic.id);
-      buttons.push({ id: topic.id, label: `Open the ${topic.label} check` });
-      continue;
-    }
-    for (const check of checks) {
-      if (!check || !check.id || seen.has(check.id)) continue;
-      seen.add(check.id);
-      buttons.push({ id: check.id, label: check.title });
+  if (card.checks && Array.isArray(card.checks.ids)) {
+    for (const id of card.checks.ids) addCard(deck, id, seen, buttons);
+  } else {
+    for (const topic of topicsFor(card.id)) {
+      const checks = cardsForTopic(topic.id, deck);
+      if (!checks.length && CHECK_IDS.includes(topic.id) && !seen.has(topic.id)) {
+        seen.add(topic.id);
+        buttons.push({ id: topic.id, label: `Open the ${topic.label} check` });
+        continue;
+      }
+      for (const check of checks) {
+        if (!check || !check.id || seen.has(check.id)) continue;
+        seen.add(check.id);
+        buttons.push({ id: check.id, label: check.title });
+      }
     }
   }
 
@@ -48,6 +59,7 @@ export default function CardLinks({ card }) {
   return (
     <section class="emg-links">
       <h3>Check this now</h3>
+      {card.checks && card.checks.note ? <p class="emg-links-note">{card.checks.note}</p> : null}
       <div class="emg-links-row">
         {buttons.map((button) => (
           <Button key={button.id} variant="soft" onClick={() => openCard(button.id)}>{button.label}</Button>
