@@ -1,0 +1,375 @@
+/* Interactive kit components: icons, chips, steps, terms, dialog, toast and the check card.
+   Colours come from tokens.css only. */
+
+/* ---------- Icon ---------- */
+
+.ui-icon {
+  flex: none;
+  vertical-align: middle;
+}
+
+/* ---------- Chips ---------- */
+
+.ui-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 16px;
+  color: var(--am-text);
+  background: color-mix(in srgb, var(--am-text) 8%, transparent);
+  border: 1px solid var(--am-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.ui-chip:hover {
+  background: var(--am-surface-hover);
+}
+
+.ui-chip.is-selected {
+  color: var(--am-on-accent);
+  background: var(--am-accent-strong);
+  border-color: var(--am-accent);
+}
+
+.ui-chip-mark {
+  display: inline-grid;
+  place-items: center;
+  min-width: 14px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* ---------- Steps ---------- */
+
+.ui-steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.ui-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--am-text);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.ui-step-num {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: var(--am-text);
+  background: none;
+  border: 2px solid var(--am-border-strong);
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ui-step-text {
+  padding-top: 4px;
+}
+
+.ui-step-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--am-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ---------- Term ---------- */
+
+.ui-term {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -13px 0;
+  padding: 0 2px;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-decoration: underline dashed;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+.ui-term-pop {
+  position: fixed;
+  inset: auto;
+  left: var(--ui-term-left, 8px);
+  top: var(--ui-term-top, 8px);
+  width: var(--ui-term-width, 18rem);
+  margin: 0;
+  padding: 12px 14px;
+  color: var(--am-text);
+  background: var(--am-bg-raised);
+  border: 1px solid var(--am-border-strong);
+  border-radius: var(--am-radius-small);
+  box-shadow: var(--am-shadow);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* ---------- Dialog ---------- */
+
+.ui-dialog {
+  width: min(560px, 94vw);
+  max-width: min(560px, 94vw);
+  max-height: 88vh;
+  padding: 0;
+  color: var(--am-text);
+  background: var(--am-bg-raised);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+  box-shadow: var(--am-shadow);
+}
+
+.ui-dialog::backdrop {
+  background: var(--am-overlay);
+}
+
+.ui-dialog-body {
+  padding: 18px 20px 20px;
+}
+
+.ui-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ui-dialog-head h2 {
+  margin: 0;
+  color: var(--am-heading);
+  font-size: 18px;
+}
+
+.ui-dialog-close {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--am-text);
+  background: none;
+  border: 0;
+  border-radius: var(--am-radius-small);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ui-dialog-close:hover {
+  background: var(--am-surface-hover);
+}
+
+.ui-dialog-content {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ui-dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* ---------- Toasts ---------- */
+
+.ui-toasts {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  z-index: 80;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: min(440px, calc(100vw - 24px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.ui-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 8px 8px 16px;
+  color: var(--am-text);
+  background: var(--am-bg-raised);
+  border: 1px solid var(--am-border-strong);
+  border-radius: var(--am-radius-small);
+  box-shadow: var(--am-shadow);
+  font-size: 13px;
+  pointer-events: auto;
+  animation: ui-toast-in 160ms ease-out;
+}
+
+.ui-toast-text {
+  flex: 1;
+}
+
+.ui-toast-undo {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--am-accent);
+  background: none;
+  border: 0;
+  border-radius: var(--am-radius-small);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ui-toast-undo:hover {
+  background: var(--am-surface-hover);
+}
+
+@keyframes ui-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- CheckCard ---------- */
+
+.ui-card {
+  margin: 0;
+  padding: 22px;
+  color: var(--am-text);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--am-surface-2) 74%, transparent),
+    color-mix(in srgb, var(--am-bg-raised) 78%, transparent)
+  );
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+  box-shadow: var(--am-shadow), inset 0 1px 0 color-mix(in srgb, var(--am-text) 6%, transparent);
+}
+
+.ui-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.ui-card-title {
+  margin: 0;
+  color: var(--am-heading);
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+
+.ui-card-art {
+  flex: none;
+  width: 128px;
+  max-width: 32%;
+}
+
+.ui-card-art img,
+.ui-card-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--am-radius-small);
+}
+
+.ui-card-body {
+  display: grid;
+  gap: 14px;
+}
+
+.ui-card-lead {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ui-card-result {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--am-text) 5%, transparent);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+}
+
+.ui-card-saw,
+.ui-card-todo {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ui-card-todo b {
+  color: var(--am-text);
+}
+
+.ui-card-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.ui-card.is-leaving {
+  animation: ui-card-leave 190ms ease-in forwards;
+}
+
+@keyframes ui-card-leave {
+  to {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+
+@media (max-width: 520px) {
+  .ui-card-head {
+    flex-direction: column-reverse;
+  }
+
+  .ui-card-art {
+    width: 100%;
+    max-width: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-card.is-leaving {
+    animation: none;
+  }
+
+  .ui-toast {
+    animation: none;
+  }
+}

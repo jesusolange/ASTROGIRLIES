@@ -1,5 +1,32 @@
 /* Shared interface components. Colours come only from tokens.css. */
 
+/* ---------- Focus and scrollbars ---------- */
+
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--am-border-strong) var(--am-bg);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--am-bg);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--am-border-strong);
+  border: 2px solid var(--am-bg);
+  border-radius: 999px;
+}
+
 /* ---------- Panel ---------- */
 
 .ui-panel {
@@ -33,7 +60,12 @@
 /* ---------- Button ---------- */
 
 .ui-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
   margin-top: 16px;
   padding: 12px 22px;
   color: var(--am-text);
@@ -113,6 +145,7 @@
 .ui-field select,
 .ui-field input {
   min-width: 220px;
+  min-height: 44px;
   padding: 10px 12px;
   color: var(--am-text);
   background: color-mix(in srgb, var(--am-text) 7%, transparent);
@@ -148,6 +181,8 @@
 }
 
 .ui-tab {
+  min-height: 44px;
+  min-width: 44px;
   padding: 10px 18px;
   color: var(--am-text);
   background: color-mix(in srgb, var(--am-text) 12%, transparent);
@@ -203,8 +238,17 @@
 /* ---------- SourceLink ---------- */
 
 .ui-source {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 2px;
   color: var(--am-accent);
+  background: none;
+  border: 0;
+  font: inherit;
   font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /* ---------- Findings ---------- */
