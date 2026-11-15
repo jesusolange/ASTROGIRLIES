@@ -6,11 +6,14 @@
    Status bands (50% / 80% of the limit) are illustrative design choices. */
 
 import { alsoTell } from "./mission.js";
+import { missionDayFor, totalFor } from "./profile.js";
+import { KEYS as ENV_KEYS } from "./environment.js";
 
 export const KEY = "astromed-radiation";
 export const LIMIT = 600;
 export const SPE_LIMIT = 250;
 
+// Reference dose rates. The table is rendered in the Sources dialog from this export.
 export const REF = [
   { place: "ISS (low Earth orbit)", v: "about 0.7", note: "731 µSv/day measured by DOSIS 3D on the ISS", src: "Zhang et al. 2020 (DOSIS 3D)", url: "https://doi.org/10.1126/sciadv.aaz1334", src2: "NASA HRP", url2: "https://www.nasa.gov/hrp/elements/radiation/" },
   { place: "Moon surface", v: "about 1.37", note: "1369 µSv/day (about 57 µSv/h) measured by Chang'e-4 LND; roughly twice the ISS", src: "Zhang et al. 2020, Science Advances", url: "https://doi.org/10.1126/sciadv.aaz1334" },
@@ -42,6 +45,34 @@ export function levelForProjection(projected, limit = LIMIT) {
   return projected >= limit ? "alert" : projected >= limit * 0.8 ? "review" : "ok";
 }
 
+// The card accepts mSv or µSv and always stores mSv.
+export function convertToMsv(value, unit) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return null;
+  return unit === "µSv" || unit === "uSv" ? number / 1000 : number;
+}
+
+export function addDose(state, entry) {
+  const record = {
+    id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+    day: entry.day,
+    dose: entry.dose,
+    src: entry.src
+  };
+  return { state: { ...state, entries: [...(state.entries || []), record] }, entry: record };
+}
+
+export function removeDose(state, id) {
+  return { ...state, entries: (state.entries || []).filter((entry) => entry.id !== id) };
+}
+
+export function missionFor(profile) {
+  return {
+    missionDay: profile && profile.startDate ? missionDayFor(profile) : null,
+    total: totalFor(profile)
+  };
+}
+
 function profileMission() {
   const profileApi = typeof window !== "undefined" ? window.AstroMedProfile : null;
   const profile = profileApi && profileApi.get ? profileApi.get() : null;
@@ -70,6 +101,12 @@ export function calc(state, mission) {
   };
 }
 
+// The numbers Progress draws for "Projected mission dose".
+export function projection(state, mission) {
+  const c = calc(state, mission);
+  return { projected: c.projected, left: c.left, rate: c.rate, level: c.projLevel, career: c.career, pct: c.pct };
+}
+
 const read = (key, fallback) => (typeof window !== "undefined" && window.AstroMedStore ? window.AstroMedStore.store.get(key, fallback) : fallback);
 const write = (key, value) => { if (typeof window !== "undefined" && window.AstroMedStore) window.AstroMedStore.store.set(key, value); };
 
@@ -80,12 +117,22 @@ export function load() {
 
 export const save = (state) => write(KEY, state);
 
-export function render() {}
-
 export function openStormSteps() {
   if (typeof window === "undefined") return;
   if (window.AstroMedEmergencies) window.AstroMedEmergencies.open("solar-storm");
   else window.AstroMedNav?.show("emergencies");
+}
+
+export function recordedToday(now = new Date()) {
+  return load().entries.some((entry) => entry.day === isoDay(now));
+}
+
+// The cabin dose-rate reading from the Cabin conditions record, converted to a daily dose.
+export function cabinRate() {
+  const state = read(ENV_KEYS.state, null);
+  const microSvPerHour = state && state.readings ? Number(state.readings.radiation) : NaN;
+  if (!Number.isFinite(microSvPerHour)) return null;
+  return { microSvPerHour, mSvPerDay: (microSvPerHour * 24) / 1000 };
 }
 
 export function status() {
@@ -121,5 +168,5 @@ export function findings() {
 }
 
 if (typeof window !== "undefined") {
-  window.AstroMedRadiation = { render, status, findings, LIMIT };
+  window.AstroMedRadiation = { status, findings, LIMIT };
 }

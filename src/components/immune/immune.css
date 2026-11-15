@@ -1,26 +1,38 @@
-/* Immune watch. Colours come only from the --am-* tokens. Shared td-* rules live in today.css. */
+/* Immune watch: symptoms and lab results. Colours come only from the --am-* tokens. */
 
-.im-sub { margin: 18px 0 6px; color: var(--am-heading); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
-
-.im-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-.im-pill {
-  padding: 8px 14px;
+.im-lead {
+  margin: 0 0 14px;
   color: var(--am-text-muted);
-  background: var(--am-field-bg);
-  border: 1px solid var(--am-border);
-  border-radius: 999px;
-  font: inherit;
   font-size: 13px;
-  cursor: pointer;
+  line-height: 1.6;
 }
-.im-pill:hover, .im-pill:focus-visible { border-color: var(--am-border-strong); color: var(--am-text); outline: none; }
-.im-pill[aria-pressed="true"] { color: var(--am-on-accent); background: var(--am-accent); border-color: var(--am-accent); font-weight: 700; }
 
-.im-status { display: grid; gap: 3px; margin: 10px 0; padding: 12px 14px; border-left: 4px solid var(--im-tone, var(--am-border)); background: var(--am-field-bg); border-radius: var(--am-radius-small); }
+.im-status {
+  display: grid;
+  gap: 4px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-left: 4px solid var(--im-tone, var(--am-border));
+  background: var(--am-field-bg);
+  border-radius: var(--am-radius-small);
+}
+
 .im-status b { color: var(--im-tone, var(--am-text)); }
-.im-status span { color: var(--am-text-muted); font-size: 12px; }
+.im-status span { color: var(--am-text-muted); font-size: 12px; line-height: 1.55; }
 .im-ok { --im-tone: var(--am-ok); }
 .im-review { --im-tone: var(--am-warn); }
 .im-alert { --im-tone: var(--am-danger); }
 
-.im-actions { margin: 10px 0; padding-left: 20px; color: var(--am-text-muted); font-size: 13px; line-height: 1.65; }
+.im-lab .ui-field { margin-bottom: 12px; }
+.im-lab .ui-field select,
+.im-lab .ui-field input { width: 100%; box-sizing: border-box; }
+
+.im-value-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .im-value-row { grid-template-columns: 1fr; gap: 0; }
+}

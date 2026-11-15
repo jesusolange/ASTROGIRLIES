@@ -1,78 +1,41 @@
-// A questionnaire form. Each question is one row of radio choices, grouped as the section needs.
-// Props: id (form id), groups ([{ label?, items: [{ index, text }] }]), options (answer labels),
-// columns (3 or 4), values (answer per question index), onAnswer(index, value), required,
-// submitLabel, onSubmit().
+// One questionnaire: each question is a row of radio choices, grouped as the section needs.
+// Props: groups ([{ label?, items: [{ index, text }] }]), options (answer labels), columns (3 or 4),
+// answers (one value per question index), onAnswer(index, value), error (message), optionRef(name) for focus.
 import { Fragment } from "preact";
-import { useRef, useState } from "preact/hooks";
-import Button from "../ui/Button.jsx";
+import { useId } from "preact/hooks";
 
-export default function Questionnaire({
-  id,
-  groups,
-  options,
-  columns,
-  values,
-  onAnswer,
-  required = false,
-  submitLabel = "See my result",
-  onSubmit,
-}) {
-  const [errorIndex, setErrorIndex] = useState(null);
-  const firstOption = useRef([]);
-
-  function answer(index, value) {
-    if (errorIndex === index) setErrorIndex(null);
-    onAnswer(index, value);
-  }
-
-  function submit(event) {
-    event.preventDefault();
-    if (required) {
-      const missing = values.findIndex((value) => value == null);
-      if (missing >= 0) {
-        setErrorIndex(missing);
-        firstOption.current[missing]?.focus();
-        return;
-      }
-    }
-    setErrorIndex(null);
-    onSubmit();
-  }
+export default function Questionnaire({ groups, options, columns = 4, answers, onAnswer, error, optionRef }) {
+  const base = useId();
+  const firstMissing = answers.findIndex((value) => value == null);
 
   return (
-    <form id={id} onSubmit={submit} noValidate>
+    <div class="mh-questionnaire">
+      {error ? <p class="ui-field-error mh-q-error" role="alert">{error}</p> : null}
       {groups.map((group, groupIndex) => (
         <Fragment key={group.label || groupIndex}>
-          {group.label ? <h4 class="am-cat">{group.label}</h4> : null}
+          {group.label ? <h4 class="mh-cat">{group.label}</h4> : null}
           {group.items.map((question) => (
-            <Fragment key={question.index}>
-              <div class={`am-q ${columns === 3 ? "am-q-row" : ""}`.trim()}>
-                <p>{question.text}</p>
-                <div class={`am-opts am-opts-${columns}`}>
-                  {options.map((option, value) => (
-                    <label key={value}>
-                      <input
-                        type="radio"
-                        name={`${id}-q${question.index}`}
-                        value={value}
-                        checked={values[question.index] === value}
-                        aria-invalid={errorIndex === question.index}
-                        ref={value === 0 ? (element) => { firstOption.current[question.index] = element; } : undefined}
-                        onChange={() => answer(question.index, value)}
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
+            <div class={`mh-q ${columns === 3 ? "mh-q-row" : ""}`.trim()} key={question.index}>
+              <p>{question.text}</p>
+              <div class={`mh-opts mh-opts-${columns}`}>
+                {options.map((option, value) => (
+                  <label key={value}>
+                    <input
+                      type="radio"
+                      name={`${base}-q${question.index}`}
+                      value={value}
+                      checked={answers[question.index] === value}
+                      onChange={() => onAnswer(question.index, value)}
+                      ref={question.index === firstMissing && value === 0 ? optionRef : undefined}
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
               </div>
-              {errorIndex === question.index
-                ? <p class="ui-field-error" role="alert">Choose an answer for this question.</p>
-                : null}
-            </Fragment>
+            </div>
           ))}
         </Fragment>
       ))}
-      <Button type="submit">{submitLabel}</Button>
-    </form>
+    </div>
   );
 }

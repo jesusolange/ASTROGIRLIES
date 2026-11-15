@@ -1,7 +1,14 @@
-/* Mental health self-check: scoring, in-section results, history and the urgent response.
-   Screening aid, not a medical device and not a diagnosis. */
+/* Mental health self-check: scoring, the urgent response and the stored results.
+   Screening aid, not a medical device and not a diagnosis.
+   The score bands and the return interval are our design choices. */
 
 import { alsoTell, hasCrew, link } from "./mission.js";
+import { daysSince, intervalFor } from "./home.js";
+import { currentMission, rankedRisks } from "./risks.js";
+import { TOPIC_BY_ID } from "../data/topics.js";
+import { CARD_BY_ID } from "../data/emergencies.js";
+import { ALCOHOL_IDX, CATS, STRESS_Q } from "../components/mental/questions.js";
+import { depTip, stressCatTip } from "../components/mental/guidance.js";
 
 export const KEYS = { mental: "astromed-mental", history: "astromed-mental-history" };
 
@@ -28,99 +35,29 @@ export function suicidalResponse(options = {}) {
     title: "Please get help now",
     text: join("You answered that you have had thoughts of being better off dead or of hurting yourself.", SOLO_SAFE, crew ? CREW_NEAR : "", second),
     actions,
-    button: "Open Emergencies"
+    button: "Open the full card"
   };
 }
 
-export const SUICIDAL_RESPONSE = {
-  get title() { return suicidalResponse().title; },
-  get text() { return suicidalResponse().text; },
-  get actions() { return suicidalResponse().actions; },
-  get button() { return suicidalResponse().button; }
-};
-const FLAGGED_LABEL = "Needs attention";
-const FLAGGED_MEANING = "This answer needs attention whatever the total score is.";
-
-export const DEP_OPTS = ["Not at all", "On certain days", "More than half the time", "Almost every day"];
-
-export const DEP_Q = [
-  "Decreased interest in everyday activities and/or no fulfilment",
-  "Despondency or helplessness",
-  "Problems falling asleep, insufficient sleep or sleeping more",
-  "Tiredness or a feeling of fatigue",
-  "Loss of appetite or increased need to eat",
-  "Negative thoughts about yourself: feeling like a failure or like you disappoint your family",
-  "Hard time concentrating, for example when reading or watching TV",
-  "Your speech has become slower and others have commented on it, or the opposite: you speak very fast",
-  "Have you wished you were dead or had suicidal thoughts"
-];
-
-export function depTip(index, options = {}) {
-  const { crew, tell } = context(options);
-  const tips = [
-    "Plan one small activity you enjoy every day (music, a hobby, photographing Earth, a call home).",
-    join("Write down how you feel and what you would say out loud.", crew ? "Share how you feel with a crewmate." : "", "Feeling helpless is common on long missions and it can be worked on.", tell()),
-    "Keep a fixed sleep schedule, dim the lights and avoid screens and caffeine in the hour before sleep.",
-    "Review your workload, sleep and nutrition together, and schedule real rest blocks.",
-    "Keep regular meals, track what you eat and report unintended weight changes.",
-    join("Write down three things you did well today.", crew ? "Talk with a crewmate about these thoughts." : "Write what you would say to someone you trust about these thoughts.", tell()),
-    "Work in short, focused blocks with breaks and avoid multitasking.",
-    join("Speak a few sentences aloud and note whether your speech is faster or slower than usual.", crew ? "Ask a crewmate if they notice the same change." : "", tell("the flight surgeon about the speech change"))
-  ];
-  return tips[index] || null;
-}
-
-export const STRESS_OPTS = ["None", "Slight", "Strong"];
-
-export const CATS = { body: "Body signs", emotional: "Emotional signs", cognitive: "Cognitive signals", behavioural: "Behavioural signs" };
-
-export const STRESS_Q = [
-  ["Heart pounding", "body"], ["Tightness in the chest", "body"], ["Breathing problems", "body"],
-  ["Problems falling asleep", "body"], ["Chronic fatigue", "body"], ["Digestion problems", "body"],
-  ["Stomach pain", "body"], ["Loss of appetite", "body"], ["Muscle tightness", "body"],
-  ["Back pain", "body"], ["Cold hands/feet", "body"], ["Strong sweating", "body"],
-
-  ["Nervousness", "emotional"], ["Irritability or anger issues", "emotional"], ["Fear", "emotional"],
-  ["Dissatisfaction", "emotional"], ["Loss of interest", "emotional"], ["Inner emptiness", "emotional"],
-  ["Nightmares", "emotional"],
-
-  ["Constantly circling thoughts", "cognitive"], ["Difficulty concentrating", "cognitive"],
-  ["Feeling mentally blank/blackout", "cognitive"], ["Daydreaming", "cognitive"],
-  ["Reduced performance/frequent mistakes", "cognitive"],
-
-  ["Aggression towards others", "behavioural"],
-  ["Drumming fingers, shuffling feet, trembling, grinding teeth", "behavioural"],
-  ["Speaking rapidly or stuttering", "behavioural"],
-  ["Interrupting others, inability to listen", "behavioural"],
-  ["Eating irregularly", "behavioural"],
-  ["Consuming alcohol (or medication) to calm down", "behavioural"],
-  ["Neglecting personal relationships", "behavioural"],
-  ["Smoking more than desired", "behavioural"],
-  ["Getting less exercise or physical activity than desired", "behavioural"]
-];
-const ALCOHOL_IDX = STRESS_Q.findIndex((q) => q[0].startsWith("Consuming alcohol"));
-
-export function stressCatTip(cat, options = {}) {
-  const { crew, tell } = context(options);
-  const tips = {
-    body: "Try slow breathing (4 seconds in, 6 out) and progressive muscle relaxation for 10 minutes. Exercise sessions also release tension.",
-    emotional: join("Name the emotion and write down what is behind it, then protect some private, quiet time.", crew ? "Talk it through with a crewmate." : "", tell()),
-    cognitive: "Write your circling thoughts down, then pick one task and finish it. Use short breaks to reset your focus.",
-    behavioural: join("Pick one habit to adjust this week.", crew ? "Keep contact with family and crew, and keep your exercise routine." : "Keep contact with family and keep your exercise routine.")
+// The medic's self-harm card content, addressed by crew and link. The solo step always comes first.
+export function selfHarmContent(options = {}) {
+  const card = CARD_BY_ID.get("self-harm");
+  const response = suicidalResponse(options);
+  const crew = options.crew != null ? Boolean(options.crew) : hasCrew();
+  const escalate = card && Array.isArray(card.escalate) ? card.escalate : [];
+  return {
+    title: card ? card.title : response.title,
+    sign: card ? card.sign : "Thoughts of suicide or of hurting yourself",
+    steps: response.actions,
+    escalate: crew ? escalate : escalate.filter((line) => !/crewmate/i.test(line))
   };
-  return tips[cat] || "";
 }
 
-export const MOODS = [["Great", "great"], ["Okay", "okay"], ["Stressed", "stressed"], ["Down", "down"], ["Not sure", "unsure"]];
-
-export const MOOD_REPLIES = {
-  great: ["dep", "A short check-in now and then still helps you notice trends. Choose either test."],
-  okay: ["dep", "Take the depression and isolation check-in, or switch to the stress test."],
-  stressed: ["stress", "That sounds heavy. The stress and burn-out test is open."],
-  down: ["dep", "That sounds difficult, and checking in is a good step. The isolation and depression test is open."],
-  unsure: ["dep", "That is fine. Start with this test, and try the stress one afterwards. Together they give a clearer picture."]};
 const NAMES = { depression: "Isolation & depression", stress: "Stress & burn-out" };
 const TYPES = ["depression", "stress"];
+
+const FLAGGED_LABEL = "Needs attention";
+const FLAGGED_MEANING = "This answer needs attention whatever the total score is.";
 
 const DEP_MEANING = {
   "Healthy": "Your answers do not point to depression symptoms on this check-in.",
@@ -143,7 +80,7 @@ export function depActions(label, options = {}) {
     "Severe depression symptoms": [
       join("Write down how you feel and what you need, and keep it with you to read to someone today.", tell()),
       join("Do not stay alone: keep the lights on and stay in the main module.", crew ? CREW_NEAR : ""),
-      join("Keep to your sleep and meal routine.", crew ? "Ask a crewmate to check in on you." : "")
+      "Keep to your sleep and meal routine." + (crew ? " Ask a crewmate to check in on you." : "")
     ]
   };
   return actions[label] || [];
@@ -201,6 +138,8 @@ export function stressSub(answers) {
 const store = () => (typeof window !== "undefined" && window.AstroMedStore && window.AstroMedStore.store) || null;
 const load = (key, fallback) => { const s = store(); return s ? s.get(key, fallback) : fallback; };
 const save = (key, value) => { const s = store(); return s ? s.set(key, value) : false; };
+
+const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 export function latest() {
   return load(KEYS.mental, {}) || {};
@@ -275,10 +214,54 @@ export function saveResult(type, answers) {
   return entry;
 }
 
-export function saveMood(value) {
+// Takes the just-saved result back out and restores the previous one of the same type.
+export function removeResult(type, date) {
+  const rows = readHistory().filter((entry) => !(entry && entry.type === type && entry.date === date));
+  save(KEYS.history, rows);
   const m = latest();
-  m.mood = { value, date: new Date().toISOString() };
+  const previous = rows.filter((entry) => entry.type === type).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  if (previous) {
+    m[type] = {
+      score: previous.score, label: previous.label, level: previous.level, answers: previous.answers,
+      sub: previous.sub, date: previous.date, flagged: previous.flagged
+    };
+  } else {
+    delete m[type];
+  }
   save(KEYS.mental, m);
+}
+
+export function saveMood(value, note = "") {
+  const m = latest();
+  const before = m.mood ? { ...m.mood } : null;
+  m.mood = { value, note: String(note || ""), date: new Date().toISOString() };
+  save(KEYS.mental, m);
+  return () => {
+    const next = latest();
+    if (before) next.mood = before;
+    else delete next.mood;
+    save(KEYS.mental, next);
+  };
+}
+
+export function moodToday(now = new Date()) {
+  const mood = latest().mood;
+  return Boolean(mood && mood.date && isoDay(new Date(mood.date)) === isoDay(now));
+}
+
+// The topic's return interval, from the NASA rating of the mission (our design choice).
+export function topicIntervalDays(topicId = "mental") {
+  const topic = TOPIC_BY_ID.get(topicId);
+  if (!topic) return 7;
+  const score = rankedRisks(currentMission().id)
+    .reduce((max, risk) => (topic.riskIds.includes(risk.id) ? Math.max(max, risk.score || 0) : max), 0);
+  return intervalFor(score).days;
+}
+
+export function questionnaireDue(type, now = new Date()) {
+  const result = latest()[type];
+  if (!result || !result.date) return true;
+  return daysSince(isoDay(new Date(result.date)), now) >= topicIntervalDays("mental");
 }
 
 export function resultLabel(entry) {
@@ -316,8 +299,8 @@ export function analyzeMental(options = {}) {
     const flagged = suicidalFlag(d.answers);
     out.mental.push({
       level: flagged ? "alert" : d.level,
-      title: "Isolation & depression check-in",
-      saw: `Score ${d.score}/27: ${flagged ? FLAGGED_LABEL : d.label}.`,
+      title: "Isolation and depression check-in",
+      saw: flagged ? "Needs attention whatever the total score is." : `Score ${d.score}/27: ${d.label}.`,
       todo: flagged ? suicidalResponse(options).actions.join(" ")
         : depActions(d.label, options).join(" ") || "Keep your routine and repeat the check-in."
     });
@@ -345,7 +328,7 @@ export function analyzeMental(options = {}) {
     const b = stressBand(s.score);
     out.mental.push({
       level: b.level,
-      title: "Stress & burn-out check-in",
+      title: "Stress and burn-out check-in",
       saw: `Score ${s.score}/${stressMax()}: ${b.label}.`,
       todo: stressActions(b.label, options).join(" ") || "Repeat the check-in and protect your rest."
     });
@@ -383,8 +366,8 @@ export function protocolRows() {
   const m = latest();
   return [
     { name: "Mood check", value: m.mood ? `${m.mood.value} · ${stamp(m.mood.date)}` : "" },
-    { name: "Isolation & depression", value: m.depression ? `${m.depression.score}/27 · ${m.depression.label}` : "" },
-    { name: "Stress & burn-out", value: m.stress ? `${m.stress.score}/${stressMax()} · ${m.stress.label}` : "" }
+    { name: "Isolation and depression", value: m.depression ? `${m.depression.score}/27 · ${m.depression.label}` : "" },
+    { name: "Stress and burn-out", value: m.stress ? `${m.stress.score}/${stressMax()} · ${m.stress.label}` : "" }
   ];
 }
 
@@ -396,4 +379,3 @@ export function findings() {
 if (typeof window !== "undefined") {
   window.AstroMedMental = { findings, history, latest, analyze: analyzeMental, saveResult, protocolRows };
 }
-

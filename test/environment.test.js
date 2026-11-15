@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  PLACES, FIELDS, evaluate, baselineFor, labelFrom, findingsFrom
+  PLACES, FIELDS, evaluate, baselineFor, labelFrom, findingsFrom, overallLevel, readingsResult, profilePlace
 } from "../src/scripts/environment.js";
 
 test("temperature follows the stated bands", () => {
@@ -90,4 +90,26 @@ test("findings keep ok and warn rows but drop the first-baseline info row", () =
 test("every reading field and the cruise dose rate stay in place", () => {
   assert.equal(FIELDS.length, 6);
   assert.equal(PLACES.transit.rad, 76.7);
+});
+
+test("overall level keeps the worst reading and the info row is allowed", () => {
+  assert.equal(overallLevel([{ level: "ok" }, { level: "review" }]), "review");
+  assert.equal(overallLevel([{ level: "review" }, { level: "alert" }]), "alert");
+  assert.equal(overallLevel([{ level: "info" }, { level: "info" }]), "info");
+  assert.equal(overallLevel([]), "info");
+});
+
+test("the reading rows keep their value and unit", () => {
+  const rows = readingsResult({ co2: 6000, temp: 22 }, "mars", []);
+  assert.equal(rows.length, 2);
+  const co2 = rows.find((row) => row.key === "co2");
+  assert.equal(co2.value, 6000);
+  assert.equal(co2.unit, "ppm");
+  assert.equal(co2.level, "alert");
+});
+
+test("the destination comes from the profile mission", () => {
+  assert.equal(profilePlace(null), "mars");
+  assert.equal(profilePlace({ missionType: "leo-long" }), "iss");
+  assert.equal(profilePlace({ missionType: "lunarSurface-long" }), "moon");
 });

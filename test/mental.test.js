@@ -94,3 +94,20 @@ test("history compares each result with the previous one of the same questionnai
   assert.equal(out[1].previous, null);
   assert.equal(out[2].delta, null);
 });
+
+test("the urgent result puts the solo step first and hides crewmate text from a solo mission", () => {
+  const alone = Mental.selfHarmContent({ crew: false, link: { kind: "none" } });
+  assert.equal(alone.steps[0], "Move away from airlock controls, tools, medicines and anything else you could use to hurt yourself.");
+  assert.ok(alone.steps.every((line) => !/crewmate/i.test(line)));
+  assert.ok(alone.escalate.every((line) => !/crewmate/i.test(line)));
+
+  const crewed = Mental.selfHarmContent({ crew: true, link: { kind: "delayed", roundTrip: "6 to 44 min" } });
+  assert.ok(crewed.steps.some((line) => /stay with a crewmate/i.test(line)));
+  assert.ok(crewed.steps.some((line) => /also tell the flight surgeon/i.test(line)));
+  assert.ok(crewed.escalate.some((line) => /crewmate/i.test(line)));
+});
+
+test("the questionnaire interval follows the topic rating", () => {
+  const days = Mental.topicIntervalDays("mental");
+  assert.ok(Number.isInteger(days) && days >= 1 && days <= 7);
+});

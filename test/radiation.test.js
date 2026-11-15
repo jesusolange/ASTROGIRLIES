@@ -79,3 +79,21 @@ test("reference table keeps the primary sources and measured rates", () => {
   assert.equal(REF[0].src2, "NASA HRP");
   assert.deepEqual(PLACE_RATE, { iss: 0.73, moon: 1.37, mars: 0.64, rover: null, other: null });
 });
+
+test("a dose can be added, converted and removed", async () => {
+  const { convertToMsv, addDose, removeDose, projection } = await import("../src/scripts/radiation.js");
+  assert.equal(convertToMsv(500, "µSv"), 0.5);
+  assert.equal(convertToMsv(0.5, "mSv"), 0.5);
+  assert.equal(convertToMsv("x", "mSv"), null);
+
+  const empty = { prior: 0, entries: [] };
+  const added = addDose(empty, { day: "2026-11-15", dose: 0.5, src: "dosimeter" });
+  assert.equal(added.state.entries.length, 1);
+  assert.equal(added.entry.dose, 0.5);
+  assert.equal(removeDose(added.state, added.entry.id).entries.length, 0);
+
+  const numbers = projection({ prior: 10, entries: [{ day: "2026-11-01", dose: 1 }] }, { missionDay: 2, total: 10 });
+  assert.equal(numbers.career, 11);
+  assert.equal(numbers.left, 8);
+  assert.equal(numbers.rate, 1);
+});

@@ -1,9 +1,15 @@
 /* Cabin readings: places, thresholds, illustrative reference ranges and the stored log.
    Reference ranges are our design choice for this prototype, not a medical standard. */
 
-import { comm } from "./mission.js";
+import { comm, profileRecord } from "./mission.js";
 
 export const KEYS = { state: "astromed-env", log: "astromed-env-log" };
+
+// The place is the destination in the profile; the mission link derives it from the same field.
+export function profilePlace(profile = profileRecord()) {
+  const value = comm(profile);
+  return value && value.place && PLACES[value.place] ? value.place : "mars";
+}
 
 export const PLACES = {
   iss: {
@@ -142,6 +148,23 @@ export function labelFrom(state) {
   return state.place === "other" ? (state.custom || "Other place") : PLACES[state.place]?.name || "";
 }
 
+const LEVEL_WEIGHT = { alert: 3, review: 2, ok: 1, info: 0 };
+
+export function overallLevel(results) {
+  return (results || []).reduce((worst, entry) => (
+    (LEVEL_WEIGHT[entry.level] || 0) > (LEVEL_WEIGHT[worst] || 0) ? entry.level : worst
+  ), "info");
+}
+
+// Every saved reading with its judgement, including the first-baseline info row.
+export function readingsResult(readings, place, log, excludeTime = null) {
+  const baseline = place && PLACES[place]?.rad ? null : baselineFor(log, place, excludeTime);
+  return FIELDS.filter((field) => Number.isFinite(readings[field.key])).map((field) => {
+    const r = evaluate(field.key, readings[field.key], place, baseline);
+    return { ...r, key: field.key, label: field.label, unit: field.unit, value: readings[field.key] };
+  });
+}
+
 export function findingsFrom(state, log) {
   if (!state || !state.place || !state.readings) return [];
   const baseline = PLACES[state.place]?.rad ? null : baselineFor(log, state.place, state.time);
@@ -186,6 +209,35 @@ export function deleteReading(time) {
   write(KEYS.log, logRecord().filter((entry) => entry.time !== time));
   const state = stateRecord();
   if (state.time === time) write(KEYS.state, { ...state, readings: null, time: null });
+}
+
+// Records one set of cabin readings for the profile's destination and returns an undo for the toast.
+export function record(readings, now = new Date().toISOString(), profile = profileRecord()) {
+  const previousState = stateRecord();
+  const previousLog = logRecord();
+  const place = profilePlace(profile);
+  saveReading({ place, custom: previousState.custom || "" }, readings, now);
+  return {
+    time: now,
+    place,
+    undo: () => {
+      write(KEYS.state, previousState);
+      write(KEYS.log, previousLog);
+    }
+  };
+}
+
+export function recordedToday(now = new Date()) {
+  const state = stateRecord();
+  return Boolean(state.time && new Date(state.time).toDateString() === now.toDateString());
+}
+
+export function readingState() {
+  return stateRecord();
+}
+
+export function readingLog() {
+  return logRecord();
 }
 
 if (typeof window !== "undefined") {
