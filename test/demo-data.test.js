@@ -29,7 +29,7 @@ test("the builder fills every record type and is deterministic for a seed", () =
   assert.ok(data["astrotwin-gui-v2-records"].length >= DAYS);
   assert.ok(Object.keys(data["astromed-immune"].log).length === DAYS);
   assert.ok(data["astromed-radiation"].entries.length === DAYS);
-  assert.ok(data["astrotwin-exercise-sessions"].length === DAYS - 1);
+  assert.ok(data["astrotwin-exercise-sessions"].length === DAYS - 2);
   assert.ok(data["astromed-env-log"].length === DAYS);
   assert.ok(data["astromed-mental-history"].length > 0);
   assert.ok(data["astromed-vision"].results.length > 0);

@@ -68,15 +68,18 @@ const CHECKUP_FIELDS = {
   muscles: { activity: () => [58, 9], strength: () => [25, 1.8] }
 };
 
-// Left open today so the demo can show these daily checks being done: heart, meals and training.
-const SHOWCASE_TODAY = new Set(["heart", "meals", "exercise"]);
+// Left open so the demo opens with these checks due on Home: Thorax (heart, lungs), Nutrition and Exercise
+// (muscles and a training session). Days left open, counted back from today; two days clears the
+// every-two-days interval as well as the daily one.
+const OPEN_DAYS = { heart: 2, lungs: 2, muscles: 2, exercise: 2, meals: 1 };
+const openFor = (key) => OPEN_DAYS[key] || 0;
 
 function checkupRecords(now, random) {
   const records = [];
   for (let index = 0; index < DAYS; index += 1) {
     const time = at(now, index, 8).toISOString();
     Object.entries(CHECKUP_FIELDS).forEach(([part, fields]) => {
-      if (index === 0 && SHOWCASE_TODAY.has(part)) return;
+      if (index < openFor(part)) return;
       const values = {};
       Object.entries(fields).forEach(([key, pick]) => {
         const [centre, spread] = pick();
@@ -200,7 +203,7 @@ const MEALS = [
 
 function nutritionData(now, random) {
   const entries = [];
-  for (let index = SHOWCASE_TODAY.has("meals") ? 1 : 0; index < DAYS; index += 1) {
+  for (let index = openFor("meals"); index < DAYS; index += 1) {
     MEALS.forEach((meal, mealIndex) => {
       const time = at(now, index, meal.hour, meal.minute).toISOString();
       const salt = (random() - 0.5) * 0.06;
@@ -224,7 +227,7 @@ function exerciseData(now, random) {
     { type: "t2", title: "T2", values: () => ({ minutes: 40, distance: round(4.8 + random() * 1.2, 0.1), speed: round(7.2 + random() * 1.2, 0.1), heartRate: Math.round(126 + random() * 12), effort: 5, soreness: 2 }) },
     { type: "cevis", title: "CEVIS", values: () => ({ minutes: 50, cadence: Math.round(80 + random() * 12), power: Math.round(110 + random() * 30), heartRate: Math.round(122 + random() * 14), effort: 5 }) }
   ];
-  for (let index = SHOWCASE_TODAY.has("exercise") ? 1 : 0; index < DAYS; index += 1) {
+  for (let index = openFor("exercise"); index < DAYS; index += 1) {
     const kind = kinds[index % kinds.length];
     sessions.push({ type: kind.type, title: kind.title, values: kind.values(), date: at(now, index, 17).toISOString() });
   }
