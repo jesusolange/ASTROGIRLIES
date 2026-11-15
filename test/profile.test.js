@@ -52,7 +52,7 @@ test("form values round-trip the stored record with safe defaults", () => {
   assert.equal(values.crew, 1);
   assert.equal(values.startDate, "2026-11-14");
   assert.equal(values.total, 365);
-  assert.equal(values.sex, "x");
+  assert.equal(values.sex, "");
   assert.equal(values.missionType, "mars-planetary");
   assert.equal(values.name, "");
 
@@ -113,17 +113,42 @@ test("applyForm clamps impossible values and falls back to today", () => {
   assert.equal(record.meno, null);
 });
 
-test("fieldErrors marks each required mission field", () => {
-  const empty = fieldErrors({ name: "  ", missionType: "mars-planetary", crew: "", startDate: "", total: "" });
-  assert.ok(empty.name);
-  assert.ok(empty.crew);
-  assert.ok(empty.startDate);
-  assert.ok(empty.total);
-  assert.equal(empty.missionType, undefined);
+test("fieldErrors marks every required profile field", () => {
+  const empty = fieldErrors({
+    name: "  ", missionType: "", crew: "", startDate: "", total: "",
+    age: "", sex: "", weight: "", height: "", meno: ""
+  });
+  ["name", "missionType", "crew", "startDate", "total", "age", "sex", "weight", "height"].forEach((key) => {
+    assert.ok(empty[key], `${key} should have an error`);
+  });
 
   const good = fieldErrors({
-    name: "Ada", missionType: "mars-planetary", crew: 2, startDate: "2026-11-01", total: 365
+    name: "Ada", missionType: "mars-planetary", crew: 2, startDate: "2026-11-01", total: 365,
+    age: 38, sex: "x", weight: 64, height: 168, meno: ""
   });
   assert.deepEqual(good, {});
   assert.equal(isoDay(new Date(2026, 10, 14)), "2026-11-14");
+});
+
+test("menopause is required only for a woman", () => {
+  const base = {
+    name: "Ada", missionType: "leo-long", crew: 1, startDate: "2026-11-01", total: 200,
+    age: 41, weight: 62, height: 168
+  };
+  assert.ok(fieldErrors({ ...base, sex: "f", meno: "" }).meno);
+  assert.equal(fieldErrors({ ...base, sex: "f", meno: "pre" }).meno, undefined);
+  assert.equal(fieldErrors({ ...base, sex: "m", meno: "" }).meno, undefined);
+  assert.equal(fieldErrors({ ...base, sex: "x" }).meno, undefined);
+});
+
+test("out-of-range measurements are refused", () => {
+  const base = {
+    name: "Ada", missionType: "leo-long", crew: 1, startDate: "2026-11-01", total: 200,
+    age: 41, sex: "x", weight: 62, height: 168
+  };
+  assert.ok(fieldErrors({ ...base, age: 12 }).age);
+  assert.ok(fieldErrors({ ...base, weight: 20 }).weight);
+  assert.ok(fieldErrors({ ...base, height: 250 }).height);
+  assert.ok(fieldErrors({ ...base, crew: 0 }).crew);
+  assert.ok(fieldErrors({ ...base, total: 0 }).total);
 });

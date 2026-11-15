@@ -1,0 +1,133 @@
+.ui-dialog.sources-dialog {
+  width: min(900px, 94vw);
+  max-width: min(900px, 94vw);
+  max-height: 90vh;
+}
+
+.sources-dialog .ui-dialog-content {
+  max-height: calc(90vh - 130px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sources-item a:focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 2px;
+}
+
+.sources-intro {
+  margin: 0 0 18px;
+  color: var(--am-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sources-list {
+  display: grid;
+  gap: 22px;
+}
+
+.sources-group h3 {
+  margin: 0 0 8px;
+  color: var(--am-heading);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sources-items {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sources-item {
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--am-text) 4%, transparent);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+}
+
+.sources-item.is-focus {
+  background: var(--am-info-bg);
+  border-color: var(--am-accent);
+}
+
+.sources-item-title {
+  color: var(--am-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sources-item-title a {
+  color: var(--am-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.sources-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 4px;
+  color: var(--am-text-muted);
+  font-size: 12px;
+}
+
+.sources-licence {
+  font-variant-numeric: tabular-nums;
+}
+
+.sources-licence a {
+  color: var(--am-text-muted);
+}
+
+.sources-note {
+  margin: 6px 0 0;
+  color: var(--am-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sources-table-wrap {
+  overflow-x: auto;
+}
+
+.sources-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.sources-table th,
+.sources-table td {
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--am-border);
+}
+
+.sources-table th {
+  color: var(--am-heading);
+  font-weight: 700;
+}
+
+.sources-table a {
+  color: var(--am-accent);
+}
+
+@media (max-width: 560px) {
+  .ui-dialog.sources-dialog {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .sources-dialog .ui-dialog-content {
+    max-height: calc(100vh - 120px);
+  }
+}

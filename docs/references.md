@@ -76,6 +76,11 @@ confirmed before submission.
 | `public/icons/icon-192.png` | AstroMed app icon, 192 px | AstroGirlies team | Project |
 | `public/icons/icon-512.png` | AstroMed app icon, 512 px | AstroGirlies team | Project |
 | `public/favicon.svg` | AstroMed favicon | AstroGirlies team | Project |
+| `public/assets/cover/earth.svg` | Earth for the low Earth orbit cover | AstroGirlies team | Project |
+| `public/assets/cover/moon.svg` | Moon for the lunar cover | AstroGirlies team | Project |
+| `public/assets/cover/mars.svg` | Mars for the Mars cover | AstroGirlies team | Project |
+
+The three cover backgrounds are drawn for this project as vector illustrations; no third-party image is used.
 
 ## Fonts and libraries
 

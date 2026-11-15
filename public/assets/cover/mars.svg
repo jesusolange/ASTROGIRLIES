@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200">
+  <defs>
+    <radialGradient id="rust" cx="36%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#f3bd8f"/>
+      <stop offset="30%" stop-color="#d9824b"/>
+      <stop offset="62%" stop-color="#a74624"/>
+      <stop offset="100%" stop-color="#4a1a0e"/>
+    </radialGradient>
+    <radialGradient id="limb" cx="42%" cy="38%" r="64%">
+      <stop offset="58%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="86%" stop-color="#000000" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.84"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="78%" stop-color="#ff9b62" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ff9b62" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="crater" cx="34%" cy="30%" r="72%">
+      <stop offset="0%" stop-color="#6e2413"/>
+      <stop offset="64%" stop-color="#8f351c"/>
+      <stop offset="100%" stop-color="#c56a3f"/>
+    </radialGradient>
+    <clipPath id="disc">
+      <circle cx="600" cy="600" r="548"/>
+    </clipPath>
+  </defs>
+
+  <circle cx="600" cy="600" r="620" fill="url(#glow)"/>
+  <circle cx="600" cy="600" r="548" fill="url(#rust)"/>
+
+  <g clip-path="url(#disc)">
+    <g fill="#6b2414" opacity="0.5">
+      <path d="M300 250 L470 220 L540 300 L500 400 L380 440 L300 380 Z"/>
+      <path d="M600 340 L760 320 L840 400 L820 500 L700 540 L610 470 Z"/>
+      <path d="M360 640 L520 610 L590 700 L540 810 L420 840 L350 760 Z"/>
+      <path d="M700 680 L860 660 L920 740 L880 820 L760 840 L700 770 Z"/>
+    </g>
+    <g fill="#7f3018" opacity="0.45">
+      <ellipse cx="420" cy="360" rx="120" ry="90"/>
+      <ellipse cx="760" cy="430" rx="150" ry="110"/>
+      <ellipse cx="480" cy="740" rx="140" ry="100"/>
+      <ellipse cx="820" cy="760" rx="110" ry="90"/>
+    </g>
+
+    <g fill="url(#crater)">
+      <ellipse cx="540" cy="300" rx="44" ry="40"/>
+      <ellipse cx="700" cy="560" rx="58" ry="52"/>
+      <ellipse cx="400" cy="540" rx="34" ry="30"/>
+      <ellipse cx="640" cy="780" rx="48" ry="44"/>
+      <ellipse cx="880" cy="520" rx="32" ry="28"/>
+      <ellipse cx="300" cy="760" rx="40" ry="36"/>
+    </g>
+
+    <g fill="#ffffff" opacity="0.34">
+      <ellipse cx="610" cy="180" rx="120" ry="40"/>
+      <ellipse cx="560" cy="166" rx="70" ry="22"/>
+    </g>
+
+    <g fill="#ffffff" opacity="0.13">
+      <path d="M250 600 C380 560 520 590 610 650 C700 710 820 700 930 640 L960 700 C850 770 720 790 610 730 C510 675 390 660 270 700 Z"/>
+    </g>
+
+    <circle cx="600" cy="600" r="548" fill="url(#limb)"/>
+  </g>
+</svg>

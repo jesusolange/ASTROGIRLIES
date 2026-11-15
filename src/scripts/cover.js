@@ -1,55 +1,31 @@
-// Cover shown on every start: what the app is for, where the mission stands, and one action to enter.
+// The cover: destination planet, mission facts and one way in. Shown once per calendar day.
 import "../styles/cover.css";
-import { currentMission, rankedRisks } from "./risks.js";
+import { h, render } from "preact";
+import Cover from "../components/cover/Cover.jsx";
+import { isoDay } from "./profile.js";
 
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+export const COVER_DAY_KEY = "astromed-cover-day";
 
-const el = document.createElement("div");
-el.className = "amc";
-el.setAttribute("role", "dialog");
-el.setAttribute("aria-modal", "true");
-el.setAttribute("aria-labelledby", "amcTitle");
-el.innerHTML = `<div class="amc-limb" aria-hidden="true"></div>
-  <div class="amc-in">
-    <h1 id="amcTitle">AstroMed</h1>
-    <p class="amc-purpose">Check your own health each day, and know what to do next, when Earth cannot answer in time.</p>
-    <dl class="amc-facts" id="amcFacts"></dl>
-    <button type="button" class="amc-go" id="amcGo">Start today's check <kbd>Enter</kbd></button>
-    <p class="amc-note">Your records stay on this device unless you choose to sign in. A self-monitoring aid, not a medical device. Team AstroGirlies, NASA Space Apps 2026.</p>
-  </div>`;
-window.__amCoverOpen = true;
-document.body.appendChild(el);
+function mountCover() {
+  const store = window.AstroMedStore && window.AstroMedStore.store;
+  if (!store) return;
+  const today = isoDay(new Date());
+  if (store.get(COVER_DAY_KEY, null) === today) return;
+  store.set(COVER_DAY_KEY, today);
 
-function renderFacts() {
-  const mission = currentMission();
-  const profile = window.AstroMedProfile && window.AstroMedProfile.get();
-  const day = profile && window.AstroMedProfile.missionDay() != null ? window.AstroMedProfile.dayLabel() : "Not set yet";
-  const first = rankedRisks(mission.id).find((r) => r.monitored && r.ops);
-  const rows = [["Mission", esc(mission.label)], ["Day", esc(day)]];
-  if (first) {
-    rows.push(["Watch first", `${esc(first.area)}: NASA rates this risk ${first.ops.l} x ${first.ops.c} for your mission ` +
-      `(<a href="${esc(first.url)}" target="_blank" rel="noopener noreferrer">source</a>)`]);
+  const host = document.createElement("div");
+  host.id = "am-cover";
+  document.body.appendChild(host);
+  window.__amCoverOpen = true;
+
+  function done() {
+    window.__amCoverOpen = false;
+    render(null, host);
+    host.remove();
+    document.dispatchEvent(new CustomEvent("astromed-cover-closed"));
   }
-  el.querySelector("#amcFacts").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+
+  render(h(Cover, { onClosed: done }), host);
 }
 
-function close() {
-  if (!window.__amCoverOpen) return;
-  window.__amCoverOpen = false;
-  el.classList.add("out");
-  document.removeEventListener("keydown", onKey);
-  setTimeout(() => el.remove(), 600);
-  document.dispatchEvent(new CustomEvent("astromed-cover-closed"));
-}
-
-function onKey(e) {
-  if (e.target.closest && e.target.closest(".amc-facts a")) return;
-  if (e.key === "Enter" || e.key === " " || e.key === "Escape") { e.preventDefault(); close(); }
-}
-
-el.addEventListener("click", (e) => { if (!e.target.closest(".amc-facts a")) close(); });
-document.addEventListener("keydown", onKey);
-document.addEventListener("DOMContentLoaded", () => {
-  renderFacts();
-  el.querySelector("#amcGo").focus();
-});
+if (typeof document !== "undefined") mountCover();

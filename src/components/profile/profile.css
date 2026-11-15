@@ -1,26 +1,85 @@
-.pf-dialog {
-  max-width: 100%;
-  max-height: 100%;
+.ui-dialog.pf-dialog {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  margin: 0;
   padding: 0;
   color: var(--am-text);
-  background: transparent;
+  background: var(--am-bg);
   border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.pf-dialog::backdrop {
+.ui-dialog.pf-dialog::backdrop {
   background: var(--am-overlay);
 }
 
-.pf-grid .ui-field select,
-.pf-grid .ui-field input {
-  min-width: 0;
-  width: 100%;
-  height: 44px;
+.pf-dialog .ui-dialog-body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   box-sizing: border-box;
+  width: min(980px, 100%);
+  height: 100%;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 32px) clamp(16px, 4vw, 40px) 0;
+}
+
+.pf-dialog .ui-dialog-content {
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  overscroll-behavior: contain;
+}
+
+.pf-dialog .ui-dialog-foot {
+  padding: 14px 0 18px;
+  border-top: 1px solid var(--am-border);
+}
+
+.pf-first .ui-dialog-close {
+  display: none;
+}
+
+.pf-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.pf-summary p {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.pf-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  color: var(--am-on-accent);
+  background: var(--am-accent);
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.pf-dialog .ui-tabs {
+  margin: 0 0 14px;
+}
+
+.pf-form {
+  display: grid;
+  gap: 22px;
 }
 
 .pf-group {
-  grid-column: 1 / -1;
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -29,7 +88,7 @@
 
 .pf-group legend {
   padding: 0;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--am-heading);
   font-size: 12px;
   font-weight: 700;
@@ -44,12 +103,170 @@
   gap: 12px;
 }
 
+.pf-grid .ui-field select,
+.pf-grid .ui-field input,
+.pf-fields .ui-field select,
+.pf-fields .ui-field input,
+.pf-form .ui-field select,
+.pf-form .ui-field input {
+  min-width: 0;
+  width: 100%;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+.pf-wide {
+  grid-column: 1 / -1;
+}
+
+.pf-note {
+  margin: 12px 0 0;
+  color: var(--am-text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.pf-notes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 20px;
+  align-items: start;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--am-border);
+}
+
+.pf-notes h4 {
+  margin: 0 0 8px;
+  color: var(--am-text);
+  font-size: 15px;
+}
+
+.pf-notes ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--am-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.pf-delay {
+  margin: 12px 0 0;
+  color: var(--am-text);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.pf-place {
+  margin: 0;
+}
+
+.pf-place img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  background: var(--am-surface);
+}
+
+.pf-place figcaption {
+  margin-top: 6px;
+  color: var(--am-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.pf-source-link {
+  padding: 0;
+  color: var(--am-accent);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pf-source-link:focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 2px;
+}
+
+.pf-data {
+  display: grid;
+  gap: 22px;
+}
+
+.pf-block {
+  display: grid;
+  gap: 10px;
+}
+
+.pf-block h4 {
+  margin: 0;
+  color: var(--am-heading);
+  font-size: 15px;
+}
+
+.pf-block p {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.pf-block p.pf-demo-state {
+  color: var(--am-warn);
+  font-weight: 700;
+}
+
+.pf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .pf-actions .ui-btn {
   margin-top: 0;
 }
 
-@media (max-width: 520px) {
+.pf-sync {
+  display: grid;
+  gap: 10px;
+}
+
+.pf-sync p {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.pf-sync p.pf-sync-status {
+  color: var(--am-text);
+}
+
+.pf-sources {
+  padding-bottom: 10px;
+}
+
+@media (max-width: 720px) {
+  .pf-notes {
+    grid-template-columns: 1fr;
+  }
+
+  .pf-place {
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 560px) {
   .pf-fields {
     grid-template-columns: 1fr;
   }
+
 }

@@ -18,6 +18,11 @@ const account = (function (root) {
   }
 
   const api = { decide };
+  api.requestLink = async () => { throw new Error("Sign-in needs the web app."); };
+  api.accountStatus = () => ({ signedIn: false, email: null, status: "" });
+  api.subscribeAccount = () => () => {};
+  api.syncNow = async () => {};
+  api.signOutNow = async () => {};
   if (typeof window === "undefined") return api;
 
   const store = root.AstroMedStore && root.AstroMedStore.store;
@@ -33,6 +38,19 @@ const account = (function (root) {
   const listeners = [];
   const setStatus = (s) => { status = s; listeners.forEach((fn) => fn()); };
   const session = () => { try { return JSON.parse(lsGet(LS.session)); } catch (e) { return null; } };
+
+  function accountStatus() {
+    const s = session();
+    return { signedIn: Boolean(s), email: s ? s.email : null, status };
+  }
+
+  function subscribeAccount(fn) {
+    listeners.push(fn);
+    return () => {
+      const index = listeners.indexOf(fn);
+      if (index >= 0) listeners.splice(index, 1);
+    };
+  }
 
   async function call(path, method, body) {
     const s = session();
@@ -161,8 +179,13 @@ const account = (function (root) {
   } catch (e) { /* ignore */ }
 
   api.sync = sync; api.signOut = signOut; api.renderAccount = renderAccount; api.session = session;
+  api.requestLink = requestLink;
+  api.accountStatus = accountStatus;
+  api.subscribeAccount = subscribeAccount;
+  api.syncNow = sync;
+  api.signOutNow = signOut;
   root.AstroMedSync = api;
   return api;
 })(typeof window !== "undefined" ? window : globalThis);
 
-export const { decide } = account;
+export const { decide, requestLink, accountStatus, subscribeAccount, syncNow, signOutNow } = account;

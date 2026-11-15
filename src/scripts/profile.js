@@ -3,6 +3,7 @@
 
 import { signal } from "@preact/signals";
 import { MISSION_TYPES, DEFAULT_MISSION } from "./risks.js";
+import { accountStatus } from "./sync.js";
 
 export const KEY = "astromed-profile";
 export const DAY = 86400000;
@@ -45,7 +46,7 @@ export function dayLabelFor(profile) {
 export function formValues(profile, now = new Date()) {
   const p = profile || {};
   const mission = p.missionType || DEFAULT_MISSION;
-  const sex = p.sex === "f" || p.sex === "m" ? p.sex : "x";
+  const sex = ["f", "m", "x"].includes(p.sex) ? p.sex : "";
   return {
     name: p.name || "",
     missionType: MISSION_TYPES.some((m) => m.id === mission) ? mission : DEFAULT_MISSION,
@@ -60,19 +61,35 @@ export function formValues(profile, now = new Date()) {
   };
 }
 
-export const REQUIRED_ORDER = ["name", "missionType", "crew", "startDate", "total"];
+export const REQUIRED_ORDER = ["name", "missionType", "crew", "startDate", "total", "age", "sex", "weight", "height", "meno"];
+
+const wholeNumber = (value) => Number.isInteger(Number(value)) && String(value).trim() !== "";
+const measured = (value) => value !== "" && value != null && Number.isFinite(Number(value));
 
 export function fieldErrors(values) {
   const errors = {};
   if (!String(values.name || "").trim()) errors.name = "Enter your name.";
   if (!MISSION_TYPES.some((m) => m.id === values.missionType)) errors.missionType = "Choose a destination.";
-  if (!Number.isInteger(Number(values.crew)) || Number(values.crew) < 1) {
-    errors.crew = "Enter a crew size of 1 or more.";
-  }
+
+  const crew = Number(values.crew);
+  if (!wholeNumber(values.crew) || crew < 1 || crew > 99) errors.crew = "Enter a crew size from 1 to 99.";
+
   if (!isIsoDay(values.startDate)) errors.startDate = "Choose the mission start date.";
-  if (!Number.isInteger(Number(values.total)) || Number(values.total) < 1) {
-    errors.total = "Enter a mission length of 1 day or more.";
-  }
+  const total = Number(values.total);
+  if (!wholeNumber(values.total) || total < 1 || total > 3000) errors.total = "Enter a mission length from 1 to 3000 days.";
+
+  const age = Number(values.age);
+  if (!wholeNumber(values.age) || age < 18 || age > 80) errors.age = "Enter your age in years, 18 to 80.";
+
+  if (!["f", "m", "x"].includes(values.sex)) errors.sex = "Choose an answer.";
+  else if (values.sex === "f" && !["pre", "post"].includes(values.meno)) errors.meno = "Choose one of the two answers.";
+
+  const weight = Number(values.weight);
+  if (!measured(values.weight) || weight < 30 || weight > 200) errors.weight = "Enter your weight in kg, 30 to 200.";
+
+  const height = Number(values.height);
+  if (!measured(values.height) || height < 100 || height > 230) errors.height = "Enter your height in cm, 100 to 230.";
+
   return errors;
 }
 
@@ -117,7 +134,7 @@ export function initialsOf(fullName) {
 export function barState() {
   const p = get();
   const n = name();
-  return { name: n, initials: initialsOf(n), demo: Boolean(p && p.demo), sync: null };
+  return { name: n, initials: initialsOf(n), demo: Boolean(p && p.demo), sync: accountStatus() };
 }
 export function closeDialog() {
   dialog.value = { open: false, first: false };
@@ -133,5 +150,5 @@ export function saveProfile(record) {
 }
 
 if (typeof window !== "undefined") {
-  window.AstroMedProfile = { get, missionDay, dayOf, total, crew, name, dayLabel, open: () => open(false), apply };
+  window.AstroMedProfile = { get, missionDay, dayOf, total, crew, name, dayLabel, open: (first, section) => open(first, section), apply };
 }
