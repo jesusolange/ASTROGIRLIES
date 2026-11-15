@@ -106,9 +106,9 @@ an "AI-generated" badge, and their alt text ends in "(AI-generated illustration)
 | `public/assets/emergency/belly-rovsing.jpg` | Abdomen with the McBurney, Lanz and Blumberg points | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/emergency/belly-murphy.jpg` | Abdomen with the Murphy point | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/emergency/dermatome.jpg` | Body map: front and back, skin areas by nerve level | AstroGirlies team | AI-generated illustration, made for this project |
-| `public/assets/ARED.png` (also `public/assets/exercise/ared.png`) | ARED resistance machine in use | AstroGirlies team | AI-generated illustration, made for this project |
-| `public/assets/T2.png` (also `public/assets/exercise/t2.png`) | T2 treadmill in use | AstroGirlies team | AI-generated illustration, made for this project |
-| `public/assets/CEVIS.png` (also `public/assets/exercise/cevis.png`) | CEVIS exercise bike in use | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/ARED.png` | ARED resistance machine in use | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/T2.png` | T2 treadmill in use | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/CEVIS.png` | CEVIS exercise bike in use | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/environment/iss.png` | International Space Station | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/environment/moon.png` | Moon | AstroGirlies team | AI-generated illustration, made for this project |
 | `public/assets/environment/mars.png` | Mars | AstroGirlies team | AI-generated illustration, made for this project |
