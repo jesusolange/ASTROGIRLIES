@@ -1,6 +1,28 @@
 # Submission form text
 
-Draft answers for the three Space Apps form fields (GitHub issue #4). Copy, check, and paste.
+Draft answers for the Space Apps form fields (GitHub issue #4). Copy, check, and paste.
+
+## Project summary
+
+AstroMed is a health monitoring app designed for astronauts on missions in low Earth orbit, on the Moon or on Mars,
+where assistance from Earth may be delayed or unavailable. It is Team AstroGirlies' entry for the 2026 NASA Space
+Apps challenge.
+
+- The 'Home' screen shows what to check today, ranked by NASA's Human Research Roadmap risk ratings for the
+  mission, and flags anything that needs attention.
+- Check records your body's condition (beside a 3D anatomical model), vision, mental state, signs of infection,
+  radiation exposure, cabin air quality, nutritional intake and exercise levels, one category at a time.
+- Progress stores all the user's history in the form of charts and a printable report.
+- The Emergency (E key) feature provides the team medic's step-by-step first-response guide.
+
+The app works offline and supports several crew members on one device. It describes every action in terms of what
+the astronaut can do alone, taking into account the mission's real signal delay to Earth. Thresholds are based on
+NASA standards and cited papers. This is a self-monitoring aid, not a medical device.
+
+It was built with Vite, Preact and three.js by a team working with AI coding agents. The medical content is
+provided by the team medicine student.
+
+Live: https://astrogirlies.pages.dev · Demo: https://youtu.be/v9RPcG16UKM
 
 ## NASA Data
 
