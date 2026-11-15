@@ -2,6 +2,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const Vision = require("../src/scripts/vision.js");
+const Session = require("../src/components/vision/session.js");
 
 const result = (over = {}) => ({
   eye: "right",
@@ -170,4 +171,57 @@ test("findingsFrom reports one finding per eye from the newest result", () => {
   assert.equal(right.level, "warn");
   assert.match(right.saw, /2 lines worse/);
   assert.equal(left.level, "ok");
+});
+
+test("the left eye comes first wherever both eyes are listed", () => {
+  assert.deepEqual(Vision.EYES.map((eye) => eye.id), ["left", "right"]);
+});
+
+test("near-chart rows wider than the card are not offered", () => {
+  const narrow = Vision.nearLinesFor(4.6, 314);
+  assert.deepEqual(narrow.skipped.map((line) => line.snellen), ["20/200"]);
+  assert.ok(narrow.offered.every((line) => line.needed <= 314));
+  assert.equal(Vision.nearRowsLabel(narrow.offered), "20/100 to 20/15");
+
+  const roomy = Vision.nearLinesFor(3.78, 314);
+  assert.equal(roomy.skipped.length, 0);
+  assert.equal(Vision.nearRowsLabel(roomy.offered), "20/200 to 20/15");
+
+  const uncalibrated = Vision.nearLinesFor(null, 314);
+  assert.equal(uncalibrated.calibrated, false);
+  assert.equal(uncalibrated.offered.length, Vision.NEAR_LINES.length);
+});
+
+test("every grid cell keeps a 24 px tap target", () => {
+  const phone = Vision.gridMetrics(3.78);
+  assert.equal(phone.cell, 24);
+  assert.equal(phone.enlarged, true);
+  assert.equal(phone.size, 480);
+
+  const roomy = Vision.gridMetrics(6);
+  assert.equal(roomy.cell, 30);
+  assert.equal(roomy.enlarged, false);
+  assert.equal(roomy.size, 600);
+});
+
+test("assessmentToday reads one result per eye, left first, with the worse level", () => {
+  const now = new Date(2026, 10, 15, 12);
+  const earlier = { eye: "left", date: new Date(2026, 10, 1, 10).toISOString(), grid: { distortion: false, marks: [] }, near: { line: 4 }, symptoms: [] };
+  const left = { eye: "left", date: new Date(2026, 10, 15, 10).toISOString(), grid: { distortion: false, marks: [] }, near: { line: 4 }, symptoms: [] };
+  const right = { eye: "right", date: new Date(2026, 10, 15, 10).toISOString(), grid: { distortion: true, marks: [] }, near: { line: 2 }, symptoms: [] };
+  const a = Session.assessmentToday({ results: [earlier, left, right] }, now);
+  assert.deepEqual(a.eyes.map((entry) => entry.eye), ["left", "right"]);
+  assert.equal(a.level, "warn");
+  const text = Session.assessmentSummary(a);
+  assert.ok(text.indexOf("Left eye") < text.indexOf("Right eye"));
+  assert.match(text, /Left eye: No change against your baseline/);
+});
+
+test("an urgent symptom in either eye makes the day urgent", () => {
+  const now = new Date(2026, 10, 15, 12);
+  const left = { eye: "left", date: new Date(2026, 10, 15, 10).toISOString(), grid: { distortion: false, marks: [] }, near: { line: 4 }, symptoms: ["blind-spot"] };
+  const right = { eye: "right", date: new Date(2026, 10, 15, 10).toISOString(), grid: { distortion: false, marks: [] }, near: { line: 4 }, symptoms: [] };
+  const a = Session.assessmentToday({ results: [left, right] }, now);
+  assert.equal(a.level, "urgent");
+  assert.deepEqual(a.urgent, ["blind-spot"]);
 });

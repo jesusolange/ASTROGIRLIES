@@ -1,184 +1,158 @@
-/* Vision (SANS) self-check. Colours come from tokens.css only. */
+/* Vision cards. Colours come from tokens.css only. */
 
-.vs-src { margin-top: 8px !important; font-size: 12px !important; color: var(--am-text-muted) !important; }
-.vs-src a { color: var(--am-accent); }
-.vs-fine { font-size: 12px !important; color: var(--am-text-muted) !important; }
-.vs-fine a { color: var(--am-accent); }
-.vs-inst { color: var(--am-text) !important; font-size: 13px !important; line-height: 1.55; }
-.vs-hint { color: var(--am-text-muted) !important; font-size: 12px !important; }
-.vs-note { color: var(--am-warn) !important; font-size: 12px !important; }
-.vs-muted { color: var(--am-text-muted); }
-
-/* ---------- shared figure ---------- */
-
-.am-figure {
-  display: grid; gap: 8px; width: min(100%, 620px); margin: 16px auto;
-  padding: 12px; background: var(--am-bg-raised);
-  border: 1px solid var(--am-border); border-radius: var(--am-radius-small);
+.vision :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 2px;
 }
-.am-figure img {
-  display: block; width: 100%; height: auto;
-  background: var(--am-surface); border-radius: var(--am-radius-small);
-}
-.am-figure figcaption { display: grid; gap: 4px; color: var(--am-text-muted); font-size: 12px; line-height: 1.5; }
-.am-figure-caption { color: var(--am-text); }
-.am-figure-credit { color: var(--am-accent); font-weight: 700; }
 
-/* ---------- record ---------- */
+.vs-fine { margin: 10px 0 0; color: var(--am-text-muted); font-size: 12px; line-height: 1.55; }
+.vs-hint { margin: 8px 0 0; color: var(--am-text-muted); font-size: 12px; line-height: 1.5; }
+.vs-note { margin: 10px 0 0; color: var(--am-warn); font-size: 12px; line-height: 1.5; }
+.vs-chosen { margin: 10px 0 0; color: var(--am-accent); font-size: 13px; font-weight: 650; }
 
-.vs-eyes {
-  display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 14px;
-  background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: 999px;
+/* ---------- figure opener ---------- */
+
+.vs-figure-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  color: var(--am-accent);
+  background: none;
+  border: 1px solid var(--am-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
 }
-.vs-eye {
-  padding: 8px 18px; border: 0; border-radius: 999px; background: transparent;
-  color: var(--am-text-muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+
+.vs-figure-link:hover {
+  background: var(--am-surface-hover);
+  border-color: var(--am-border-strong);
 }
-.vs-eye.on { background: var(--am-accent-strong); color: var(--am-on-accent); }
-.vs-steps { margin: 0 0 10px; padding-left: 20px; color: var(--am-text-muted); font-size: 13px; line-height: 1.6; }
-.vs-steps b { color: var(--am-text); }
 
 /* ---------- calibration ---------- */
 
+.vs-cal { display: grid; justify-items: start; gap: 12px; }
+.vs-cal .ui-steps { width: 100%; }
+.vs-cal-scroll { max-width: 100%; padding-bottom: 4px; overflow-x: auto; }
 .vs-cal-bar {
-  height: 34px; margin: 12px 0; box-sizing: border-box;
-  background: var(--am-field-bg); border: 2px solid var(--am-accent); border-radius: var(--am-radius-small);
+  height: 34px;
+  box-sizing: border-box;
+  background: var(--am-field-bg);
+  border: 2px solid var(--am-accent);
+  border-radius: var(--am-radius-small);
 }
-.vs-cal input[type="range"] { width: min(100%, 620px); accent-color: var(--am-accent); }
-.vs-cal-read { color: var(--am-text) !important; font-size: 13px !important; font-variant-numeric: tabular-nums; }
-.vs-cal .am-btn { margin-top: 10px; }
-.vs-cal .am-btn-soft { margin-left: 8px; }
+.vs-cal .ui-field { width: 100%; }
+.vs-cal input[type="range"] { width: 100%; accent-color: var(--am-accent); }
+.vs-cal-read { margin: 0; color: var(--am-text); font-size: 13px; font-variant-numeric: tabular-nums; }
 
 /* ---------- Amsler grid ---------- */
 
+.vs-grid-block { display: grid; justify-items: start; gap: 4px; }
 .vs-grid-wrap {
-  max-width: 100%; margin: 4px 0 10px; padding: 8px; overflow: auto;
-  background: var(--am-bg-raised); border: 1px solid var(--am-border); border-radius: var(--am-radius-small);
+  max-width: 100%;
+  max-height: 70vh;
+  margin-top: 6px;
+  padding: 8px;
+  overflow: auto;
+  background: var(--am-bg-raised);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
 }
 .vs-grid {
   position: relative;
-  width: var(--vs-size, 350px); height: var(--vs-size, 350px);
+  width: var(--vs-size, 350px);
+  height: var(--vs-size, 350px);
   background-color: var(--am-surface);
   background-image:
     repeating-linear-gradient(to right, var(--am-border-strong) 0 1px, transparent 1px var(--vs-cell, 17.5px)),
     repeating-linear-gradient(to bottom, var(--am-border-strong) 0 1px, transparent 1px var(--vs-cell, 17.5px));
 }
+.vs-grid:focus-visible { outline: 3px solid var(--am-focus); outline-offset: 3px; }
 .vs-grid-cells {
-  position: absolute; inset: 0; display: grid;
-  grid-template-columns: repeat(20, 1fr); grid-template-rows: repeat(20, 1fr);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(20, var(--vs-cell, 17.5px));
+  grid-template-rows: repeat(20, var(--vs-cell, 17.5px));
 }
 .vs-cell {
-  padding: 0; border: 0; background: transparent; cursor: crosshair;
-  appearance: none; -webkit-appearance: none;
+  width: var(--vs-cell, 17.5px);
+  height: var(--vs-cell, 17.5px);
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: crosshair;
+  appearance: none;
+  -webkit-appearance: none;
 }
 .vs-cell:hover { background: var(--am-surface-2); }
 .vs-cell.marked { background: color-mix(in srgb, var(--am-danger) 45%, transparent); }
+.vs-cell.is-cursor { box-shadow: inset 0 0 0 2px var(--am-accent); }
 .vs-dot {
-  position: absolute; left: 50%; top: 50%; width: 7px; height: 7px;
-  margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--am-danger);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--am-danger);
+  pointer-events: none;
 }
-.vs-choices { display: grid; gap: 8px; margin: 10px 0; }
-.vs-choice { display: flex; gap: 8px; align-items: flex-start; color: var(--am-text); font-size: 13px; line-height: 1.5; }
-.vs-choice input { margin-top: 2px; accent-color: var(--am-accent); }
 
 /* ---------- near-vision chart ---------- */
 
 .vs-chart {
-  display: grid; gap: 2px; justify-items: start; max-width: 100%;
-  margin: 10px 0; padding: 10px; overflow-x: auto;
-  background: var(--am-bg-raised); border: 1px solid var(--am-border); border-radius: var(--am-radius-small);
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  width: 100%;
+  max-width: 100%;
+  margin: 10px 0 0;
+  padding: 10px;
+  overflow-x: auto;
+  background: var(--am-bg-raised);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
 }
 .vs-line {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  width: 100%; min-height: 20px; padding: 3px 8px;
-  border: 1px solid transparent; border-radius: 8px; background: transparent;
-  color: var(--am-text); font: inherit; text-align: left; cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--am-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .vs-line:hover { background: var(--am-surface-2); }
-.vs-line.on { border-color: var(--am-accent); background: color-mix(in srgb, var(--am-accent) 12%, transparent); }
-.vs-line-opts { display: flex; align-items: center; gap: 10px; }
+.vs-line.on { border-color: var(--am-accent); background: var(--am-selected-bg); }
+.vs-line-opts { display: flex; align-items: center; gap: var(--vs-gap, 10px); }
 .vs-opt { flex: none; width: var(--vs-opt, 16px); height: var(--vs-opt, 16px); fill: var(--am-text); }
 .vs-line-lab { color: var(--am-text); font-size: 12px; font-weight: 700; white-space: nowrap; }
 .vs-line-lab small { display: block; color: var(--am-text-muted); font-size: 11px; font-weight: 500; }
-.vs-cannot { width: auto; justify-content: flex-start; margin-top: 6px; border: 1px dashed var(--am-border-strong); }
-.vs-chosen { color: var(--am-accent) !important; font-size: 13px !important; font-weight: 600; }
+.vs-cannot { width: auto; justify-content: flex-start; margin-top: 8px; border: 1px dashed var(--am-border-strong); }
 
-/* ---------- symptoms ---------- */
+/* ---------- chips ---------- */
 
-.vs-symptoms { display: grid; gap: 6px; margin-top: 8px; }
-.vs-symptom {
-  display: flex; gap: 10px; align-items: center; padding: 9px 12px;
-  background: var(--am-field-bg); border: 1px solid var(--am-border);
-  border-radius: var(--am-radius-small); color: var(--am-text); font-size: 13px;
+.vision .ui-chip.is-selected {
+  color: var(--am-btn-primary-text);
+  background: var(--am-btn-primary-bg);
+  border-color: var(--am-btn-primary-bg);
 }
-.vs-symptom input { accent-color: var(--am-accent); }
-
-/* ---------- save, result ---------- */
-
-.vs-save { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--am-border); }
-.vs-save .am-btn { margin-top: 0; }
-.vs-msg {
-  min-height: 18px; margin: 10px 0 0 !important;
-  color: var(--am-accent) !important; font-size: 13px !important; font-weight: 600;
-}
-.vs-result h3 { margin: 0 0 4px; font-size: 18px; }
-.vs-result p { color: var(--am-text) !important; font-size: 13px; line-height: 1.55; }
-.vs-result .vs-meta { color: var(--am-text-muted) !important; font-size: 12px; }
-.vs-result .vs-saw { font-weight: 600; }
-.vs-result .vs-change { color: var(--am-heading) !important; font-weight: 600; }
-.vs-result .vs-fine { color: var(--am-text-muted) !important; font-size: 12px !important; }
-.vs-todo-title { margin: 12px 0 6px; color: var(--am-heading); font-size: 14px; }
-.vs-result.vs-ok { border-left-color: var(--am-ok); }
-.vs-result.vs-warn { border-left-color: var(--am-warn); }
-.vs-result.vs-urgent { border-left-color: var(--am-danger); }
-.vs-result.vs-info { border-left-color: var(--am-info); }
-.vs-emergency { background: var(--am-danger); color: var(--am-on-accent); }
-.vs-emergency:hover { background: var(--am-danger); filter: brightness(1.08); }
-
-/* ---------- latest ---------- */
-
-.vs-latest { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.vs-latest-card {
-  display: grid; gap: 3px; padding: 12px 14px;
-  background: var(--am-field-bg); border: 1px solid var(--am-border);
-  border-left: 4px solid var(--am-border-strong); border-radius: var(--am-radius-small);
-  color: var(--am-text); font-size: 12px;
-}
-.vs-latest-card b { font-size: 14px; }
-.vs-latest-card.vs-ok { border-left-color: var(--am-ok); }
-.vs-latest-card.vs-warn { border-left-color: var(--am-warn); }
-.vs-latest-card.vs-urgent { border-left-color: var(--am-danger); }
-.vs-latest-line { color: var(--am-heading); font-weight: 700; }
-
-/* ---------- history ---------- */
-
-.vs-empty { color: var(--am-text-muted) !important; }
-.vs-hist-list { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
-.vs-hist {
-  display: grid; gap: 6px; padding: 12px 14px;
-  background: var(--am-field-bg); border: 1px solid var(--am-border);
-  border-left: 4px solid var(--am-border-strong); border-radius: var(--am-radius-small); color: var(--am-text);
-}
-.vs-hist.vs-ok { border-left-color: var(--am-ok); }
-.vs-hist.vs-warn { border-left-color: var(--am-warn); }
-.vs-hist.vs-urgent { border-left-color: var(--am-danger); }
-.vs-hist-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; color: var(--am-text-muted); font-size: 12px; }
-.vs-hist-top b { color: var(--am-text); font-size: 14px; }
-.vs-hist-saw, .vs-hist-todo { margin: 0 !important; color: var(--am-text) !important; font-size: 13px !important; line-height: 1.5; }
-.vs-changes { display: grid; gap: 2px; color: var(--am-text-muted); font-size: 12px; }
-.vs-changes b { color: var(--am-text); }
-
-/* ---------- what to do ---------- */
-
-.vs-rules { display: grid; gap: 10px; margin: 0 0 14px; padding: 0; list-style: none; }
-.vs-rules li {
-  padding: 12px 14px; background: var(--am-field-bg); border-left: 4px solid var(--am-border-strong);
-  border-radius: var(--am-radius-small); color: var(--am-text); font-size: 13px; line-height: 1.55;
-}
-.vs-rules li.vs-urgent { border-left-color: var(--am-danger); }
-.vs-rules li.vs-warn { border-left-color: var(--am-warn); }
-.vs-rules li.vs-ok { border-left-color: var(--am-ok); }
-
-@media (max-width: 640px) {
-  .vs-latest { grid-template-columns: 1fr; }
-}
+.vision .ui-chip.is-selected:hover { background: var(--am-btn-primary-hover); }
+.vs-field-focus { border-radius: var(--am-radius-small); }
+.vs-field-focus:focus-visible { outline: 3px solid var(--am-focus); outline-offset: 2px; }
+.vs-symptoms .ui-chips { margin: 0; }

@@ -1,14 +1,20 @@
 /* Vision (SANS) self-check: comparison against the astronaut's own baseline.
-   Screening aid, not a diagnosis. Change thresholds are our design choice. */
+   Screening aid, not a diagnosis. Change thresholds and the grid are our design choice. */
 
 import { rankedRisks, currentMission } from "./risks.js";
 
 export const KEYS = { vision: "astromed-vision" };
+export const PROGRESS_KEY = "astromed-vision-progress";
 export const EMPTY_DATA = { ppmm: null, calibratedAt: null, results: [] };
+export const EMPTY_PROGRESS = { day: null, left: null, right: null, symptoms: null };
 
+export const CARD_MM = 85.6;
+export const CALIBRATION = { minPx: 180, maxPx: 620, cardMm: CARD_MM };
+
+// Left first: wherever both eyes are shown, the left eye is on the left and its card comes first.
 export const EYES = [
-  { id: "right", label: "Right eye" },
-  { id: "left", label: "Left eye" }
+  { id: "left", label: "Left eye" },
+  { id: "right", label: "Right eye" }
 ];
 export const EYE_LABEL = { right: "Right eye", left: "Left eye" };
 
@@ -16,7 +22,8 @@ export const VIEW = {
   gridCellMm: 5,
   gridCells: 20,
   gridDistanceCm: 30,
-  nearDistanceCm: 40
+  nearDistanceCm: 40,
+  minCellPx: 24
 };
 
 // Optotype height in millimetres at the stated distance. 20/20 subtends 5 minutes of arc
@@ -32,6 +39,10 @@ export const NEAR_LINES = [
   { mm: 0.44, snellen: "20/15" }
 ];
 
+// Space a chart row needs: five optotypes, a gap of one optotype between them, the line label
+// and the row padding. Rows wider than the card are not offered.
+export const NEAR_ROW = { optotypes: 5, gapRatio: 1, labelPx: 88, paddingPx: 24 };
+
 export const SYMPTOMS = [
   { id: "near-blur", label: "New blur when reading at near" },
   { id: "blind-spot", label: "A blind spot or dark patch in central vision" },
@@ -45,7 +56,6 @@ export const RULES = {
   recheckDays: 7,
   nearLineLossForChange: 2,
   urgentSymptoms: ["blind-spot", "sudden-loss"],
-  pendingReview: "Design choice for this app, not a medical standard.",
   actions: {
     urgent: {
       level: "urgent",
@@ -153,15 +163,48 @@ export function changeSummary(result, reference) {
   if (c.newDistortion) parts.push("new grid distortion");
   else if (result.grid && result.grid.distortion) parts.push("grid distortion unchanged");
   if (c.newSymptoms.length) parts.push(`${c.newSymptoms.length} new symptom${c.newSymptoms.length === 1 ? "" : "s"}`);
-  return parts.join(" · ");
+  return parts.join(" \u00b7 ");
 }
 
-const store = () => (typeof window !== "undefined" && window.AstroMedStore && window.AstroMedStore.store) || null;
-const load = (key, fallback) => { const s = store(); return s ? s.get(key, fallback) : fallback; };
-const write = (key, value) => { const s = store(); return s ? s.set(key, value) : false; };
+/* ---------- screen measurements ---------- */
 
-function readData() {
-  const data = load(KEYS.vision, EMPTY_DATA) || EMPTY_DATA;
+export function nearLinesFor(ppmm, widthPx, row = NEAR_ROW) {
+  const scale = Number(ppmm);
+  const width = Number(widthPx);
+  const all = NEAR_LINES.map((line, index) => ({ ...line, index }));
+  if (!(scale > 0) || !(width > 0)) return { offered: all, skipped: [], calibrated: false };
+  const offered = [];
+  const skipped = [];
+  all.forEach((line) => {
+    const letter = line.mm * scale;
+    const needed = letter * (row.optotypes + row.gapRatio * (row.optotypes - 1)) + row.labelPx + row.paddingPx;
+    (needed <= width ? offered : skipped).push({ ...line, px: Math.max(1.5, letter), needed });
+  });
+  return { offered, skipped, calibrated: true };
+}
+
+export function nearRowsLabel(lines) {
+  if (!lines || !lines.length) return "";
+  const first = lines[0].snellen;
+  const last = lines[lines.length - 1].snellen;
+  return first === last ? first : `${first} to ${last}`;
+}
+
+export function gridMetrics(ppmm) {
+  const scale = Number(ppmm) > 0 ? Number(ppmm) : 0;
+  const calibrated = VIEW.gridCellMm * scale;
+  const cell = Math.max(VIEW.minCellPx, calibrated);
+  return { cell, size: cell * VIEW.gridCells, enlarged: scale > 0 && calibrated < VIEW.minCellPx };
+}
+
+/* ---------- stored data ---------- */
+
+const store = () => (typeof window !== "undefined" && window.AstroMedStore && window.AstroMedStore.store) || null;
+export const loadValue = (key, fallback) => { const s = store(); return s ? s.get(key, fallback) : fallback; };
+export const writeValue = (key, value) => { const s = store(); return s ? s.set(key, value) : false; };
+
+export function readData() {
+  const data = loadValue(KEYS.vision, EMPTY_DATA) || EMPTY_DATA;
   return {
     ppmm: Number(data.ppmm) > 0 ? Number(data.ppmm) : null,
     calibratedAt: data.calibratedAt || null,
@@ -190,7 +233,7 @@ export function saveCalibration(ppmm) {
   if (!(value > 0)) return null;
   data.ppmm = value;
   data.calibratedAt = new Date().toISOString();
-  write(KEYS.vision, data);
+  writeValue(KEYS.vision, data);
   return value;
 }
 
@@ -207,7 +250,7 @@ export function lastResult(eye = null) {
   return lastResultFrom(readData(), eye);
 }
 
-function missionDayNow() {
+export function missionDayNow() {
   try {
     return typeof window !== "undefined" && window.AstroMedProfile && typeof window.AstroMedProfile.missionDay === "function"
       ? window.AstroMedProfile.missionDay()
@@ -217,29 +260,7 @@ function missionDayNow() {
   }
 }
 
-export function makeResult(input = {}) {
-  const symptoms = Array.isArray(input.symptoms) ? input.symptoms.filter((id) => SYMPTOMS.some((s) => s.id === id)) : [];
-  const marks = Array.isArray(input.grid && input.grid.marks)
-    ? input.grid.marks.filter((m) => m && Number.isInteger(m.row) && Number.isInteger(m.col))
-    : [];
-  return {
-    id: `${input.eye === "left" ? "left" : "right"}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    eye: input.eye === "left" ? "left" : "right",
-    date: new Date().toISOString(),
-    missionDay: missionDayNow(),
-    grid: { distortion: Boolean(input.grid && input.grid.distortion), marks },
-    near: { line: Number.isInteger(input.near && input.near.line) ? input.near.line : null },
-    symptoms
-  };
-}
-
-export function saveResult(input = {}) {
-  const data = readData();
-  const entry = makeResult(input);
-  data.results.push(entry);
-  write(KEYS.vision, data);
-  return entry;
-}
+/* ---------- history and findings ---------- */
 
 // Newest first, each entry with its own baseline (first result for that eye) and previous result.
 export function historyFrom(data) {
@@ -308,7 +329,7 @@ export function sansRisk() {
 
 if (typeof window !== "undefined") {
   window.AstroMedVision = {
-    findings, history, lastResult, isDue, results, saveResult,
+    findings, history, lastResult, isDue, results,
     calibration, saveCalibration, assess, compare, KEYS, RULES
   };
 }
