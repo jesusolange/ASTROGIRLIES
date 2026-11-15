@@ -1,0 +1,17 @@
+/* Progress chart colours and level stripes, drawn from the shared tokens. */
+.pg-band { fill: var(--am-ok); opacity: 0.14; }
+.pg-grid-line { stroke: var(--am-chart-grid); }
+.pg-mean { stroke: var(--am-accent-strong); stroke-dasharray: 5 5; opacity: 0.7; }
+.pg-note-mean { fill: var(--am-accent-strong); }
+.pg-line { fill: none; stroke: var(--am-accent-strong); stroke-width: 2.5; stroke-linejoin: round; }
+.pg-dot { stroke: var(--am-surface); stroke-width: 2; }
+.pg-dot-ok { fill: var(--am-ok); }
+.pg-dot-review { fill: var(--am-warn); }
+.pg-dot-alert { fill: var(--am-danger); }
+.pg-dot-urgent { fill: var(--am-danger); }
+.pg-dot-info { fill: var(--am-info); }
+.pg-stripe { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; border-radius: 12px 0 0 12px; }
+.pg-stripe-ok { background: var(--am-ok); }
+.pg-stripe-review { background: var(--am-warn); }
+.pg-stripe-alert, .pg-stripe-urgent { background: var(--am-danger); }
+.pg-stripe-info { background: var(--am-info); }

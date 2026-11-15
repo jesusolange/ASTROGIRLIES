@@ -306,25 +306,9 @@ export function sansRisk() {
   return risk ? { ...risk, missionLabel: mission.label } : null;
 }
 
-function registerNav() {
-  if (!window.AstroMedNav) return false;
-  window.AstroMedNav.register({ id: "vision", label: "Vision", before: "twin" });
-  return true;
-}
-
 if (typeof window !== "undefined") {
   window.AstroMedVision = {
     findings, history, lastResult, isDue, results, saveResult,
     calibration, saveCalibration, assess, compare, KEYS, RULES
   };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    if (registerNav()) return;
-    let tries = 0;
-    const retry = () => {
-      if (registerNav() || ++tries >= 20) return;
-      setTimeout(retry, 50);
-    };
-    setTimeout(retry, 0);
-  });
 }

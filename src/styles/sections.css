@@ -140,13 +140,6 @@
 .am-saved b { color: var(--am-text); text-align: right; font-weight: 650; }
 .am-saved .am-btn { margin: 0; padding: 8px 16px; }
 
-.am-consult { border: 2px solid var(--am-border); }
-
-.am-report {
-  width: 100%; height: 520px; margin-top: 16px;
-  border: 1px solid var(--am-border); border-radius: 12px; background: var(--am-surface);
-}
-
 /* ---------- responsive ---------- */
 
 @media (max-width: 850px) {

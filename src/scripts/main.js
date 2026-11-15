@@ -3,6 +3,8 @@
 import "./storage.js";
 import "./sync.js";
 import "./risks.js";
+import "../lib/nav.js";
+import "../lib/ui.js";
 import "./checkup.js";
 import "./exercise.js";
 import "./health-indicators.js";

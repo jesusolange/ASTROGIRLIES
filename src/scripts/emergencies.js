@@ -77,16 +77,8 @@ export function open(id) {
   return true;
 }
 
-function registerNav() {
-  if (!window.AstroMedNav) return false;
-  window.AstroMedNav.register({ id: "emergencies", label: "Emergencies", before: "environment" });
-  return true;
-}
-
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
     window.AstroMedEmergencies = { open, situations, findings };
-    if (registerNav()) return;
-    const timer = setInterval(() => { if (registerNav()) clearInterval(timer); }, 20);
   });
 }

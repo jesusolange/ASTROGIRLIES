@@ -76,15 +76,3 @@ export function reasonFor(item) {
   }
   return `${when}. NASA rates this risk ${ratingOf(item.area)} for this mission, so this check comes back ${item.interval.label} (our design choice).`;
 }
-
-function registerToday(attempt = 0) {
-  if (!window.AstroMedNav) { setTimeout(() => registerToday(attempt), 20); return; }
-  const emergencies = document.querySelector('.nav button[data-action="emergencies"]');
-  if (!emergencies && attempt < 25) { setTimeout(() => registerToday(attempt + 1), 20); return; }
-  window.AstroMedNav.register({ id: "today", label: "Today", icon: "ic-overview", before: "environment" });
-  const announce = () => document.dispatchEvent(new CustomEvent("astromed-nav-changed"));
-  setTimeout(() => { window.AstroMedNav.show("today"); announce(); }, 0);
-  setTimeout(announce, 500);
-}
-
-document.addEventListener("DOMContentLoaded", () => registerToday());

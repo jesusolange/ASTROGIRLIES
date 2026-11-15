@@ -1,0 +1,6 @@
+.st-wrap { display: grid; gap: 16px; color: var(--am-text); }
+.st-wrap p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--am-text-muted); }
+.st-block { display: grid; gap: 10px; }
+.st-block h3 { margin: 0; font-size: 16px; color: var(--am-heading); }
+.st-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.st-note { font-size: 12px; color: var(--am-text-muted); }

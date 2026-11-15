@@ -23,12 +23,3 @@ export function setMissionType(id, silent) {
   if (!silent) document.dispatchEvent(new CustomEvent("astromed-profile-changed"));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (!window.AstroMedNav) return;
-  window.AstroMedNav.register({
-    id: "riskmap",
-    label: "Mission risks",
-    icon: "ic-report",
-    before: "radiation",
-  });
-});

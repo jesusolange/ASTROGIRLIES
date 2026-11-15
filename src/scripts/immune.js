@@ -73,10 +73,3 @@ export function testRows(tests) {
 }
 
 if (typeof window !== "undefined") window.AstroMedImmune = { status, findings };
-
-function registerImmune() {
-  if (!window.AstroMedNav) { setTimeout(registerImmune, 20); return; }
-  window.AstroMedNav.register({ id: "immune", label: "Immune watch", icon: "ic-mental", before: "radiation" });
-}
-
-document.addEventListener("DOMContentLoaded", registerImmune);

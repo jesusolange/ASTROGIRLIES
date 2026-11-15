@@ -382,57 +382,6 @@
     letter-spacing: -0.3px;
   }
   
-  .system-btn {
-    width: 100%;
-    display: flex;
-  
-    align-items: center;
-    gap: 12px;
-  
-    padding: 10px 11px;
-    margin: 4px 0;
-  
-    border: 0;
-    border-radius: 13px;
-  
-    background: transparent;
-    color: var(--am-text);
-  
-    text-align: left;
-    font-size: 12px;
-  }
-  
-  .system-btn:hover {
-    background: var(--am-surface);
-  }
-  
-  .system-btn.selected {
-    background: var(--am-surface);
-    font-weight: 700;
-  }
-  
-  .sys-symbol {
-    width: 36px;
-    height: 36px;
-  
-    display: grid;
-    place-items: center;
-  
-    border-radius: 50%;
-    border: 1px solid var(--am-border);
-  
-    background: var(--am-surface);
-    color: var(--am-accent);
-  
-    font-size: 21px;
-  }
-  
-  .system-btn.selected .sys-symbol {
-    background: var(--am-surface);
-    color: var(--am-danger);
-    border-color: var(--am-danger);
-  }
-  
   .info-note {
     margin-top: 15px;
     padding: 11px;
@@ -1277,36 +1226,6 @@
     gap: 14px;
   }
   
-  .readiness-line {
-    display: grid;
-  
-    grid-template-columns: 1fr 90px;
-  
-    align-items: center;
-    gap: 10px;
-  
-    color: var(--am-text-muted);
-    font-size: 10px;
-  }
-  
-  .readiness-line .meter {
-    height: 5px;
-  
-    background: var(--am-surface);
-    border-radius: 10px;
-  
-    overflow: hidden;
-  }
-  
-  .readiness-line .meter i {
-    display: block;
-  
-    height: 100%;
-  
-    background: var(--am-surface-2);
-    border-radius: 9px;
-  }
-  
   
   /* ============================================================
      18. QUICK ACTION BUTTONS
@@ -1435,127 +1354,7 @@
   
   
   /* ============================================================
-     21. MODAL DIALOGS
-     ============================================================ */
-  
-  .modal-backdrop {
-    display: none;
-  
-    position: fixed;
-    inset: 0;
-    z-index: 30;
-  
-    align-items: center;
-    justify-content: center;
-  
-    padding: 18px;
-  
-    background: var(--am-overlay);
-    backdrop-filter: blur(4px);
-  }
-  
-  .modal-backdrop.show {
-    display: flex;
-  }
-  
-  .modal {
-    width: min(520px, 100%);
-  
-    padding: 27px;
-  
-    background: var(--am-surface);
-  
-    border-radius: 23px;
-  
-    box-shadow: var(--am-shadow);
-  }
-  
-  .modal-header {
-    display: flex;
-  
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-  }
-  
-  .modal-header h2 {
-    margin: 0;
-    font-size: 22px;
-  }
-  
-  .close {
-    width: 34px;
-    height: 34px;
-  
-    border: 0;
-    border-radius: 9px;
-  
-    background: var(--am-btn-soft-bg);
-    color: var(--am-btn-soft-text);
-  
-    font-size: 22px;
-  }
-  
-  .modal p {
-    line-height: 1.6;
-    color: var(--am-text-muted);
-  }
-  
-  
-  /* ============================================================
-     22. RADIATION SIMULATION
-     ============================================================ */
-  
-  .slider-row {
-    display: grid;
-    gap: 6px;
-    margin-top: 18px;
-  }
-  
-  .slider-row label {
-    font-size: 12px;
-    font-weight: 650;
-  }
-  
-  .slider-row input {
-    width: 100%;
-    accent-color: var(--am-accent);
-  }
-  
-  .sim-result {
-    margin-top: 20px;
-    padding: 18px;
-  
-    background: var(--am-surface);
-    border-radius: 14px;
-  }
-  
-  .sim-result strong {
-    display: block;
-  
-    color: var(--am-accent);
-    font-size: 29px;
-  }
-  
-  .sim-result small {
-    color: var(--am-text-muted);
-  }
-  
-  .report-list {
-    max-height: 260px;
-    overflow: auto;
-  }
-  
-  .report-list p {
-    margin: 0;
-    padding: 10px 0;
-  
-    border-bottom: 1px solid var(--am-border);
-  }
-  
-  
-  /* ============================================================
-     23. STATUS AND EMPTY STATES
+     21. STATUS AND EMPTY STATES
      ============================================================ */
   
   .flag {
@@ -1739,19 +1538,6 @@
       gap: 2px;
     }
   
-    .system-btn {
-      padding: 7px;
-      gap: 5px;
-  
-      font-size: 10px;
-    }
-  
-    .sys-symbol {
-      width: 28px;
-      height: 28px;
-      font-size: 15px;
-    }
-  
     .info-note {
       display: none;
     }
@@ -1793,10 +1579,6 @@
   
     .metric-item strong {
       font-size: 17px;
-    }
-  
-    .modal {
-      padding: 20px;
     }
   
     body {

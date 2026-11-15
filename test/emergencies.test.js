@@ -135,8 +135,8 @@ test("the section markup lives in Preact components and the module builds no HTM
   assert.match(view, /import "\.\/emergencies\.css"/);
   assert.match(view, /openCard\.value/);
   assert.match(view, /<EmergencyCard/);
-  assert.match(script, /id: "emergencies"/);
-  assert.match(script, /before: "environment"/);
+  const nav = read("src", "lib", "nav.js");
+  assert.match(nav, /id: "emergencies"/);
   assert.match(script, /window\.AstroMedEmergencies = \{ open, situations, findings \}/);
   assert.doesNotMatch(script, /innerHTML|insertAdjacentHTML|querySelector|localStorage/);
 });
