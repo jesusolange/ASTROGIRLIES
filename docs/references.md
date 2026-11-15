@@ -56,8 +56,7 @@ under CC BY-SA 3.0 as well. Attribution must name Laboratoires Servier (or the a
 ## 3D models
 
 Copied from `README.md`; the README is not changed. All are credited there as CC BY 4.0 on Sketchfab.
-The brain and heart files carry no embedded licence data, so their Sketchfab URLs still need to be
-confirmed before submission.
+The brain and heart Sketchfab URLs were confirmed by the team on 15 Nov 2026.
 
 | Model | Author | Source | Licence |
 |---|---|---|---|
@@ -65,8 +64,8 @@ confirmed before submission.
 | Human Kidney | neshallads | https://sketchfab.com/3d-models/human-kidney-e1476ceb1e3b4412af5418eee9c5ed08 | CC BY 4.0 |
 | Lungs | reynosa2000 | https://sketchfab.com/3d-models/lungs-981d026657984895a90422d5e99e7ac2 | CC BY 4.0 |
 | Human Anatomy (muscles, skeleton) | mohamedhussien | https://sketchfab.com/3d-models/human-anatomy-faf0f3eaec554bcf854be2038993024f | CC BY 4.0 |
-| Human Brain | AH | Sketchfab (URL to confirm) | CC BY 4.0 |
-| Human Heart | TinkerLane Studio | Sketchfab (URL to confirm) | CC BY 4.0 |
+| Human Brain | AH | https://sketchfab.com/3d-models/human-brain-7a27c17fd6c0488bb31ab093236a47fb | CC BY 4.0 |
+| Human Heart | TinkerLane Studio | https://sketchfab.com/3d-models/heart-764e3bbc71664221bb123eef5c47fee8 | CC BY 4.0 |
 
 ## Planet textures
 

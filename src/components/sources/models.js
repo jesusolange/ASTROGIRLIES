@@ -28,8 +28,8 @@ export const MODELS = [
     licence: "CC BY 4.0",
     url: "https://sketchfab.com/3d-models/human-anatomy-faf0f3eaec554bcf854be2038993024f"
   },
-  { id: "brain", title: "Human brain", author: "AH", licence: "CC BY 4.0", url: null },
-  { id: "heart", title: "Human heart", author: "TinkerLane Studio", licence: "CC BY 4.0", url: null }
+  { id: "brain", title: "Human brain", author: "AH", licence: "CC BY 4.0", url: "https://sketchfab.com/3d-models/human-brain-7a27c17fd6c0488bb31ab093236a47fb" },
+  { id: "heart", title: "Human heart", author: "TinkerLane Studio", licence: "CC BY 4.0", url: "https://sketchfab.com/3d-models/heart-764e3bbc71664221bb123eef5c47fee8" }
 ];
 
 // The destination pictures in public/assets/environment/, shown in the profile's Mission section.

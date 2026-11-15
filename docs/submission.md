@@ -69,6 +69,7 @@ and honest sourcing, with AI-generated images marked on screen.
 | Hassler et al. 2014: radiation measured by MSL RAD on the Martian surface | https://doi.org/10.1126/science.1244797 |
 | NASA Blue Marble Next Generation (Earth texture) | https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/ |
 | NASA Scientific Visualization Studio, CGI Moon Kit (Moon texture, LRO data) | https://svs.gsfc.nasa.gov/4720 |
+| NASA Lifetime Surveillance of Astronaut Health, MR089S: Annual Medical Examinations | https://nlsp.nasa.gov/explore/lsah/MR089S.pdf |
 | NASA/USGS Mars Viking MDIM2.1 global colour mosaic (Mars texture) | https://astrogeology.usgs.gov/search/details/Mars/Viking/MDIM21/Mars_Viking_MDIM21_ClrMosaic_global_232m/cub |
 
 ## Space Agency Partner & Other Data
@@ -77,8 +78,7 @@ and honest sourcing, with AI-generated images marked on screen.
 |---|---|
 | Zhang et al. 2020: DOSIS 3D (DLR/ESA) ISS and Chang'e-4 LND (CNSA) lunar dose rates | https://doi.org/10.1126/sciadv.aaz1334 |
 | Space anaemia study (PMC10976580) | https://pmc.ncbi.nlm.nih.gov/articles/PMC10976580/ |
-| Crucian et al. 2018: virus reactivation in spaceflight | _URL needed_ |
-| MR089S: bone and mineral | _URL needed_ |
+| Crucian et al. 2018: Immune system dysregulation during spaceflight (virus reactivation) | https://pmc.ncbi.nlm.nih.gov/articles/PMC6038331/ |
 | Glasgow Coma Scale | https://www.glasgowcomascale.org/ |
 | Amboss: chest drain | https://www.amboss.com/us |
 | Stop the Bleed | https://www.stopthebleed.org/ |
@@ -88,8 +88,8 @@ and honest sourcing, with AI-generated images marked on screen.
 | 3D model: Human Kidney by neshallads (Sketchfab, CC BY 4.0) | https://sketchfab.com/3d-models/human-kidney-e1476ceb1e3b4412af5418eee9c5ed08 |
 | 3D model: Lungs by reynosa2000 (Sketchfab, CC BY 4.0) | https://sketchfab.com/3d-models/lungs-981d026657984895a90422d5e99e7ac2 |
 | 3D model: Human Anatomy, muscles and skeleton, by mohamedhussien (Sketchfab, CC BY 4.0) | https://sketchfab.com/3d-models/human-anatomy-faf0f3eaec554bcf854be2038993024f |
-| 3D model: Human Brain by AH (Sketchfab, CC BY 4.0) | _URL needed_ |
-| 3D model: Human Heart by TinkerLane Studio (Sketchfab, CC BY 4.0) | _URL needed_ |
+| 3D model: Human Brain by AH (Sketchfab, CC BY 4.0) | https://sketchfab.com/3d-models/human-brain-7a27c17fd6c0488bb31ab093236a47fb |
+| 3D model: Human Heart by TinkerLane Studio (Sketchfab, CC BY 4.0) | https://sketchfab.com/3d-models/heart-764e3bbc71664221bb123eef5c47fee8 |
 | Figure: dermatomes, front (Laboratoires Servier, CC BY-SA 3.0) | https://commons.wikimedia.org/wiki/File:Nervous_system_-_Dermatomes_1_--_Smart-Servier.png |
 | Figure: dermatomes, back (Laboratoires Servier, CC BY-SA 3.0) | https://commons.wikimedia.org/wiki/File:Nervous_system_-_Dermatomes_2_--_Smart-Servier.png |
 | Figure: heart (Laboratoires Servier, CC BY-SA 3.0) | https://commons.wikimedia.org/wiki/File:Cardiovascular_system_-_Heart_1_--_Smart-Servier.png |
