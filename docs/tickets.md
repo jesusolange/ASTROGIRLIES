@@ -43,7 +43,7 @@ Written 14 Nov 2026 from the app review and the vision discussion. Submission cl
 - [ ] Fix scale, rotation and position of brain, lungs, heart and kidneys.
 - [ ] Remove the stray hand and disc, or attach the pulse marker to the wrist.
 - [ ] Remove the dead `<img>` tags and the legacy anatomy SVG.
-- [ ] Protocols: use the 3D body instead of the SVG body.
+- [x] Protocols: use the 3D body instead of the SVG body. (Obsolete: T18 rebuilt Protocols as saved results and the report, with no body drawing.)
 
 **Done when.** Every organ sits in its anatomical place from the front view and the console shows no 404.
 
