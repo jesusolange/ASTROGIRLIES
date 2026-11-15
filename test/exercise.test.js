@@ -124,7 +124,7 @@ test("weekly resistive counts ARED sessions in the last seven days", () => {
     session("ared", { minutes: 20 }, 6),
     session("ared", { minutes: 20 }, 7)
   ];
-  assert.equal(RESISTIVE_WEEKLY_TARGET, 3);
+  assert.equal(RESISTIVE_WEEKLY_TARGET, 6);
   assert.equal(weeklyResistive(data, now), 3);
 });
 

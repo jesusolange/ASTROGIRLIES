@@ -1,4 +1,4 @@
-// Add one food: search My foods, look up a barcode, or type the values from the label.
+// Add one food: search Saved foods, look up a barcode, or type the values from the label.
 // Offline, the camera scan is disabled and one line explains why; manual entry and import still work.
 import { useEffect, useState } from "preact/hooks";
 import { Camera, GlassWater, Plus } from "lucide-preact";
@@ -13,11 +13,12 @@ const EXTRA = [
   ["carb", "Carbohydrate (g)"], ["prot", "Protein (g)"], ["fat", "Fat (g)"], ["fiber", "Fibre (g)"],
   ["sodium", "Salt as sodium (mg)"], ["veg", "Vegetables (g)"], ["fluid", "Fluid (mL)"], ["iron", "Iron (mg)"]
 ];
-const newDraft = () => ({ amount: 100, unit: "g", name: "", code: "", kcal: "", editName: false });
+const newDraft = () => ({ amount: 100, unit: "g", name: "", code: "", kcal: "", editName: false, found: false });
 
 function canScan() {
   return typeof window !== "undefined" && "BarcodeDetector" in window
-    && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === "function";
+    && typeof navigator !== "undefined" && navigator.mediaDevices
+    && typeof navigator.mediaDevices.getUserMedia === "function";
 }
 
 function autoMeal() {
@@ -38,10 +39,14 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
     return () => { window.removeEventListener("online", update); window.removeEventListener("offline", update); };
   }, []);
 
-  const update = (key, value) => setDraft((current) => ({ ...current, [key]: value }));
+  const update = (key, value) => setDraft((current) => ({
+    ...current,
+    [key]: value,
+    ...(key === "name" ? { found: false } : {})
+  }));
   const applyFood = (food, message) => {
     setDraft((current) => {
-      const next = { ...current };
+      const next = { ...current, found: true };
       if (food.name) next.name = food.name;
       if (food.unit) next.unit = food.unit;
       FIELDS.forEach((key) => { if (food[key] != null) next[key] = food[key]; });
@@ -63,9 +68,8 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
   };
 
   const startScan = () => {
-    if (!online) return;
     if (!canScan()) {
-      setNote("This browser cannot use the camera. Type the barcode, or fill in the food by hand.");
+      setNote("This browser cannot scan barcodes with the camera. Type the barcode, or fill in the food by hand.");
       return;
     }
     setScanning(true);
@@ -73,7 +77,7 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
 
   const pickFood = (food) => {
     setMeal(meal || autoMeal());
-    setDraft({ ...newDraft(), ...food, amount: food.unit === "portion" ? 1 : 100 });
+    setDraft({ ...newDraft(), ...food, amount: food.unit === "portion" ? 1 : 100, found: true });
     setNote("How much did you have? Change the amount.");
   };
 
@@ -95,7 +99,8 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
   };
 
   const eaten = Math.round((Number(draft.kcal) || 0) * factor(draft));
-  const hasName = String(draft.name || "").trim() && !draft.editName;
+  const hasName = Boolean(draft.found) && !draft.editName;
+  const scanSupported = canScan();
 
   return (
     <div class="ntr-add">
@@ -131,7 +136,7 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
                 onBlur={(event) => runLookup(event.currentTarget.value)}
                 onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); runLookup(event.currentTarget.value); } }}
               />
-              <Button className="ntr-scan-btn" aria-label="Scan barcode" disabled={!online} onClick={startScan}>
+              <Button className="ntr-scan-btn" aria-label="Scan barcode with the camera" onClick={startScan}>
                 <Camera size={20} aria-hidden="true" />
               </Button>
             </span>
@@ -147,6 +152,7 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
             </label>
           )}
         </div>
+        {!scanSupported ? <p class="ntr-note">This browser cannot scan barcodes with the camera. Type the barcode, or fill in the food by hand.</p> : null}
         {!online ? <p class="ntr-note">Barcode lookup needs a connection. Enter the food by hand or import a food list.</p> : null}
         <p class="ntr-note" aria-live="polite">{note}</p>
 

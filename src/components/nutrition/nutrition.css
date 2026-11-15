@@ -23,9 +23,9 @@
   color: var(--am-field-text); background: var(--am-bg-raised);
   border: 1px solid var(--am-field-border); border-radius: var(--am-radius-small); font: inherit; font-size: 14px;
 }
-.ntr-code { display: flex; gap: 8px; }
-.ntr-code input { flex: 1; }
-.ntr-scan-btn { margin-top: 0; flex: none; padding: 10px 12px; }
+.ntr-code { display: flex; align-items: stretch; gap: 8px; }
+.ntr-code input { flex: 1; height: 44px; }
+.ntr-code .ntr-scan-btn { margin-top: 0; flex: none; height: 44px; padding: 0 12px; }
 .ntr-found {
   display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px;
   background: var(--am-ok-bg); border: 1px solid var(--am-ok); border-radius: var(--am-radius-small);
@@ -41,7 +41,7 @@
 .ntr-form-actions .ui-btn { margin-top: 0; }
 .ntr-remember { display: flex; align-items: center; gap: 6px; color: var(--am-text-muted); font-size: 12px; }
 
-/* ---------- My foods ---------- */
+/* ---------- Saved foods ---------- */
 
 .ntr-foods { display: grid; gap: 10px; }
 .ntr-search {
@@ -69,6 +69,8 @@
 /* ---------- Targets ---------- */
 
 .ntr-targets { display: grid; grid-template-columns: minmax(220px, 270px) 1fr; gap: 20px; align-items: center; }
+.ui-card-aside .ntr-targets { grid-template-columns: 1fr; }
+.ui-card-aside .ntr-plate-chart { width: min(230px, 100%); }
 .ntr-plate { position: relative; }
 .ntr-plate-chart { position: relative; width: min(260px, 100%); aspect-ratio: 1; margin: 0 auto; }
 .ntr-plate-chart canvas { display: block; width: 100% !important; height: 100% !important; }
@@ -111,6 +113,8 @@
 .ntr-mini span { font-size: 12px; color: var(--am-text); }
 .ntr-mini em { font-size: 11px; font-style: normal; color: var(--am-text-muted); }
 
+.ntr-iron-note { margin: 0; padding: 10px 14px; border-radius: var(--am-radius-small); background: var(--am-info-bg); color: var(--am-text); font-size: 12px; line-height: 1.55; }
+
 .ntr-meals { display: flex; flex-wrap: wrap; gap: 8px; }
 .ntr-meals span { padding: 5px 12px; border-radius: 999px; background: var(--am-field-bg); border: 1px solid var(--am-border); color: var(--am-text-muted); font-size: 12px; }
 .ntr-meals span.is-on { background: var(--am-ok-bg); border-color: var(--am-ok); color: var(--am-text); }
@@ -125,6 +129,7 @@
 .ntr-result-head span { color: var(--am-text-muted); font-size: 12px; }
 .ntr-result-note { margin: 0; color: var(--am-text); font-size: 13px; line-height: 1.55; }
 .ntr-result-note .ui-btn { margin-left: 8px; }
+.ntr-iron-line { margin: 0; color: var(--am-text-muted); font-size: 12px; line-height: 1.55; }
 
 .ntr-log ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .ntr-entry { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--am-field-bg); border-radius: var(--am-radius-small); }

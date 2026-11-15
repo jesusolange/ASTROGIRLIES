@@ -75,6 +75,22 @@ export const SOURCES = [
     usedBy: ["anemia"],
   },
   {
+    id: "jsc-67378-2020",
+    title: "JSC-67378 Rev 1: Nutritional Requirements for Exploration Missions up to 365 days",
+    author: "NASA Johnson Space Center",
+    url: "https://ntrs.nasa.gov/api/citations/20205008306/downloads/JSC67378%20Expl%20Nutr%20Reqs%20042020.pdf",
+    licence: "Public domain (U.S. Government work)",
+    usedBy: [],
+  },
+  {
+    id: "sprint-study-2020",
+    title: "English et al. 2020: High intensity training during spaceflight (NASA Sprint Study)",
+    author: "English KL et al., npj Microgravity 2020;6:21",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC7434884/",
+    licence: "Referenced, not reproduced",
+    usedBy: [],
+  },
+  {
     id: "red-cross-first-aid",
     title: "First Aid Steps",
     author: "American Red Cross",

@@ -7,15 +7,20 @@
 
 /* ---------- Chooser ---------- */
 
-.exr-chooser { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.exr-chooser { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .exr-device {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  min-height: 44px; padding: 8px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+  min-height: 44px; padding: 10px; cursor: pointer; text-align: left;
   color: var(--am-text); background: var(--am-field-bg);
-  border: 2px solid transparent; border-radius: var(--am-radius-small);
-  font: inherit; font-size: 12px; font-weight: 700;
+  border: 2px solid transparent; border-radius: var(--am-radius);
+  font: inherit;
 }
-.exr-device img { width: 56px; height: 56px; object-fit: contain; border-radius: 8px; background: var(--am-bg-raised); }
+.exr-device img {
+  display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover;
+  border-radius: var(--am-radius-small); background: var(--am-bg-raised);
+}
+.exr-device-name { font-size: 15px; font-weight: 700; }
+.exr-device small { color: var(--am-text-muted); font-size: 12px; }
 .exr-device:hover { border-color: var(--am-border-strong); }
 .exr-device.is-on { border-color: var(--am-accent); background: var(--am-selected-bg); }
 .exr-selected { margin: 0; color: var(--am-text); font-size: 13px; }
@@ -23,7 +28,7 @@
 /* ---------- Fields ---------- */
 
 .exr-form { display: grid; gap: 12px; padding: 14px; background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius); }
-.exr-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.exr-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .exr-field { display: grid; gap: 5px; min-width: 0; color: var(--am-text); font-size: 12px; }
 .exr-field > span { color: var(--am-text-muted); font-weight: 600; }
 .exr-field input,
@@ -55,10 +60,10 @@
 
 /* ---------- Instructions ---------- */
 
-.exr-instructions { padding: 12px 14px; background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius-small); }
-.exr-instructions summary { min-height: 32px; cursor: pointer; color: var(--am-heading); font-weight: 600; }
-.exr-device-steps { margin-top: 14px; }
-.exr-device-steps h3 { margin: 0; color: var(--am-text); font-size: 14px; }
+.exr-instructions { display: grid; gap: 2px; padding: 12px 14px; background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius-small); }
+.exr-instructions-title { margin: 0 0 4px; color: var(--am-heading); font-size: 15px; }
+.exr-device-steps { padding: 4px 0; border-top: 1px solid var(--am-border); }
+.exr-device-steps summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--am-heading); font-weight: 600; }
 .exr-device-steps > p { margin: 2px 0 10px; color: var(--am-text-muted); font-size: 12px; }
 
 .exr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
@@ -66,6 +71,6 @@
 .exr-hint { color: var(--am-text-muted); font-size: 12px; }
 
 @media (max-width: 640px) {
-  .exr-chooser { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .exr-device img { width: 48px; height: 48px; }
+  .exr-chooser { grid-template-columns: 1fr; }
+  .exr-fields { grid-template-columns: 1fr; }
 }

@@ -4,8 +4,9 @@
 export const KEY = "astrotwin-exercise-sessions";
 export const TYPES = ["ared", "t2", "cevis"];
 
-// Our design choice, labelled on screen: three resistive sessions a week keeps the bone-loading habit.
-export const RESISTIVE_WEEKLY_TARGET = 3;
+// The station programme performs aerobic and resistance exercise on six days per week (English et al.,
+// npj Microgravity 2020;6:21).
+export const RESISTIVE_WEEKLY_TARGET = 6;
 
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const dayOf = (value) => {

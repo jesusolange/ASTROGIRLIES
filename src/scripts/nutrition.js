@@ -10,13 +10,21 @@ export const MEALS = ["Breakfast", "Lunch", "Dinner", "Snack"];
 export const UNITS = ["g", "mL", "portion"];
 export const AF_OPTIONS = [1.11, 1.25];
 
-// Iron in flight: NASA spaceflight nutrition cites about 8 to 10 mg per day for every crew member, lower than
-// the ground value for women because iron stores rise in weightlessness. This 10 mg goal is our design choice;
-// the app records iron from the package label or the imported food list and never estimates it.
-export const IRON_GOAL = 10;
+// Iron in flight is a limit, not a target. JSC-67378 Rev 1 (NASA JSC, 20 April 2020, page 6) requires iron
+// intake not to exceed 8 mg per day for men and women; women under 50 who have not reached menopause need at
+// least 18 mg per day unless menstruation is suppressed with medication. The app records iron from the package
+// label or the imported food list and never estimates it.
+export const IRON_LIMIT = 8;
+export const IRON_MIN_PRE = 18;
 
-export function ironTarget() {
-  return IRON_GOAL;
+export function ironLimit() {
+  return IRON_LIMIT;
+}
+
+export function ironMinimum(prof) {
+  if (!prof || prof.sex !== "f" || prof.meno === "post") return null;
+  const age = Number(prof.age);
+  return Number.isFinite(age) && age < 50 ? IRON_MIN_PRE : null;
 }
 
 const round1 = (n) => Math.round(n * 10) / 10;
@@ -68,12 +76,20 @@ export function targets(prof, evaHours, af = 1.11) {
     sodiumMax: 2300,
     fluid: Math.max(32 * kg, pick(2500, 2100)),
     veg: 400,
-    iron: ironTarget(prof),
+    iron: IRON_LIMIT,
+    ironMin: ironMinimum(prof),
     evaKcal: 200 * (evaHours || 0)
   };
 }
 
 export const dayEntries = (state, day) => (state.entries || []).filter((e) => isoDay(new Date(e.time)) === day);
+
+// Everything the meal card and its aside show for one day.
+export function dayView(state, prof, day = isoDay(new Date())) {
+  const eva = Number((state.eva || {})[day]) || 0;
+  const list = dayEntries(state, day).sort((a, b) => new Date(a.time) - new Date(b.time));
+  return { day, eva, T: targets(prof, eva, state.af || 1.11), list, tot: totalsOf(list) };
+}
 
 const DAY_MEALS = ["Breakfast", "Lunch", "Dinner"];
 
@@ -107,8 +123,8 @@ export function plateShares(tot) {
   return rows.map((row) => ({ ...row, share: total > 0 ? row.grams / total : 0, total }));
 }
 
-export function ironUnder(tot, T) {
-  return Boolean(T && tot && tot.iron < T.iron);
+export function ironOver(tot, T) {
+  return Boolean(T && tot && tot.iron > T.iron);
 }
 
 export function totalsOf(list) {
@@ -214,11 +230,11 @@ export function summaryFor(state, prof, now = new Date()) {
     const T = targets(prof, Number((state.eva || {})[key]) || 0, state.af || 1.11);
     if (!T) continue;
     const t = totalsOf(list);
-    rows.push({ ratio: t.kcal / T.kcal, fluid: T.fluid ? t.fluid / T.fluid : null });
+    rows.push({ ratio: t.kcal / T.kcal, fluid: T.fluid ? t.fluid / T.fluid : null, iron: t.iron });
   }
   if (!rows.length) return null;
   const avg = (f) => rows.reduce((a, r) => a + (r[f] || 0), 0) / rows.length;
-  return { ratio: avg("ratio"), fluid: avg("fluid"), days: rows.length };
+  return { ratio: avg("ratio"), fluid: avg("fluid"), iron: avg("iron"), ironLimit: IRON_LIMIT, days: rows.length };
 }
 
 const appetiteTell = () => {
@@ -235,6 +251,14 @@ export function findingsFor(s) {
   else if (s.ratio > 1.2) out.push({ level: "review", title: "Nutrition · calories above goal", saw: `You ate about ${pct}% of your calorie goal.`, todo: "Look at portion sizes and snacks. Keep exercising every day." });
   else out.push({ level: "ok", title: "Nutrition · calories", saw: `You ate about ${pct}% of your calorie goal.`, todo: "Keep the balance." });
   if (s.fluid != null && s.fluid > 0 && s.fluid < 0.6) out.push({ level: "review", title: "Nutrition · low fluids", saw: `You drank about ${Math.round(s.fluid * 100)}% of your fluid goal.`, todo: "Drink water through the day. Fluids shift in space and thirst can be weak." });
+  if (s.iron != null && s.ironLimit && s.iron > s.ironLimit) {
+    out.push({
+      level: "info",
+      title: "Nutrition · iron above the flight limit",
+      saw: `You averaged ${Math.round(s.iron * 10) / 10} mg of iron a day over the last ${s.days} logged day${s.days > 1 ? "s" : ""}. NASA's limit in flight is ${s.ironLimit} mg a day, because iron builds up in the body in space.`,
+      todo: "Check food and supplement labels and keep the next meals low in iron."
+    });
+  }
   return out;
 }
 
@@ -257,7 +281,7 @@ export function parseFoodList(text, filename = "list.csv") {
     });
 }
 
-// Imported foods go to the front so they are found first when the astronaut searches "My foods".
+// Imported foods go to the front so they are found first when the astronaut searches "Saved foods".
 export function mergeFoodList(lib, rows) {
   const next = [...lib];
   rows.forEach((item) => {

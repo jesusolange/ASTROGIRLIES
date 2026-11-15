@@ -1,4 +1,4 @@
-// "My foods": search the saved and imported list, then pick an amount. Imported CSV foods sit first.
+// Saved foods: search the saved and imported list, then pick an amount. Imported CSV foods sit first.
 import { useState } from "preact/hooks";
 import { Search, Upload } from "lucide-preact";
 import { searchFoods } from "../../scripts/nutrition.js";
@@ -11,12 +11,13 @@ export default function MyFoods({ lib, onPick, onImport }) {
 
   return (
     <section class="ntr-foods">
-      <h3 class="ntr-subtitle">My foods</h3>
+      <h3 class="ntr-subtitle">Saved foods</h3>
+      <p class="ntr-note">Foods you saved or imported. Tap one, then enter the amount.</p>
       <label class="ntr-search">
         <Search size={18} aria-hidden="true" />
         <input
           type="search" value={query} placeholder="Search saved and imported foods"
-          aria-label="Search my foods" onInput={(event) => setQuery(event.currentTarget.value)}
+          aria-label="Search saved foods" onInput={(event) => setQuery(event.currentTarget.value)}
         />
       </label>
 

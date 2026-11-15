@@ -1,4 +1,4 @@
-// The three machines as small thumbnails. The abbreviation itself is defined with Term beside them.
+// The three machines as large pictures. Choosing one selects it and reveals its fields below.
 export default function DeviceChooser({ devices, value, onChange }) {
   return (
     <div class="exr-chooser" role="group" aria-label="Training machine">
@@ -10,8 +10,9 @@ export default function DeviceChooser({ devices, value, onChange }) {
           aria-pressed={value === device.type ? "true" : "false"}
           onClick={() => onChange(device.type)}
         >
-          <img src={device.image} alt="" loading="lazy" decoding="async" />
-          <span>{device.title}</span>
+          <img src={device.image} alt={device.alt} loading="lazy" decoding="async" />
+          <span class="exr-device-name">{device.title}</span>
+          <small>{device.subtitle}</small>
         </button>
       ))}
     </div>

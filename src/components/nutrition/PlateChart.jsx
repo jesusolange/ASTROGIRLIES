@@ -29,13 +29,19 @@ export default function PlateChart({ totals }) {
     const plugin = {
       id: "nutritionPlateIcons",
       afterDraw(chart) {
+        const canvas = chart.canvas;
+        const sx = chart.width ? canvas.clientWidth / chart.width : 1;
+        const sy = chart.height ? canvas.clientHeight / chart.height : 1;
         const arcs = (chart.getDatasetMeta(0).data || []);
         const next = arcs
           .map((arc, index) => {
             if (!rows[index] || rows[index].grams <= 0) return null;
-            const angle = (arc.startAngle + arc.endAngle) / 2;
+            const halfAngle = (arc.startAngle + arc.endAngle) / 2;
             const radius = (arc.innerRadius + arc.outerRadius) / 2;
-            return { key: rows[index].key, x: arc.x + Math.cos(angle) * radius, y: arc.y + Math.sin(angle) * radius };
+            const centre = typeof arc.getCenterPoint === "function"
+              ? arc.getCenterPoint()
+              : { x: arc.x + Math.cos(halfAngle) * radius, y: arc.y + Math.sin(halfAngle) * radius };
+            return { key: rows[index].key, x: centre.x * sx, y: centre.y * sy };
           })
           .filter(Boolean);
         const layout = JSON.stringify(next);

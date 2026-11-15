@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import {
   targets, totalsOf, dayEntries, factor, unitLabel, buildEntry, status,
   weekRows, summaryFor, findingsFor, addToLibrary, parseFoodList, mergeFoodList,
-  isoDay, blankNutrition, waterEntry, lookupFood, doneToday, plateShares, ironTarget,
-  ironUnder, searchFoods, removeEntry, todaySummary
+  isoDay, blankNutrition, waterEntry, lookupFood, doneToday, plateShares, ironLimit,
+  ironMinimum, ironOver, searchFoods, removeEntry, todaySummary
 } from "../src/scripts/nutrition.js";
 
 const profile = { age: 40, sex: "m", weightKg: 80, heightCm: 180, startDate: "2026-11-01" };
@@ -22,14 +22,23 @@ test("energy target follows the male equation at activity 1.11", () => {
   close(T.fluid, 2560);
   close(T.sodiumMax, 2300);
   close(T.veg, 400);
-  close(T.iron, 10);
+  close(T.iron, 8);
+  assert.equal(T.ironMin, null);
 });
 
-test("the iron goal is the same for every crew member", () => {
-  assert.equal(ironTarget({ sex: "m" }), 10);
-  assert.equal(ironTarget({ sex: "f", meno: "pre" }), 10);
-  assert.equal(ironTarget({ sex: "x" }), 10);
-  assert.equal(ironTarget(null), 10);
+test("iron is a limit of 8 mg for every crew member", () => {
+  assert.equal(ironLimit(), 8);
+  assert.equal(targets(profile, 0, 1.11).iron, 8);
+});
+
+test("women under 50 who are not postmenopausal get the 18 mg minimum", () => {
+  assert.equal(ironMinimum({ sex: "f", meno: "pre", age: 30 }), 18);
+  assert.equal(ironMinimum({ sex: "f", age: 30 }), 18);
+  assert.equal(ironMinimum({ sex: "f", meno: "pre", age: 55 }), null);
+  assert.equal(ironMinimum({ sex: "f", meno: "post", age: 45 }), null);
+  assert.equal(ironMinimum({ sex: "m" }), null);
+  assert.equal(ironMinimum(null), null);
+  assert.equal(targets({ ...profile, sex: "f", meno: "pre", age: 30 }, 0, 1.11).ironMin, 18);
 });
 
 test("prefer not to say averages the male and female formulas", () => {
@@ -84,12 +93,24 @@ test("plate shares follow the grams eaten and add up", () => {
   assert.deepEqual(plateShares({ carb: 0, prot: 0, veg: 0 }).map((row) => row.share), [0, 0, 0]);
 });
 
-test("iron under target is flagged and an entry can be removed", () => {
+test("iron over the limit is marked and an entry can be removed", () => {
   const T = targets(profile, 0, 1.11);
-  assert.equal(ironUnder({ iron: 4 }, T), true);
-  assert.equal(ironUnder({ iron: 10 }, T), false);
+  assert.equal(ironOver({ iron: 9 }, T), true);
+  assert.equal(ironOver({ iron: 8 }, T), false);
   const state = { ...blankNutrition(), entries: [entry(at(2026, 11, 14), 100)] };
   assert.equal(removeEntry(state, state.entries[0].id).entries.length, 0);
+});
+
+test("iron above the flight limit is only an info finding", () => {
+  const now = new Date(2026, 10, 14, 12);
+  const high = summaryFor({ ...blankNutrition(), entries: [entry(at(2026, 11, 14), 200, { iron: 10 })] }, profile, now);
+  close(high.iron, 10);
+  assert.equal(high.ironLimit, 8);
+  const iron = findingsFor(high).filter((finding) => /iron/i.test(finding.title));
+  assert.equal(iron.length, 1);
+  assert.equal(iron[0].level, "info");
+  const low = summaryFor({ ...blankNutrition(), entries: [entry(at(2026, 11, 14), 200, { iron: 5 })] }, profile, now);
+  assert.equal(findingsFor(low).filter((finding) => /iron/i.test(finding.title)).length, 0);
 });
 
 test("entries are grouped by the local day", () => {
