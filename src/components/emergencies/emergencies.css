@@ -6,7 +6,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 14px 18px;
-  margin: 0 0 6px;
+  margin: 0 0 24px;
   color: var(--am-text);
   background: var(--am-surface);
   border: 2px solid var(--am-danger);
@@ -18,12 +18,13 @@
 @keyframes emgPulse { 50% { box-shadow: 0 0 24px var(--am-danger); } }
 
 .emg-h { margin: 18px 0 8px; color: var(--am-heading); font-size: 1.05rem; }
-.emg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.emg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); grid-auto-rows: 1fr; gap: 12px; }
 .emg-tile {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-height: 140px;
   padding: 16px;
   color: var(--am-text);
   text-align: left;
