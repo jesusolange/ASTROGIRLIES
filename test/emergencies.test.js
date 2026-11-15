@@ -316,17 +316,75 @@ test("the section markup lives in Preact components and the module builds no HTM
   const page = read("src", "components", "App.jsx");
   const area = read("src", "components", "shell", "AreaView.jsx");
   const view = read("src", "components", "emergencies", "EmergenciesView.jsx");
+  const index = read("src", "components", "emergencies", "EmergencyIndex.jsx");
   const script = read("src", "scripts", "emergencies.js");
   assert.match(area, /<EmergenciesView \/>/);
   assert.doesNotMatch(page, /AstroMedNav/);
   assert.match(view, /import "\.\/emergencies\.css"/);
-  assert.match(view, /openCard\.value/);
-  assert.match(view, /indexCards/);
+  assert.match(view, /<EmergencyIndex/);
   assert.match(view, /<EmergencyCard/);
+  assert.match(index, /indexCards/);
+  assert.match(index, /SearchBox/);
+  assert.match(index, /VitalEntry/);
+  assert.match(index, /groupEmergencies/);
   const nav = read("src", "lib", "nav.js");
   assert.match(nav, /emergency/);
   assert.match(script, /window\.AstroMedEmergencies = \{ open, situations, findings \}/);
-  assert.doesNotMatch(script, /innerHTML|insertAdjacentHTML|querySelector|localStorage/);
+  assert.doesNotMatch(script, /innerHTML|insertAdjacentHTML|querySelector|localStorage|DOMContentLoaded/);
+});
+
+test("the index groups the kept cards by urgency", async () => {
+  const { groupEmergencies, sectionFor, SECTIONS } = await import("../src/scripts/emergencies.js");
+  assert.deepEqual(SECTIONS.map((section) => section.title), ["Act now", "Within hours", "Space events", "Slow risks"]);
+  const solo = groupEmergencies(indexCards(1));
+  assert.deepEqual(solo.map((section) => section.cards.map((card) => card.id)), [
+    ["breath", "bleeding", "vision-change"],
+    ["belly", "fever", "back", "calf", "fracture"],
+    ["cabin-air", "storm"],
+  ]);
+  const crew = groupEmergencies(indexCards(6));
+  assert.deepEqual(crew.map((section) => section.cards.length), [4, 5, 2]);
+  assert.equal(sectionFor(CARD_BY_ID.get("storm")), "space");
+  assert.equal(sectionFor(CARD_BY_ID.get("gcs")), "minutes");
+  assert.equal(sectionFor(CARD_BY_ID.get("calf")), "hours");
+});
+
+test("search matches titles, symptoms, terms and the shared self-harm card", async () => {
+  const { matchesQuery, filterCards } = await import("../src/scripts/emergencies.js");
+  const calf = CARD_BY_ID.get("calf");
+  assert.equal(matchesQuery(calf, "calf"), true);
+  assert.equal(matchesQuery(calf, "dvt"), true);
+  assert.equal(matchesQuery(calf, "swollen calf"), false);
+  assert.equal(matchesQuery(CARD_BY_ID.get("self-harm"), "suicide"), true);
+  assert.equal(matchesQuery(BONE_LOSS, "bone"), true);
+  assert.equal(matchesQuery(ANEMIA, "anemia"), true);
+  assert.deepEqual(filterCards(indexCards(6), "calf").map((card) => card.id), ["calf"]);
+  assert.equal(filterCards(indexCards(6), "zzz").length, 0);
+});
+
+test("the blood loss table is one row per class with words, not arrows", async () => {
+  const { bloodTable, arrowText } = await import("../src/scripts/emergencies.js");
+  const model = bloodTable(BLOOD_LOSS);
+  assert.equal(model.rows.length, 4);
+  assert.equal(model.columns.length, 10);
+  assert.deepEqual(model.rows.map((row) => row.head), BLOOD_LOSS.head);
+  assert.deepEqual(model.rows[1].cells.slice(0, 3), ["15–30%", "unchanged or higher", "unchanged"]);
+  assert.equal(arrowText("↑↑"), "much higher");
+  assert.equal(arrowText("↓↓"), "much lower");
+  for (const row of model.rows) {
+    for (const cell of row.cells) {
+      assert.doesNotMatch(String(cell), /[↔↑↓]/);
+    }
+  }
+});
+
+test("the slow risks stay as reference cards in the deck", () => {
+  const cards = read("src", "components", "emergencies", "cards.js");
+  assert.match(cards, /guide\(BONE_LOSS, "bones"\)/);
+  assert.match(cards, /guide\(ANEMIA, "nutrition"\)/);
+  assert.match(cards, /reference: true/);
+  assert.match(cards, /id: card\.id/);
+  assert.match(cards, /topic/);
 });
 
 test("the emergency styles use only the colour tokens", () => {
@@ -334,4 +392,8 @@ test("the emergency styles use only the colour tokens", () => {
   assert.doesNotMatch(css, /#[0-9a-fA-F]{3,8}\b/);
   assert.doesNotMatch(css, /rgba?\(/);
   assert.match(css, /var\(--am-danger\)/);
+  assert.doesNotMatch(css, /emgPulse|infinite/);
+  assert.equal((css.match(/border-left/g) || []).length, 1, "only the range tick keeps a side line");
+  assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.match(css, /\.emg-bt i,\s*\.emg-storm-step\s*\{\s*animation:\s*none;/);
 });

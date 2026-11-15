@@ -1,17 +1,19 @@
 import CardIcon from "./CardIcon.jsx";
-import { openCard } from "../../scripts/emergencies.js";
 
-export default function Tile({ card }) {
-  const open = () => {
-    openCard.value = card.id;
-    window.scrollTo({ top: 0 });
-  };
+export default function Tile({ entry, active, onOpen }) {
+  const danger = entry.kind === "emergency" && entry.card.actWithin === "minutes";
   return (
-    <button type="button" class={`emg-tile ${card.tone}`} data-emg-open={card.id} onClick={open}>
-      <span class="emg-ic"><CardIcon name={card.icon} /></span>
-      <b>{card.title}</b>
-      <small>{card.sign}</small>
-      {card.tag && <em>{card.tag}</em>}
+    <button
+      type="button"
+      class={`emg-tile${danger ? " is-danger" : ""}${active ? " is-active" : ""}`}
+      data-emg-open={entry.id}
+      aria-current={active ? "true" : undefined}
+      onClick={onOpen}
+    >
+      <span class="emg-ic"><CardIcon name={entry.icon} /></span>
+      <b>{entry.title}</b>
+      <small>{entry.sub}</small>
+      {entry.tag ? <em>{entry.tag}</em> : null}
     </button>
   );
 }

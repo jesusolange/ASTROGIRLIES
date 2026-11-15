@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { useStored } from "../../lib/use-stored.js";
 import { ntxStatus } from "../../scripts/emergencies.js";
+import RichText from "./RichText.jsx";
 
 const MAX = 130;
 const pct = (value) => (value / MAX) * 100;
@@ -22,7 +23,7 @@ export default function NtxCheck({ ranges }) {
       </div>
       <div class="emg-vf">
         <label>
-          <span>Your N-telopeptide (urine)</span>
+          <span><RichText text="Your N-telopeptide (urine)" /></span>
           <input type="number" inputmode="decimal" data-ntx value={value} onInput={(event) => setValue(event.currentTarget.value)} />
         </label>
       </div>

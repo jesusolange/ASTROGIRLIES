@@ -1,10 +1,15 @@
 import { signal } from "@preact/signals";
 import { VITALS_REFERENCE, resolveCardId, situations as listSituations } from "../data/emergencies.js";
 import { NTX_RANGES } from "../data/slow-risks.js";
+import { openEmergency } from "../lib/nav.js";
 
 const NORMAL = VITALS_REFERENCE.normal;
 
+// Older callers read this signal; the screen itself follows the hash route.
 export const openCard = signal(null);
+
+// The search box text survives a card opening, so Back returns to the same list.
+export const searchTerm = signal("");
 
 export function gcsScore(picks) {
   const picked = picks.filter(Boolean).length;
@@ -68,13 +73,106 @@ export function findings() {
 export function open(id) {
   const resolved = resolveCardId(id);
   if (!resolved) return false;
-  openCard.value = resolved;
-  if (window.AstroMedNav) window.AstroMedNav.show("emergencies");
+  openEmergency(resolved);
   return true;
 }
 
-if (typeof document !== "undefined") {
-  document.addEventListener("DOMContentLoaded", () => {
-    window.AstroMedEmergencies = { open, situations, findings };
-  });
+// ---------- Index: urgency sections ----------
+
+export const SECTIONS = [
+  { id: "minutes", title: "Act now", note: "Act within minutes." },
+  { id: "hours", title: "Within hours", note: "Act within a few hours." },
+  { id: "space", title: "Space events", note: "Cabin and solar events." },
+  { id: "slow", title: "Slow risks", note: "Guides that explain. They are not recorded." },
+];
+
+const SPACE_EVENT_IDS = new Set(["cabin-air", "storm"]);
+
+export function sectionFor(card) {
+  if (!card) return null;
+  if (SPACE_EVENT_IDS.has(card.id)) return "space";
+  return card.actWithin === "minutes" ? "minutes" : "hours";
+}
+
+export function groupEmergencies(cards) {
+  return SECTIONS.filter((section) => section.id !== "slow").map((section) => ({
+    ...section,
+    cards: cards.filter((card) => sectionFor(card) === section.id),
+  }));
+}
+
+// ---------- Search ----------
+
+const norm = (value) => String(value || "")
+  .toLowerCase()
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "");
+
+function collect(node, out) {
+  if (node == null) return;
+  if (typeof node === "string") {
+    out.push(node);
+    return;
+  }
+  if (Array.isArray(node)) {
+    node.forEach((item) => collect(item, out));
+    return;
+  }
+  if (typeof node !== "object") return;
+  for (const [key, value] of Object.entries(node)) {
+    if (key === "src" || key === "icon" || key === "sourceIds") continue;
+    collect(value, out);
+  }
+}
+
+export function cardText(card) {
+  const out = [];
+  collect(card, out);
+  return norm(out.join(" "));
+}
+
+export function matchesQuery(card, query) {
+  const tokens = norm(query).split(/\s+/).filter(Boolean);
+  if (!tokens.length) return true;
+  const haystack = cardText(card);
+  return tokens.every((token) => haystack.includes(token));
+}
+
+export function filterCards(cards, query) {
+  if (!norm(query).trim()) return cards;
+  return cards.filter((card) => matchesQuery(card, query));
+}
+
+// ---------- Blocks: generated text ----------
+
+const ARROWS = {
+  "↔": "unchanged",
+  "↑": "higher",
+  "↑↑": "much higher",
+  "↓": "lower",
+  "↓↓": "much lower",
+};
+
+export function arrowText(cell) {
+  return String(cell)
+    .split("/")
+    .map((part) => part.trim())
+    .map((part) => ARROWS[part] || part)
+    .join(" or ");
+}
+
+// One row per class, values in columns, words instead of arrows.
+export function bloodTable(table) {
+  const heads = table.rows.map((row) => row[0]);
+  return {
+    columns: ["Class", ...heads],
+    rows: table.head.map((head, index) => ({
+      head,
+      cells: table.rows.map((row) => arrowText(row[index + 1])),
+    })),
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.AstroMedEmergencies = { open, situations, findings };
 }

@@ -1,8 +1,16 @@
 import { Fragment } from "preact";
 import { useState } from "preact/hooks";
 import { gcsScore } from "../../scripts/emergencies.js";
+import { alsoTell } from "../../scripts/mission.js";
+import RichText from "./RichText.jsx";
 
 const INITIAL = "Tap one box in each column. Score: 3 to 15.";
+
+function resultText(result) {
+  if (!result.total) return result.message;
+  const sentence = result.tell ? alsoTell("the flight surgeon") : "";
+  return sentence ? `${result.message} ${sentence}` : result.message;
+}
 
 export default function GcsPicker({ table }) {
   const [picks, setPicks] = useState([0, 0, 0]);
@@ -37,8 +45,8 @@ export default function GcsPicker({ table }) {
       </div>
       <div class={`emg-gres${touched && result.total ? ` emg-${result.level}` : ""}`}>
         {!touched || !result.total
-          ? (touched ? result.message : INITIAL)
-          : <><b>{result.total}</b> / 15 <span>{result.message}</span></>}
+          ? <RichText text={touched ? result.message : INITIAL} />
+          : <><b>{result.total}</b> / 15 <span><RichText text={resultText(result)} /></span></>}
       </div>
     </>
   );

@@ -7,6 +7,7 @@ export const TERMS = {
   "T2": "The second treadmill in orbit, used with a harness that holds the runner down.",
   "CEVIS": "Cycle Ergometer with Vibration Isolation and Stabilization: the exercise bike used in orbit.",
   "N-telopeptide": "A fragment of bone collagen measured in urine as a marker of bone breakdown.",
+  "Flight surgeon": "The mission's doctor on Earth who supports the crew.",
   "GCS": "Glasgow Coma Scale: a score of eye, verbal and motor responses that describes level of consciousness.",
   "SANS": "Spaceflight Associated Neuro-ocular Syndrome: eye and vision changes linked to spaceflight.",
   "ICR": "Intercostal space: the gap between two ribs, used to place a chest needle or drain.",
