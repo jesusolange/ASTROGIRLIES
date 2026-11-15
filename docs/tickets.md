@@ -1,196 +1,118 @@
-# AstroMed tickets (draft, not yet filed on GitHub)
+# AstroMed remaster: tickets T21 to T40
 
-Written 14 Nov 2026 from the app review and the vision discussion. Submission closes Sunday 15 Nov, 23:59 local time.
+Written 15 Nov 2026 from the design critique and the owner's review. Submission closes tonight, 23:59 local time.
+These replace the earlier tickets (see git history of this file). One spec per ticket in `docs/specs/T21.md` to
+`T40.md`. `docs/specs/RULES.md` is the new text for `AGENTS.md` and `docs/decisions.md`; T21 applies it.
+
+## How to run them
+
+- Batches run in order. Inside a batch the five tickets run in parallel; their owned paths do not overlap.
+- A batch starts only after the one before it is merged into `name15` and `pnpm test`, `pnpm build` pass.
+- If time runs out, the last merged batch is the submission. Each batch leaves the app working.
+- T30 (3D repair) has no dependencies and may start with batch 1 if a sixth agent is free.
+
+| Batch | Tickets | What the app gains |
+|---|---|---|
+| 1 | T21 T22 T23 T24 T25 | Vite and Preact only; mission fields; mission-worded copy; no false reassurance; 11 emergency cards |
+| 2 | T26 T27 T28 T29 T30 | Top bar with three destinations; Home; shared kit and deck frame; profile and cover; 3D repair |
+| 3 | T31 T32 T33 T34 T35 | Every check as cards in the deck; Emergency screen rebuilt |
+| 4 | T36 T37 T38 T39 | Progress with charts; formal report; one stylesheet system; phone and keyboard pass |
+| last | T40 | Demo mission walk-through, dead code removed, offline check |
 
 ## Decisions these tickets rest on
 
-- **User:** the astronaut, alone. No doctor view, no live "call a doctor".
-- **Setting:** long Moon or Mars mission with delayed or missing contact with Earth. ISS is the source of reference data.
-- **Differentiator:** every indicator ends in a concrete action.
-- **NASA data:** Human Research Roadmap risk ratings and NASA-STD-3001 drive the evaluation. The submission does not depend on the pending NLSP access request.
-- **Wearables:** simulated data only, labelled as simulated.
-- **Home:** one "Today" page replaces Overview, Readiness and the Missions task list.
-- **Section pattern:** every section has Record, History and What to do.
-- **Demo:** a slide presentation of at most 7 slides (title and intro slides count), in English, not a video.
+**Product**
+- The mission is set only in the profile: destination, crew size, start date, duration in days. The link to Earth is
+  derived from the destination (`comm()`), never chosen separately.
+- Copy follows the mission. Every action first says what the astronaut can do alone. "Tell the flight surgeon" may
+  follow as a second step, worded by the link delay. Content about helping a crewmate shows only when crew size is
+  over 1.
+- Professional tone. One visual system, the current palette. No celebration, mascot, emoji, demo names or
+  developer notes ("CHECK", "SOURCE-NEEDED", "pending review", "not yet reviewed") on screen.
+- The medical text is the team medic's and is kept as written. Agents do not rewrite medical content; they move it
+  and change who it addresses.
+- "Not a medical device" appears once, in the fixed footer. Sources, study references, reference tables and asset
+  credits live in one Sources dialog in the profile; a card keeps at most a short "Source" link that opens it.
 
-## Still open
+**Structure**
+- Vite with the Preact plugin; a minimal `index.html`; one root component. Astro is removed.
+- Dependencies added: `lucide-preact` (icons, ISC), `chart.js` (charts, MIT). Bundled, no CDN. No tooltip library:
+  term definitions use the HTML `popover` attribute.
+- Top bar, full width, no outer margin: brand, Home / Check / Progress, mission chip, red Emergency button
+  (key `E`), theme, profile. On phone the three destinations are a bottom tab bar.
+- Routes are URL hashes: `#/home`, `#/check`, `#/check/<card id>`, `#/progress`, `#/emergency`,
+  `#/emergency/<card id>`. Back and forward work everywhere.
+- Deleted as pages: Overview, Readiness, Missions, Settings, Environment, Mission risks, Daily Checkup, Protocols
+  (becomes the report export on Progress). The "Next destination" card is deleted.
+- Record, History, What to do is app-wide, not per section: Check records, Progress holds all history, Home says
+  what to do.
 
-- Priority and cut line for Sunday night (which tickets are must-have).
-- Who owns what (2 developers, 1 medic).
-- Demo story and who builds the slides.
-- Whether to add a build tool before the deadline (to be reconsidered Sunday).
+**Screens**
+- Home: streak and completion ring at the top (static, no animation of reward), what is due, "Needs attention"
+  linking to the matching emergency card. The score shows only when at least 50% of the due areas are recorded;
+  below that it says how many are recorded and lists the missing checks.
+- Intervals come from the NASA risk score of each topic for the chosen mission (as `today.js` does now), labelled
+  as our design choice.
+- Check: a deck of cards built from one shared card component. A card has inputs, an inline error under the field
+  with focus, Save, then the result and one action, then it leaves the deck. A toast offers Undo after each save.
+  Records are for today only; no date picker.
+- Progress: Chart.js line charts per measure, filter chips, the full history with Delete (and Undo), report export.
+- Emergency: 11 cards, search, one step style, links to and from checks.
+- Profile: all personal fields, required at first run, no "Later"; initials avatar; "Load demo mission";
+  import and export; Sources.
+- Cover: a planet for the destination; shown once per day.
+- Report: formal, text-only.
+- The 3D astronaut is an illustration beside the body cards. Every card must work without it.
 
----
+**Kept on purpose**
+- Barcode lookup through Open Food Facts stays. It needs the network, so offline it says so and offers manual
+  entry and CSV import (`src/lib/csv.js`).
+- The term "flight surgeon" stays.
 
-## 1. Daily checkup: make the guided flow work
+## Owner answers, 15 Nov 2026 (binding; they override the ticket text where they differ)
 
-**Problem.** The 3D checklist on the left and the measurement form on the right run separately. The checklist says "click the glowing brain" while the form stays on Cardiovascular. Saving ticks Heart, does not advance, and the form never changes. Each click on "Save measurements" stores another identical reading. The coloured indicator bars look like sliders but are read-only.
+- The group label "General first response (not yet reviewed by the team doctor)" goes, as T25 says. The
+  agent-written cards (bleeding, fracture, vision-change, cabin-air, self-harm) are shown like the others.
+- The doctor's four flight-surgeon lines are worded by the mission's link (`tell: "flight-surgeon"`, T25 and T35).
+- Belly pain keeps both pictures, one beside each stage: they show different examinations (appendix points; Murphy's
+  sign). T35's "one picture" item is withdrawn.
+- The doctor's "Blood loss and shock" table moves from the vitals card into the bleeding card, text unchanged (T25).
+- Body cards use the 3D model (T31); the old organ PNGs may be deleted when nothing uses them.
+- First-run profile: name, destination, crew, start date and duration are required; age, sex, weight and height
+  stay optional, and a card that needs them links to the profile (T22, T34).
+- Pictograph characters inside the medic's text (for example in the kidney stone flow) are icons, not words: T25
+  removes them and keeps every word.
+- `cabin-air` has `topic: null`: there is no environment topic or check after T26.
 
-**Do.**
-- [ ] One source of truth for the current step; selecting an organ (3D or list) switches the form, and saving advances both to the next step in list order.
-- [ ] One reading per system per save; a second save the same minute replaces instead of duplicating.
-- [ ] Remove the duplicate "Demo values" pill and button, or keep one that fills typical (mean) values.
-- [ ] Make the bars clearly read-only, or make them real inputs. Pick one.
-- [ ] When all steps are done, return to the suited astronaut view with a summary and the next action.
+## Already on name15 before batch 1
 
-**Done when.** A full checkup can be completed in order with no manual re-selection, History shows one reading per system, and the flow ends on the astronaut view.
+Reuse these; do not rebuild them. Today has the 50% coverage rule, Vision in the due list, and urgent findings
+with a button to the matching emergency card (`src/scripts/today.js`, `src/components/today/`). Protocols has
+mission-worded sending (`src/components/protocols/report-wording.js`). The profile has the menopause field and
+`ntxRange(profile)` for N-telopeptide (T20). The app is offline-ready (`tools/service-worker.mjs`). The checkup is
+one guided flow (`src/scripts/checkup-flow.js`); T31 replaces its step pane and keeps its record shape.
 
-## 2. 3D model: organ placement and leftovers
+## Contracts between tickets
 
-**Problem.** The brain covers the whole skull, the lungs are rotated, the heart and kidneys are out of position, organs bunch at the pelvis, and a detached hand with a disc floats beside the body. `index.html` still requests three images that were replaced by the 3D model (`astronaut.png`, `assets/astronaut_anatomy.png`, `assets/space-background.jpg`) and they return 404.
+These names are fixed so parallel tickets can rely on them before the other side is merged.
 
-**Do.**
-- [ ] Fix scale, rotation and position of brain, lungs, heart and kidneys.
-- [ ] Remove the stray hand and disc, or attach the pulse marker to the wrist.
-- [ ] Remove the dead `<img>` tags and the legacy anatomy SVG.
-- [x] Protocols: use the 3D body instead of the SVG body. (Obsolete: T18 rebuilt Protocols as saved results and the report, with no body drawing.)
-
-**Done when.** Every organ sits in its anatomical place from the front view and the console shows no 404.
-
-## 3. Mission risk map
-
-**Problem.** The app treats every body system as equally important for every mission. NASA's Human Research Roadmap rates each of 22 risks by likelihood and consequence for each mission type, separately for in-mission operations and long-term health. The app uses none of this.
-
-**Do.**
-- [ ] Data file with the 22 risks: id, short title, ratings per mission type, source URL, date published.
-- [ ] Mission type chosen at profile setup and editable in Environment.
-- [ ] A map view: risks ranked for the chosen mission, each linked to its app section and to the roadmap page.
-- [ ] Mark risks the app does not yet cover (sensorimotor, medications, dust) as "not monitored yet".
-
-**Done when.** Changing the mission changes the ranking, and every row shows its NASA source.
-
-## 4. Readiness: weights from the risk map
-
-**Problem.** The readiness weights are hand-picked and the page says it is not a NASA score. It showed 100/100 "Ready" from three heart-rate readings covering two of seven areas.
-
-**Do.**
-- [ ] Derive area weights from the risk ratings of the chosen mission (ticket 3).
-- [ ] Do not show "Ready" when coverage is low; show "not enough data" with what is missing.
-- [ ] Explain the calculation on the page: the ratings are NASA's, the formula is ours.
-- [ ] Immune watch: replace checkboxes with pills; allow saliva and blood test results to be entered.
-
-**Done when.** The score changes with the mission, and low coverage never produces a high score.
-
-## 5. Today page and work queue
-
-**Problem.** Overview and Readiness both lead with the same score, and Missions holds a separate daily task list. Three pages answer "what should I do today".
-
-**Do.**
-- [ ] One Today page: score at the top, then the items due today ordered by the mission's risk ratings, each opening its check.
-- [ ] Reuse the Missions tasks and their automatic ticking; higher-rated risks come up more often. Label the intervals as our design choice.
-- [ ] Remove Overview and Readiness as separate pages. Decide whether points, streaks and badges stay.
-
-**Done when.** One page shows the score and the queue, and finishing a check removes it from the queue.
-
-## 6. Vision (SANS) self-check
-
-**Problem.** Spaceflight-associated neuro-ocular syndrome is rated 4x4 for a Mars mission and the app has no vision check.
-
-**Do.**
-- [ ] On-screen self-test, one eye at a time (grid distortion and near vision). Content and thresholds from the medic.
-- [ ] Record, History and What to do, like every other section.
-- [ ] Add it to the 3D body (eyes) and to the work queue.
-- [ ] State on screen that it is a screening aid, not a diagnosis.
-
-**Done when.** A result can be saved, compared with earlier results, and leads to an action.
-
-## 7. Emergencies
-
-**Problem.** Urgent guidance is scattered; the solar storm steps sit inside Radiation. Owner: colleague already working on this.
-
-**Do.**
-- [ ] One Emergencies section, organised by symptom ("what is happening to me"), not by body system.
-- [ ] Move the solar storm steps here; Radiation links to it.
-- [ ] Other sections link here when a reading crosses an urgent threshold.
-- [ ] Works with no connection.
-
-**Done when.** Any urgent state in the app leads to one Emergencies page with steps to follow.
-
-## 8. Copy and source fixes
-
-- [ ] Settings: replace "Data is never sent to a server" with text that is true when sign-in is used: data stays on the device unless you choose to sign in.
-- [ ] Sidebar: remove "Works offline in Firefox".
-- [ ] Radiation: replace the Phys.org and Space.com citations with the instrument papers or NASA pages.
-- [ ] Radiation: rewrite the "Where you are going" instructions.
-- [ ] Environment: "the risks I watch for" becomes "the risks the tool watches for".
-- [ ] Rename "report" to "protocols" where the two are mixed.
-- [ ] Cover: remove "PDF for your doctor" (there is no doctor view).
-
-## 9. Theme
-
-**Problem.** The checkup panel and the Settings dialog are light cards on a dark page; dropdowns and the email field use browser defaults.
-
-**Do.**
-- [ ] One set of colour tokens for the whole app; dark is the default.
-- [ ] Style inputs, selects, dropdown lists and the email field.
-- [ ] Light and dark switch in the header.
-- [ ] Profile icon in the top right showing sign-in and sync state.
-- [ ] Contrast check on all text.
-
-**Done when.** No screen mixes light and dark surfaces, and the switch changes every section.
-
-## 10. Profile form
-
-- [ ] Align "Save profile" and "Later" (currently 8 px apart vertically).
-- [ ] Raise contrast of labels and help text.
-- [ ] Height: lower the minimum from 120 cm or explain the limit.
-- [ ] Sex: rename to "Sex used for energy calculation"; options Female, Male, Prefer not to say (uses an average).
-- [ ] Add mission type and destination to setup (feeds ticket 3).
-
-## 11. Environment
-
-- [ ] Add "In transit" (matches the Mars cruise dose rate in Radiation).
-- [ ] Decide whether ground or analog missions are offered.
-- [ ] Link each location to the mission risk map.
-- [ ] Keep the "Keep in mind" notes.
-
-## 12. Mental health
-
-- [ ] Show results in the section instead of redirecting to Overview.
-- [ ] If the suicidal-thoughts question is answered with anything other than "Not at all", show an immediate response: who to tell on the crew, and a link to Emergencies. Wording from the medic.
-- [ ] Add History.
-
-## 13. Medical images
-
-**Problem.** The generated SVG illustrations look poor, and specific medical figures (for example dermatome maps) are needed. NASA does not publish these.
-
-**Do.**
-- [ ] List the figures needed.
-- [ ] Source each from a licence that allows reuse with credit (candidates: Wikimedia Commons including public-domain Gray's Anatomy plates, OpenStax Anatomy and Physiology, Servier Medical Art). Check each file's licence page.
-- [ ] Record title, author, URL and licence for the references (GitHub issue 4).
-- [ ] Do not use images taken from a general image search without a clear licence.
-
-## 14. Cover page redo
-
-**Problem.** The cover reads as generated: emoji icons, four generic cards, gradient button.
-
-**Do.**
-- [ ] Redesign with the impeccable and taste skills.
-- [ ] Say what the app is for in one line, and enter the app in one action.
-
-## 15. Build tool (decide Sunday)
-
-- [ ] Add Vite with ES modules; keep the existing vanilla code.
-- [ ] Remove the script-order dependency in `index.html`.
-- [ ] Load 3D models as real `.glb` files.
-- [ ] Confirm the Cloudflare Pages deploy still works.
-
-A move to a component framework stays in GitHub issue 2 for after submission.
-
-## 16. After submission
-
-- [ ] Charts from a library that is bundled locally (works offline), replacing hand-drawn SVG charts.
-- [ ] Nutrition: barcode scanning with the camera; fix camera button padding.
-- [ ] Apply Record, History, What to do to every section and fold Progress into each History.
-- [ ] Simplify data entry across sections.
-
----
-
-## Changes to existing GitHub issues
-
-- **Issue 1 (public site, data store, accounts):** the site is live at astrogirlies.pages.dev but serves an older build; deploy the current branch. Storage module and export/import are done. Sign-in is coded and tested but not configured (database id, mail key, site URL); decide whether to switch it on, given this is health data.
-- **Issue 2 (framework):** keep as the after-submission framework move; the build-tool step is ticket 15 here.
-- **Issue 3 (offline PWA):** unchanged.
-- **Issue 4 (references and AI use):** add the medical image sources from ticket 13; note the README now has model credits.
-- **Issue 5 (demo):** format is decided: slide presentation, 7 slides maximum, in English, hosted at a public link with no login. Slides must show the team name, the members' names and the challenge, plus an image of the project, the user experience and how NASA data makes it possible. Story still open. Nutrition is reported broken on the public site; confirm before taking screenshots.
-- **Issue 6 (NLSP cross-reference):** add the Human Research Roadmap crawl as a source alongside NLSP.
+- **Profile record** (`astromed-profile`): `missionType` (existing), `crew` (integer, 1 or more; missing means 1),
+  start date and duration in days (reuse the existing fields behind `totalFor` and `missionDayFor` in
+  `src/scripts/profile.js`).
+- **`src/scripts/mission.js`** (T23 creates): `crewSize()`, `hasCrew()`, `link()` returning
+  `{ kind: "live" | "delayed" | "none", oneWay, roundTrip }`, `alsoTell(who)` returning the second-step sentence
+  for the current link or an empty string when there is no link. `comm()` moves here from `environment.js` in T26.
+- **`src/data/topics.js`** (T27 creates, replaces `src/data/risk-coverage.js`): one row per topic,
+  `{ id, label, riskIds: [], emergency: "<card id>" | null }`, with `topicFor(riskId)`, `emergencyFor(topicId)`,
+  `topicsFor(emergencyId)`. Cards name their own topic; `cardsForTopic(topicId)` comes from
+  `src/components/check/deck.js`. Home, the deck, "Why this order" and every cross-link read these.
+- **Deck cards** (T28 creates the frame): each section exports its cards from `src/components/<section>/cards.js`
+  as `export const cards = [{ id, topic, title, Component, isDone }]`. The deck collects them with
+  `import.meta.glob("../*/cards.js", { eager: true })`, so no shared file is edited. `Component` receives
+  `{ onSaved }`; `isDone()` says whether today's record exists.
+- **Shared kit** (`src/components/ui/`, T28): `CheckCard`, `Steps`, `Term`, `Chips`, `Tabs`, `Field` (with
+  `error`), `SourceLink`, `Dialog`, and `toast({ text, undo })` from `src/lib/ui.js`.
+- **Emergency data** (`src/data/emergencies.js`, T25): each card may carry `crewOnly: true`; every card has
+  `topic` matching a row in `topics.js` where one exists.
+- **Routes** (`src/lib/nav.js`, T26): `go(path)`, `route` signal `{ area, id }`, `openEmergency(id)`,
+  `openCard(id)`.
