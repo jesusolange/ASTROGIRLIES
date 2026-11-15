@@ -22,7 +22,7 @@
 | O5 | Radiation: the ISS rate is now about 0.7 mSv/day (731 µSv/day, DOSIS 3D, as quoted in Zhang et al. 2020) instead of 0.2 to 0.5; the worker could not open the two Science papers (paywall) to re-read 1.84 and 0.64 mSv/day. Someone with access should confirm the three figures. |
 | O1 | Confirm the Sketchfab URLs and licences for the brain and heart models (README credits). |
 | O2 | In Cloudflare Pages, change the build settings before the next deploy (see D4). |
-| O6 | The five images in the Emergency guide (`chest`, `drain`, `belly-rovsing`, `belly-murphy`, `dermatome`): where do they come from and under what licence? They need a line each in the references (ticket 13). |
+| O6 | Resolved 15 Nov: the five Emergency images are AI-generated illustrations; they carry an "AI-generated" badge (T55). |
 | O7 | `origin/main` and `name15` have diverged since the first commit: main has the Emergency guide on the old flat layout, name15 has everything else on Astro. After T14 the guide is on name15; main then needs to be replaced by name15 (a merge will conflict on every file). Decide who does that and when. |
 | O8 | Resolved 15 Nov: the doctor's four flight-surgeon lines are worded by the mission's link (docs/tickets.md, owner answers). |
 | O9 | The organ pictures in `public/assets/` (team's first commit): who made them? Six look AI-generated (lungs, kidneys, brain, skeleton, muscles, pulse, liver); `heart.png` looks like a stock vector (Freepik/Vecteezy style) and needs its source and licence. Captions say "AstroGirlies team" and "source to confirm" for the heart until answered. |
