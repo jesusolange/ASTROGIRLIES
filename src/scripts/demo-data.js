@@ -68,8 +68,8 @@ const CHECKUP_FIELDS = {
   muscles: { activity: () => [58, 9], strength: () => [25, 1.8] }
 };
 
-// Left open today so the demo can show these checks being done: the bones card and the meal card.
-const SHOWCASE_TODAY = new Set(["bones", "meals"]);
+// Left open today so the demo can show these checks being done: bones, kidneys and the meal card.
+const SHOWCASE_TODAY = new Set(["bones", "kidneys", "meals"]);
 
 function checkupRecords(now, random) {
   const records = [];
