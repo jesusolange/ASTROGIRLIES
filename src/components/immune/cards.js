@@ -1,4 +1,4 @@
-// The Immune deck cards: symptoms today and a free-form saliva or blood result.
+// The Immune deck cards: symptoms today and a free-form saliva, blood or urine result.
 import { openEmergency } from "../../lib/nav.js";
 import {
   ACTIONS, SYMPTOMS, addTest, assess, immuneState, labDue, latestTest, riskFactors,
@@ -43,8 +43,7 @@ function saveLab(values) {
     return { error: { field: "value", message: "Enter the result as a number." } };
   }
   if (!unit) return { error: { field: "unit", message: "Enter the unit, for example µg/dL." } };
-  const kind = values.kind === "blood" ? "blood" : "saliva";
-  const { test, undo } = addTest({ kind, name, value, unit, note: values.note });
+  const { test, undo } = addTest({ kind: values.kind, name, value, unit, note: values.note });
   const saved = testRows(immuneState().tests).find((row) => row.id === test.id);
   const change = saved && saved.before != null
     ? ` Change from the previous ${name}: ${saved.value - saved.before >= 0 ? "+" : ""}${Number((saved.value - saved.before).toFixed(4))} ${unit}.`
@@ -52,7 +51,7 @@ function saveLab(values) {
   return {
     result: {
       level: "info",
-      saw: `Saved ${name}: ${value} ${unit} (${kind} test). No reference range is applied.${change}`,
+      saw: `Saved ${name}: ${value} ${unit} (${test.kind} test). No reference range is applied.${change}`,
       todo: "Compare it with your earlier results in Progress.",
       toast: "Lab result recorded."
     },
@@ -80,7 +79,7 @@ export const cards = [
   {
     id: "immune-lab",
     topic: "immune",
-    title: "Lab result (saliva or blood)",
+    title: "Lab result (saliva, blood or urine)",
     Component: LabCard,
     isDone: () => !labDue(),
     summary() {

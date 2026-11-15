@@ -1,11 +1,15 @@
-// A saliva or blood result, entered free-form: sample, test name, value, typed unit and an optional note.
+// A saliva, blood or urine result, entered free-form: sample, test name, value, typed unit and an optional note.
 // Props: form (CheckCard form state).
-import { unitOptions } from "../../scripts/immune.js";
+import { testOptions, unitOptions } from "../../scripts/immune.js";
 import Field from "../ui/Field.jsx";
+
+const NAME_PLACEHOLDER = { saliva: "e.g. cortisol", blood: "e.g. CRP", urine: "e.g. N-telopeptide" };
 
 export default function LabCard({ form }) {
   const values = form.values;
-  const units = unitOptions(values.name);
+  const sample = values.kind || "saliva";
+  const units = unitOptions(values.name, sample);
+  const names = testOptions(sample);
   return (
     <div class="im-lab">
       <p class="im-lead">
@@ -13,22 +17,27 @@ export default function LabCard({ form }) {
         against your earlier values are for your own monitoring.
       </p>
       <Field label="Sample" id="im-kind">
-        <select id="im-kind" value={values.kind || "saliva"} onChange={(event) => form.set("kind", event.currentTarget.value)}>
+        <select id="im-kind" value={sample} onChange={(event) => form.set("kind", event.currentTarget.value)}>
           <option value="saliva">Saliva</option>
           <option value="blood">Blood</option>
+          <option value="urine">Urine</option>
         </select>
       </Field>
-      <Field label="Test name" id="im-name" error={form.errorFor("name")}>
+      <Field label="Test name" id="im-name" error={form.errorFor("name")} help="Choose a common test or type your own.">
         <input
           id="im-name"
           type="text"
+          list="im-name-options"
           maxlength="60"
-          placeholder="e.g. cortisol"
+          placeholder={NAME_PLACEHOLDER[sample] || "e.g. cortisol"}
           value={values.name || ""}
           ref={form.fieldRef("name")}
           onInput={(event) => form.set("name", event.currentTarget.value)}
         />
       </Field>
+      <datalist id="im-name-options">
+        {names.map((name) => <option value={name} key={name} />)}
+      </datalist>
       <div class="im-value-row">
         <Field label="Value" id="im-value" error={form.errorFor("value")}>
           <input

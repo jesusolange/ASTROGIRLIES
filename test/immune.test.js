@@ -1,6 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ACTIONS, LAB_UNITS, SYMPTOMS, assess, testRows, unitOptions } from "../src/scripts/immune.js";
+import {
+  ACTIONS, LAB_UNITS, SAMPLE_TYPES, SYMPTOMS, URINE_UNITS, addTest, assess, immuneState, testOptions, testRows, unitOptions
+} from "../src/scripts/immune.js";
+
+const fakeStore = (init = {}) => {
+  const map = new Map(Object.entries(init));
+  return {
+    get: (key, fallback) => (map.has(key) ? map.get(key) : fallback),
+    set: (key, value) => { map.set(key, value); return value; }
+  };
+};
 
 test("symptoms follow the same bands whether saved or live", () => {
   assert.equal(assess([]).level, "ok");
@@ -46,4 +56,29 @@ test("the unit combobox offers the usual units for the chosen test", () => {
   assert.deepEqual(unitOptions("an unknown test"), LAB_UNITS);
   assert.deepEqual(unitOptions(""), LAB_UNITS);
   assert.equal(LAB_UNITS.length, 9);
+});
+
+test("urine is a sample type with its own test and unit suggestions", () => {
+  assert.deepEqual(SAMPLE_TYPES, ["saliva", "blood", "urine"]);
+  for (const name of ["N-telopeptide", "Calcium", "Creatinine", "Specific gravity", "pH"]) {
+    assert.ok(testOptions("urine").includes(name), name);
+  }
+  assert.deepEqual(unitOptions("", "urine"), URINE_UNITS);
+  assert.deepEqual(unitOptions("an unknown test", "urine"), URINE_UNITS);
+  assert.ok(unitOptions("N-telopeptide", "urine").includes("nmol/mmol creatinine"));
+  assert.ok(unitOptions("urine calcium", "urine").includes("mg/24 h"));
+  assert.deepEqual(unitOptions("pH", "urine"), []);
+  assert.deepEqual(unitOptions("Cortisol", "urine"), URINE_UNITS);
+  assert.deepEqual(unitOptions("Cortisol"), ["µg/dL", "nmol/L"]);
+});
+
+test("a urine result is stored with its sample and old results still read", () => {
+  const previous = { id: "old-blood", time: "2026-11-01T09:00:00.000Z", kind: "blood", name: "CRP", value: 1.2, unit: "mg/L" };
+  globalThis.AstroMedStore = { store: fakeStore({ "astromed-immune": { log: {}, tests: [previous] } }) };
+  const { test } = addTest({ kind: "urine", name: "N-telopeptide", value: 42, unit: "nmol/mmol creatinine" });
+  assert.equal(test.kind, "urine");
+  const tests = immuneState().tests;
+  assert.equal(tests.length, 2);
+  assert.deepEqual(tests[0], previous);
+  assert.equal(tests[1].kind, "urine");
 });

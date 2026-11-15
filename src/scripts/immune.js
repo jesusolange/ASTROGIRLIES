@@ -21,8 +21,17 @@ export const SYMPTOMS = [
 ];
 
 // The usual units for a named lab test. The name stays free-form, so an unknown name gets the
-// general list and the astronaut can always type a unit of their own.
+// general list for the sample and the astronaut can always type a unit of their own.
 export const LAB_UNITS = ["µg/dL", "nmol/L", "mg/dL", "mmol/L", "U/mL", "cells/µL", "pg/mL", "mg/L", "ng/mL"];
+export const URINE_UNITS = ["mg/dL", "mmol/L", "µmol/L", "g/L", "nmol/mmol creatinine", "mg/24 h"];
+export const SAMPLE_TYPES = ["saliva", "blood", "urine"];
+
+// Common tests a crew may run, offered as suggestions for the free-form name field.
+export const TEST_OPTIONS = {
+  saliva: ["Cortisol", "Alpha-amylase", "IgA", "Melatonin"],
+  blood: ["CRP", "Interleukin-6", "White cell count", "IgG", "Vitamin D (25-OH)", "Ferritin", "D-dimer"],
+  urine: ["N-telopeptide", "Calcium", "Creatinine", "Specific gravity", "pH"]
+};
 
 const UNIT_HINTS = [
   { match: /cortisol/i, units: ["µg/dL", "nmol/L"] },
@@ -40,10 +49,24 @@ const UNIT_HINTS = [
   { match: /d-?dimer/i, units: ["µg/mL", "mg/L"] }
 ];
 
-export function unitOptions(name = "") {
+const URINE_UNIT_HINTS = [
+  { match: /n-?telopeptide|ntx/i, units: ["nmol/mmol creatinine", "µg/mmol creatinine"] },
+  { match: /calcium/i, units: ["mg/dL", "mmol/L", "mg/24 h"] },
+  { match: /creatinine/i, units: ["mg/dL", "mmol/L", "µmol/L", "g/L"] },
+  { match: /specific gravity/i, units: [] },
+  { match: /\bph\b/i, units: [] }
+];
+
+export function testOptions(sample = "") {
+  return (TEST_OPTIONS[sample] || []).slice();
+}
+
+export function unitOptions(name = "", sample = "") {
   const text = String(name).trim();
-  const found = UNIT_HINTS.find((entry) => entry.match.test(text));
-  return (found ? found.units : LAB_UNITS).slice();
+  const hints = sample === "urine" ? URINE_UNIT_HINTS : UNIT_HINTS;
+  const found = hints.find((entry) => entry.match.test(text));
+  if (found) return found.units.slice();
+  return (sample === "urine" ? URINE_UNITS : LAB_UNITS).slice();
 }
 export const EMPTY_IMMUNE = { log: {}, tests: [] };
 const tell = () => {
@@ -117,10 +140,11 @@ export function symptomRows(state = immuneState()) {
 
 export function addTest(entry, now = new Date().toISOString()) {
   const state = immuneState();
+  const requested = entry.kind || entry.sample;
   const test = {
     id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
     time: now,
-    kind: entry.kind === "blood" ? "blood" : "saliva",
+    kind: requested === "blood" || requested === "urine" ? requested : "saliva",
     name: entry.name,
     value: Number(entry.value),
     unit: entry.unit,
