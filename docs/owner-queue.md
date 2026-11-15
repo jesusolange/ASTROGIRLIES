@@ -1,4 +1,4 @@
-﻿# Owner queue
+# Owner queue
 
 ## Decide
 
@@ -25,4 +25,5 @@
 | O6 | The five images in the Emergency guide (`chest`, `drain`, `belly-rovsing`, `belly-murphy`, `dermatome`): where do they come from and under what licence? They need a line each in the references (ticket 13). |
 | O7 | `origin/main` and `name15` have diverged since the first commit: main has the Emergency guide on the old flat layout, name15 has everything else on Astro. After T14 the guide is on name15; main then needs to be replaced by name15 (a merge will conflict on every file). Decide who does that and when. |
 | O8 | Doctor: the Emergency guide says "call / ask the flight surgeon" in four places (life-in-danger banner, GCS 9 to 12 and 8 or less, stone 7 mm or bigger, bisphosphonate). What should the astronaut do when Earth cannot be reached in time? |
+| O9 | The organ pictures in `public/assets/` (team's first commit): who made them? Six look AI-generated (lungs, kidneys, brain, skeleton, muscles, pulse, liver); `heart.png` looks like a stock vector (Freepik/Vecteezy style) and needs its source and licence. Captions say "AstroGirlies team" and "source to confirm" for the heart until answered. |
 | O7 | `origin/main` and `name15` have diverged since the first commit: main has the Emergency guide on the old flat layout, name15 has everything else on Astro. After T14 the guide is on name15; main then needs to be replaced by name15 (a merge will conflict on every file). Decide who does that and when. |
