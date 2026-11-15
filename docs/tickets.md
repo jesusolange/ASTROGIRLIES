@@ -137,3 +137,16 @@ These names are fixed so parallel tickets can rely on them before the other side
   `readComm`, `profileRecord`; each takes the profile or link as an optional argument for tests.
 - **Routes** (`src/lib/nav.js`, T26): `go(path)`, `route` signal `{ area, id }`, `openEmergency(id)`,
   `openCard(id)`.
+
+## Owner answers after the batch 2 review, 15 Nov (binding)
+
+- Navigation stays the top bar with Home, Check and Progress and the phone tab bar; no sidebar.
+- Emergency index: sections by urgency (T35).
+- "How this score is made" keeps its dialog and the "Why this order" heading; the opener becomes a clear button
+  and the risk rows get a clean layout (T44).
+- The Cabin conditions check is built in batch 3 (T33); Home links to it once it exists.
+- T36 (Progress with all history) runs with batch 3. Progress loses "Delete all history" and the demo-data buttons.
+- Batch 2 review fixes for the shell, Home and profile are T44, run with batch 3. T43 (crew on one device) also
+  runs with batch 3.
+- Motion is wanted: transitions and small animations, 150 to 300 ms, none looping or pulsing, all off under
+  `prefers-reduced-motion`.
