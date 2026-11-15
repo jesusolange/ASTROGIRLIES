@@ -1,3 +1,4 @@
+import { effect } from "@preact/signals";
 import { Color, Vector3 } from "three";
 import { applyOpacity, createBody } from "./body.js";
 import { bindControls } from "./controls.js";
@@ -6,10 +7,9 @@ import { PART_ORDER } from "./layout.js";
 import { loadModels } from "./models.js";
 import { createPicking } from "./picking.js";
 import { createScene } from "./scene.js";
-
-const RECORDS_KEY = "astrotwin-gui-v2-records";
-const RESTART_KEY = "astromed-3d-restart";
-const START = Date.now();
+import {
+  currentStep, doneParts, flowComplete, complete as completeStep, reset as resetFlow, select as selectStep
+} from "../checkup-flow.js";
 
 const NONE = new Color(0);
 const ACTIVE = new Color(0xff2d3f);
@@ -19,35 +19,6 @@ const smoothstep = (value) => {
   const t = Math.min(Math.max(value, 0), 1);
   return t * t * (3 - 2 * t);
 };
-
-function appStore() {
-  return window.AstroMedStore && window.AstroMedStore.store;
-}
-
-function readRecords() {
-  try {
-    const records = appStore() ? appStore().get(RECORDS_KEY, []) : [];
-    return Array.isArray(records) ? records : [];
-  } catch {
-    return [];
-  }
-}
-
-function readRestart() {
-  try {
-    return Number(appStore() ? appStore().get(RESTART_KEY, 0) : 0) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-function writeRestart() {
-  try {
-    if (appStore()) appStore().set(RESTART_KEY, Date.now());
-  } catch {
-    /* storage unavailable */
-  }
-}
 
 export function createStage(container, { onSelect } = {}) {
   const view = createScene(container);
@@ -67,7 +38,6 @@ export function createStage(container, { onSelect } = {}) {
 
   const state = {
     mode: "intro",
-    done: new Set(),
     selected: null,
     status: "",
     statusTimer: 0,
@@ -120,12 +90,17 @@ export function createStage(container, { onSelect } = {}) {
   });
 
   function firstUndone() {
-    const part = PART_ORDER.find((item) => !state.done.has(item.id));
+    const done = new Set(doneParts.value);
+    const part = PART_ORDER.find((item) => !done.has(item.id));
     return part ? part.id : null;
   }
 
   function currentPart() {
-    return state.selected || firstUndone();
+    return currentStep.value || firstUndone();
+  }
+
+  function doneSet() {
+    return new Set(doneParts.value);
   }
 
   function flashStatus(message) {
@@ -138,11 +113,11 @@ export function createStage(container, { onSelect } = {}) {
   }
 
   function renderGuide() {
-    const undone = firstUndone();
+    const active = currentStep.value || firstUndone();
     guide.render({
       mode: state.mode,
-      active: undone === null ? null : (state.selected || undone),
-      done: state.done,
+      active,
+      done: doneSet(),
       status: state.status,
     });
   }
@@ -168,37 +143,56 @@ export function createStage(container, { onSelect } = {}) {
     applyOpacity(body.bodyMaterials, value);
   }
 
+  function enterBody() {
+    if (state.mode === "body") return;
+    state.mode = "body";
+    state.spin = 0;
+    setSuitOpacity(0);
+    setBodyOpacity(1);
+    body.suitGroup.visible = false;
+    body.bodyGroup.visible = true;
+    root.rotation.y = 0;
+    root.position.y = 0;
+  }
+
   function selectPart(part, user = false) {
     if (!body.parts[part]) return;
-    if (state.mode !== "body") {
-      state.mode = "body";
-      state.spin = 0;
-      setSuitOpacity(0);
-      setBodyOpacity(1);
-      body.suitGroup.visible = false;
-      body.bodyGroup.visible = true;
-      root.rotation.y = 0;
-      root.position.y = 0;
-    }
+    enterBody();
     state.selected = part;
-    document.querySelector(`.hotspot[data-part="${part}"]`)?.click();
+    if (user) {
+      selectStep(part);
+      if (onSelect) onSelect(part);
+    }
     renderGuide();
     updateCameraGoal();
-    if (user && onSelect) onSelect(part);
   }
 
   function markDone(part) {
     if (!body.parts[part]) return;
-    state.done.add(part);
+    completeStep(part);
     body.parts[part].pop = 1;
     flashStatus(`${body.parts[part].label} saved \u2713`);
     renderGuide();
   }
 
+  function showComplete() {
+    state.mode = "complete";
+    state.selected = null;
+    state.dragAngle = 0;
+    setSuitOpacity(1);
+    setBodyOpacity(0);
+    body.suitGroup.visible = true;
+    body.bodyGroup.visible = false;
+    body.screen.visible = false;
+    root.rotation.y = 0;
+    root.position.y = 0;
+    renderGuide();
+    updateCameraGoal();
+  }
+
   function reset() {
-    writeRestart();
+    resetFlow();
     clearTimeout(state.statusTimer);
-    state.done = new Set();
     state.selected = null;
     state.status = "";
     state.mode = "intro";
@@ -218,28 +212,12 @@ export function createStage(container, { onSelect } = {}) {
     updateCameraGoal();
   }
 
-  function refreshDone() {
-    const restart = Math.max(readRestart(), START);
-    const today = new Date().toDateString();
-    const done = new Set();
-    readRecords().forEach((record) => {
-      if (!record || !body.parts[record.part]) return;
-      const when = new Date(record.time);
-      if (when.getTime() > restart && when.toDateString() === today) done.add(record.part);
-    });
-    const added = [...done].find((id) => !state.done.has(id)) || null;
-    state.done = done;
-    if (added && state.selected === added) state.selected = null;
-    return added;
-  }
-
   function startSpin() {
     if (state.mode !== "intro") return;
     state.mode = "spin";
     state.spin = 0;
     state.spinStartY = root.rotation.y;
     body.bodyGroup.visible = true;
-    refreshDone();
     renderGuide();
   }
 
@@ -252,19 +230,21 @@ export function createStage(container, { onSelect } = {}) {
     root.rotation.y = 0;
     root.position.y = 0;
     state.dragAngle = 0;
+    state.selected = currentPart();
     renderGuide();
     updateCameraGoal();
   }
 
   function updateGlow(time, delta) {
     const active = currentPart();
+    const done = doneSet();
     const wave = 0.5 + 0.5 * Math.sin(time * 4.5);
     Object.values(body.parts).forEach((part) => {
       let color = NONE;
       let intensity = 0;
       let haloOpacity = 0;
       if (state.mode === "body") {
-        if (state.done.has(part.id)) {
+        if (done.has(part.id)) {
           color = DONE;
           intensity = 0.55;
           haloOpacity = 0.5;
@@ -355,16 +335,22 @@ export function createStage(container, { onSelect } = {}) {
 
   bindControls(canvas, { state, picking, startSpin, selectPart });
 
-  document.addEventListener("click", (event) => {
-    if (!event.target.closest("#saveData")) return;
-    setTimeout(() => {
-      const added = refreshDone();
-      if (added) flashStatus(`${body.parts[added].label} saved \u2713`);
+  effect(() => {
+    const complete = flowComplete.value;
+    const step = currentStep.value;
+    doneParts.value;
+    if (complete) {
+      showComplete();
+      return;
+    }
+    if (state.mode === "complete") enterBody();
+    if (step) {
+      state.selected = step;
       renderGuide();
-    }, 60);
+      updateCameraGoal();
+    }
   });
 
-  refreshDone();
   renderGuide();
   updateCameraGoal();
   cameraPosition.copy(cameraGoal);
@@ -372,7 +358,7 @@ export function createStage(container, { onSelect } = {}) {
   requestAnimationFrame(frame);
 
   return {
-    select: (part) => selectPart(part, false),
+    select: (part) => selectPart(part, true),
     markDone,
     reset,
     parts: () => PART_ORDER.map((part) => part.id),

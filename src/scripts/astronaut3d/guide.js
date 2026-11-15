@@ -26,11 +26,13 @@ export function createGuide(container, { parts, onPick, onRestart, onOverview })
   });
 
   function render({ mode, active, done, status }) {
-    const complete = mode === "body" && active === null;
+    const complete = mode === "complete";
     if (helper) {
-      helper.textContent = mode === "body"
-        ? "Click a glowing organ \u00b7 drag to rotate"
-        : "Click the astronaut to begin \u00b7 drag to rotate";
+      helper.textContent = complete
+        ? "Checkup complete \u00b7 summary on the right"
+        : mode === "body"
+          ? "Click a glowing organ \u00b7 drag to rotate"
+          : "Click the astronaut to begin \u00b7 drag to rotate";
     }
 
     panel.classList.toggle("is-complete", complete);
@@ -44,8 +46,8 @@ export function createGuide(container, { parts, onPick, onRestart, onOverview })
       title.textContent = "Scanning\u2026";
       text.textContent = "Opening the 3D body scan.";
     } else if (complete) {
-      title.textContent = "Done!";
-      text.textContent = "Log complete \u2713 All 7 body systems are saved.";
+      title.textContent = "Checkup complete";
+      text.textContent = "All 7 body systems are saved. The summary is on the right.";
       const overview = document.createElement("button");
       overview.type = "button";
       overview.textContent = "Open Today";
@@ -53,15 +55,16 @@ export function createGuide(container, { parts, onPick, onRestart, onOverview })
       const restart = document.createElement("button");
       restart.type = "button";
       restart.className = "soft";
-      restart.textContent = "Restart checkup";
+      restart.textContent = "Start another checkup";
       restart.addEventListener("click", onRestart);
       actions.append(overview, restart);
     } else if (status) {
       title.textContent = status;
-      text.textContent = `Next up: the ${labels.get(active).toLowerCase()}.`;
+      text.textContent = active ? `Next up: the ${labels.get(active).toLowerCase()}.` : "";
     } else {
       const label = labels.get(active).toLowerCase();
-      title.textContent = `Step ${done.size + 1} of ${parts.length}`;
+      const step = parts.findIndex((part) => part.id === active) + 1;
+      title.textContent = `Step ${step} of ${parts.length}`;
       if (active !== parts.find((part) => !done.has(part.id)).id) {
         text.textContent = `You\u2019re logging the ${label}. Enter your data, then press Save measurements.`;
       } else {
