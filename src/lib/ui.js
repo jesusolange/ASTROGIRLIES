@@ -102,12 +102,9 @@ function installShortcuts() {
       return;
     }
     if (key !== "/" && !NAV_KEYS[key]) return;
-    // A shortcut never fires in a field or under a dialog. Claiming the key here also keeps other
-    // handlers from acting on it, because they check defaultPrevented first.
-    if (window.__amCoverOpen || isTyping(event.target) || hasOpenLayer()) {
-      event.preventDefault();
-      return;
-    }
+    // A shortcut never fires in a field or under a dialog. Leave the key alone there: preventing its
+    // default would stop the letter from being typed.
+    if (window.__amCoverOpen || isTyping(event.target) || hasOpenLayer()) return;
     event.preventDefault();
     if (key === "/") focusEmergencySearch();
     else go(NAV_KEYS[key]);
