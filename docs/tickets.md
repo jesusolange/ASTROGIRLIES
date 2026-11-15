@@ -85,6 +85,10 @@ These replace the earlier tickets (see git history of this file). One spec per t
 - Pictograph characters inside the medic's text (for example in the kidney stone flow) are icons, not words: T25
   removes them and keeps every word.
 - `cabin-air` has `topic: null`: there is no environment topic or check after T26.
+- The Vision tests (T32) are the owner's own work; no agent takes T32 or edits `src/components/vision/**` or
+  `src/scripts/vision.js`. Other tickets link to Vision only through `topic: "vision"`, `cardsForTopic("vision")`
+  and `emergencyFor("vision")`, and must not depend on Vision's internals. T23 leaves `vision.js` and
+  `src/components/vision/TodoPanel.jsx` alone.
 
 ## Already on name15 before batch 1
 
