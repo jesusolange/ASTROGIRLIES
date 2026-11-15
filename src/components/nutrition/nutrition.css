@@ -16,7 +16,8 @@
 .ntr-form { display: grid; gap: 10px; padding: 14px; background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius); }
 .ntr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
 .ntr-field { display: grid; gap: 5px; min-width: 0; color: var(--am-text); font-size: var(--am-fs-xs); }
-.ntr-field > span:first-child { color: var(--am-text-muted); font-weight: 600; }
+.ntr-field > span:first-child,
+.ntr-field > label:first-child { color: var(--am-text-muted); font-weight: 600; }
 .ntr-field input,
 .ntr-field select {
   width: 100%; min-height: 44px; box-sizing: border-box; padding: 10px 12px;
@@ -39,7 +40,8 @@
 .ntr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 10px 0; }
 .ntr-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .ntr-form-actions .ui-btn { margin-top: 0; }
-.ntr-remember { display: flex; align-items: center; gap: 6px; color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+.ntr-remember { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--am-text-muted); font-size: var(--am-fs-xs); cursor: pointer; }
+.ntr-remember input { width: 18px; height: 18px; margin: 0; flex: none; }
 
 /* ---------- Saved foods ---------- */
 
@@ -69,8 +71,6 @@
 /* ---------- Targets ---------- */
 
 .ntr-targets { display: grid; grid-template-columns: minmax(220px, 270px) 1fr; gap: 20px; align-items: center; }
-.ui-card-aside .ntr-targets { grid-template-columns: 1fr; }
-.ui-card-aside .ntr-plate-chart { width: min(230px, 100%); }
 .ntr-plate { position: relative; }
 .ntr-plate-chart { position: relative; width: min(260px, 100%); aspect-ratio: 1; margin: 0 auto; }
 .ntr-plate-chart canvas { display: block; width: 100%; height: 100%; }
@@ -100,7 +100,7 @@
 .ntr-rings { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 10px; }
 .ntr-mini { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; }
 .ntr-mini-ring { position: relative; display: grid; place-items: center; width: 84px; height: 84px; }
-.ntr-mini-ring svg { position: absolute; inset: 0; }
+.ntr-mini-ring > svg:not(.ntr-mini-icon) { position: absolute; inset: 0; }
 .ntr-mini-icon { position: relative; color: var(--am-text); }
 .ntr-mini-track { stroke: var(--am-field-border); opacity: 0.35; }
 .ntr-mini-arc { stroke: var(--am-info); transition: stroke-dasharray 280ms ease-out; }
@@ -157,6 +157,20 @@
 .ntr-scan-card { position: relative; width: min(92vw, 460px); display: grid; gap: 12px; justify-items: center; color: var(--am-text); }
 .ntr-scan-card video { width: 100%; max-height: 60vh; border-radius: var(--am-radius); background: var(--am-bg-raised); object-fit: cover; }
 .ntr-scan-frame { position: absolute; top: 18%; left: 12%; right: 12%; height: 28%; border: 3px solid var(--am-accent); border-radius: var(--am-radius-small); pointer-events: none; }
+
+@media (max-width: 640px) {
+  .ntr-scan { place-items: stretch; }
+  .ntr-scan-card {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    box-sizing: border-box;
+    align-content: center;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 14px calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--am-bg-raised);
+  }
+  .ntr-scan-card video { max-height: 55dvh; }
+}
 
 @media (max-width: 860px) {
   .ntr-targets { grid-template-columns: 1fr; }

@@ -1,6 +1,6 @@
 // Add one food: search Saved foods, look up a barcode, or type the values from the label.
 // Offline, the camera scan is disabled and one line explains why; manual entry and import still work.
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useId, useState } from "preact/hooks";
 import { Camera, GlassWater, Plus } from "lucide-preact";
 import { FIELDS, MEALS, UNITS, basisText, buildEntry, factor, isoDay, libraryItem, lookupFood, unitLabel } from "../../scripts/nutrition.js";
 import Chips from "../ui/Chips.jsx";
@@ -31,6 +31,7 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
   const [note, setNote] = useState("");
   const [scanning, setScanning] = useState(false);
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine !== false);
+  const codeId = useId();
 
   useEffect(() => {
     const update = () => setOnline(navigator.onLine !== false);
@@ -128,9 +129,11 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
         </div>
 
         <div class="ntr-row">
-          <label class="ntr-field"><span>Barcode (optional)</span>
+          <div class="ntr-field">
+            <label for={codeId}>Barcode (optional)</label>
             <span class="ntr-code">
               <input
+                id={codeId}
                 name="code" type="text" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="Scan or type"
                 value={draft.code} onInput={(event) => update("code", event.currentTarget.value)}
                 onBlur={(event) => runLookup(event.currentTarget.value)}
@@ -140,7 +143,7 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
                 <Camera size={20} aria-hidden="true" />
               </Button>
             </span>
-          </label>
+          </div>
           {hasName ? (
             <div class="ntr-found">
               <b>{draft.name}</b>

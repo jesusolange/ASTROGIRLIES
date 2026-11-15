@@ -150,14 +150,14 @@ export default function CheckCard({ card, onDone }) {
         ) : null}
       </header>
 
-      <div class={`ui-card-main ${Aside ? "has-aside" : ""}`.trim()}>
-        {body}
-        {Aside ? (
+      {Aside ? (
+        <div class="ui-card-main has-aside">
+          {body}
           <aside class="ui-card-aside" aria-label={`${card.title}: overview`}>
             <Aside form={form} result={result} />
           </aside>
-        ) : null}
-      </div>
+        </div>
+      ) : body}
 
       <footer class="ui-card-foot">
         {result ? (

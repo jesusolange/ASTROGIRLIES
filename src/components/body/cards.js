@@ -7,7 +7,6 @@ import { EQUIP } from "../../data/devices.js";
 import { get as getProfile } from "../../scripts/profile.js";
 import { saveCard, doneToday, summaryFor, withProfileWeight } from "../../scripts/checkup-flow.js";
 import BodyCard from "./BodyCard.jsx";
-import BodyAside from "./BodyAside.jsx";
 
 function ruleFor(key, value) {
   const data = typeof window !== "undefined" ? window.AstroMedData : null;
@@ -28,15 +27,10 @@ function componentFor(spec) {
   return function BodyCardFor(props) {
     return h(BodyCard, {
       part: spec.part,
+      focus: spec.focus,
       devices: spec.devices.map((key) => EQUIP[key]).filter(Boolean),
       ...props
     });
-  };
-}
-
-function asideFor(spec) {
-  return function BodyAsideFor(props) {
-    return h(BodyAside, { part: spec.part, focus: spec.focus, ...props });
   };
 }
 
@@ -58,7 +52,6 @@ export const cards = SPECS.map((spec) => ({
   topic: spec.topic,
   title: spec.title,
   Component: componentFor(spec),
-  Aside: asideFor(spec),
   save: saveFor(spec),
   isDone: () => doneToday(spec.part),
   summary: () => summaryFor(spec.part)

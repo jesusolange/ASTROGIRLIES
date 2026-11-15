@@ -1,5 +1,5 @@
 // The one nutrition card: log a meal and take an entry out. Records are always for today.
-// The plate and target rings sit in the card's aside; a meal can be logged more than once.
+// The plate and target rings sit inside the card; a meal can be logged more than once.
 import { useState } from "preact/hooks";
 import { useStored } from "../../lib/use-stored.js";
 import { open as openProfile } from "../../scripts/profile.js";
@@ -11,6 +11,7 @@ import {
 import Button from "../ui/Button.jsx";
 import SourceLink from "../ui/SourceLink.jsx";
 import "./nutrition.css";
+import NutritionTargets from "./NutritionTargets.jsx";
 import AddFood from "./AddFood.jsx";
 import FoodLog from "./FoodLog.jsx";
 import NutritionSettings from "./NutritionSettings.jsx";
@@ -100,6 +101,8 @@ export default function MealCard({ onDone }) {
             : <p class="ntr-result-note">All targets reached for today.</p>}
         </div>
       ) : null}
+
+      <NutritionTargets T={T} tot={tot} list={list} />
 
       <p class="ntr-iron-line">
         Iron today: {Math.round(tot.iron * 10) / 10} mg. NASA's limit in flight is {T.iron} mg a day, because iron builds up in the body in space. <SourceLink id="jsc-67378-2020">Source</SourceLink>
