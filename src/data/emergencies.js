@@ -84,7 +84,7 @@ export const CARDS = [
   {
     id: "breath",
     icon: "breath",
-    title: "Short of breath or chest tight",
+    title: "Shortness of breath or chest tightness",
     topic: "heart",
     tone: "bad",
     actWithin: "minutes",
