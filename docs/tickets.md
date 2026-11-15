@@ -10,8 +10,8 @@ These replace the earlier tickets (see git history of this file). One spec per t
 - A batch starts only after the one before it is merged into `name15` and `pnpm test`, `pnpm build` pass.
 - If time runs out, the last merged batch is the submission. Each batch leaves the app working.
 - T30 (3D repair) has no dependencies and may start with batch 1 if a sixth agent is free.
-- Evidence: workers take no screenshots. The coordinator takes them, and runs `tools/shot.mjs --strict`, once at
-  the end of each batch, into `docs/evidence/batch-<n>/`.
+- Evidence: no screenshots, from workers or the coordinator; skip every screenshot item in "Done when". The owner
+  reviews the running app after each batch. `pnpm test` and `pnpm build` remain the gate.
 
 | Batch | Tickets | What the app gains |
 |---|---|---|
@@ -85,11 +85,6 @@ These replace the earlier tickets (see git history of this file). One spec per t
 - Pictograph characters inside the medic's text (for example in the kidney stone flow) are icons, not words: T25
   removes them and keeps every word.
 - `cabin-air` has `topic: null`: there is no environment topic or check after T26.
-- The Vision tests (T32) are the owner's own work; no agent takes T32 or edits `src/components/vision/**` or
-  `src/scripts/vision.js`. Other tickets link to Vision only through `topic: "vision"`, `cardsForTopic("vision")`
-  and `emergencyFor("vision")`, and must not depend on Vision's internals. T23 leaves `vision.js` and
-  `src/components/vision/TodoPanel.jsx` alone.
-
 ## Already on name15 before batch 1
 
 Reuse these; do not rebuild them. Today has the 50% coverage rule, Vision in the due list, and urgent findings
