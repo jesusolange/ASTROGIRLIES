@@ -140,7 +140,7 @@ function analyze() {
   }
 
   /* ---- Radiation, immune, readiness, nutrition, fitness ---- */
-  const extra = (obj, fn, cat) => { try { ((obj && obj[fn] && obj[fn]()) || []).forEach(f => { out.hasData = true; out[cat].push({ level: f.level, title: f.title, saw: f.saw, todo: f.todo }); }); } catch (e) { console.error(fn, e); } };
+  const extra = (obj, fn, cat) => { try { ((obj && obj[fn] && obj[fn]()) || []).forEach(f => { out.hasData = true; if (f.level === "info") return; out[cat].push({ level: f.level, title: f.title, saw: f.saw, todo: f.todo }); }); } catch (e) { console.error(fn, e); } };
   extra(window.AstroMedReadiness, "findings", "checkup");
   extra(window.AstroMedRadiation, "findings", "checkup");
   extra(window.AstroMedReadiness, "immuneFindings", "checkup");

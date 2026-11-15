@@ -92,7 +92,7 @@ function bind() {
     toggle.addEventListener("click", () => setTheme(current === "light" ? "dark" : "light", true));
   }
   const chip = document.querySelector("[data-profile-open]");
-  if (chip) chip.addEventListener("click", openAccount);
+  if (chip) chip.addEventListener("click", () => { if (window.AstroMedProfile) window.AstroMedProfile.open(); });
 
   renderProfile();
   if (store && typeof store.subscribe === "function") store.subscribe(renderProfile);
