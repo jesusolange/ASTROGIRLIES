@@ -2,6 +2,7 @@ import { Box3, Group, Vector3 } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { ASTRONAUT, MODELS } from "./layout.js";
 import { ownMaterials } from "./materials.js";
+import { bendForward } from "./shape.js";
 
 function modelUrl(file) {
   return new URL(`assets/models/${file}`, document.baseURI).href;
@@ -24,8 +25,13 @@ function spreadMeshes(group, gap) {
   });
 }
 
-// Rotates, scales so the longest side is `size`, and centres the model on `at`.
-export function placeModel(scene, { at, size, rot, spread }) {
+// Bends, rotates, scales so the longest side is `size` (then by `stretch` per axis), and centres the model on `at`.
+export function placeModel(scene, { at, size, rot, spread, stretch, bend }) {
+  if (bend) {
+    scene.traverse((node) => {
+      if (node.isMesh) bendForward(node.geometry.attributes.position, bend);
+    });
+  }
   scene.rotation.set(rot[0], rot[1], rot[2]);
   scene.updateMatrixWorld(true);
   const bounds = new Box3().setFromObject(scene);
@@ -35,6 +41,7 @@ export function placeModel(scene, { at, size, rot, spread }) {
   const group = new Group();
   group.add(scene);
   group.scale.setScalar(size / (Math.max(extent.x, extent.y, extent.z) || 1));
+  if (stretch) group.scale.multiply(new Vector3(...stretch));
   group.position.set(at[0], at[1], at[2]);
   if (spread) spreadMeshes(group, spread);
   return group;
