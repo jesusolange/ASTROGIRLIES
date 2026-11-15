@@ -4,7 +4,7 @@
 export const SOURCES = [
   {
     id: "team-doctor-notes",
-    title: "Team doctor's notes",
+    title: "Team medic's notes",
     author: "AstroGirlies team medic",
     url: null,
     licence: "Project",
