@@ -1,35 +1,20 @@
-"use strict";
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const Wording = require("../src/components/protocols/report-wording.js");
+import test from "node:test";
+import assert from "node:assert/strict";
+import { closingLine } from "../src/scripts/report.js";
 
-test("near Earth says send now", () => {
-  assert.equal(Wording.linkKind({ place: "iss" }), "now");
-  assert.match(Wording.sendHint({ place: "iss" }), /send it now/i);
+test("a live link lets the record go to the flight surgeon now", () => {
+  const line = closingLine({ kind: "live", oneWay: "< 1 s", roundTrip: "about 1 s" });
+  assert.match(line, /sent to the flight surgeon/i);
+  assert.match(line, /link is live/i);
 });
 
-test("the Moon says replies come after a short pause", () => {
-  assert.equal(Wording.linkKind({ place: "moon" }), "moon");
-  assert.match(Wording.sendHint({ place: "moon" }), /short pause/i);
+test("a delayed link states the reply time", () => {
+  const line = closingLine({ kind: "delayed", oneWay: "3 to 22 min", roundTrip: "6 to 44 min" });
+  assert.match(line, /sent to the flight surgeon/i);
+  assert.match(line, /reply takes about 6 to 44 minutes/i);
 });
 
-test("Mars and the cruise to Mars ask for one complete message and no waiting", () => {
-  assert.equal(Wording.linkKind({ place: "mars" }), "mars");
-  assert.equal(Wording.linkKind({ place: "transit" }), "mars");
-  assert.match(Wording.sendHint({ place: "mars" }), /one complete message/i);
-  assert.match(Wording.sendHint({ place: "mars" }), /6 to 44 minutes/i);
-  assert.match(Wording.sendHint({ place: "mars" }), /do not wait/i);
-});
-
-test("no environment, or an unknown place, uses the neutral wording", () => {
-  for (const comm of [null, undefined, {}, { place: "rover" }, { place: "other" }, { place: "unknown" }]) {
-    assert.equal(Wording.linkKind(comm), "none");
-    assert.match(Wording.sendHint(comm), /if you have contact with Earth, you can send it/i);
-  }
-});
-
-test("the report is the astronaut's own record first, then the sending step", () => {
-  const lead = Wording.reportLead({ place: "mars" });
-  assert.ok(lead.startsWith("Your mission health report. Keep it as your record."));
-  assert.match(lead, /send it as one complete message/i);
+test("no link means the report says nothing about sending it", () => {
+  assert.equal(closingLine({ kind: "none", oneWay: null, roundTrip: null }), "");
+  assert.equal(closingLine(null), "");
 });

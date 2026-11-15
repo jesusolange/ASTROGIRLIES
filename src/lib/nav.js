@@ -9,7 +9,7 @@ export const CHECK_IDS = ["checkup", "vision", "exercise", "nutrition", "mental"
 // Section ids the older modules still ask about while their pages are converted.
 const LEGACY_IDS = new Set([
   "today", "overview", "checkup", "twin", "nutrition", "mental", "environment",
-  "immune", "radiation", "vision", "emergencies", "progress", "protocols",
+  "immune", "radiation", "vision", "emergencies", "progress",
 ]);
 
 export function parseRoute(hash) {
