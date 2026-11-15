@@ -110,3 +110,72 @@ test("importAll can keep a given modified time (used when pulling from the serve
   s.importAll(JSON.stringify({ app: "astromed", version: Store.VERSION, data: { "astromed-a": 1 } }), { modifiedAt: 123 });
   assert.equal(s.getModified(), 123);
 });
+
+test("every app key lives under the active person and reads back with the plain key", () => {
+  const st = fake();
+  const s = Store.create(st);
+  s.setActive("p1");
+  s.set("astromed-profile", { name: "A" });
+  assert.equal(st.getItem("astromed-p:p1:astromed-profile"), '{"name":"A"}');
+  assert.deepEqual(s.get("astromed-profile"), { name: "A" });
+  assert.deepEqual(s.appKeys(), ["astromed-profile"]);
+  s.setActive("p2");
+  assert.equal(s.get("astromed-profile", null), null);
+  assert.deepEqual(s.appKeys(), []);
+});
+
+test("one person's export imports into another person's records without touching the first", () => {
+  const st = fake();
+  const s = Store.create(st);
+  s.setActive("a");
+  s.set("astromed-a", 1);
+  const file = JSON.stringify(s.exportAll());
+  s.setActive("b");
+  s.importAll(file);
+  assert.equal(s.get("astromed-a"), 1);
+  s.setActive("a");
+  assert.equal(s.get("astromed-a"), 1);
+  s.set("astromed-a", 2);
+  s.setActive("c");
+  assert.equal(s.get("astromed-a", null), null);
+});
+
+test("a file written before people existed becomes the first person's data", () => {
+  const st = fake({
+    "astromed-profile": '{"name":"Ada"}',
+    "astrotwin-exercise-sessions": "[1]",
+  });
+  const s = Store.create(st);
+  assert.equal(s.hasLegacyData(), true);
+  assert.equal(s.migrateLegacy("p1"), 2);
+  s.setActive("p1");
+  assert.deepEqual(s.get("astromed-profile"), { name: "Ada" });
+  assert.deepEqual(s.get("astrotwin-exercise-sessions"), [1]);
+  assert.equal(s.hasLegacyData(), false);
+  assert.equal(st.getItem("astromed-profile"), null);
+  assert.deepEqual(Object.keys(s.exportAll().data).sort(), ["astromed-profile", "astrotwin-exercise-sessions"]);
+});
+
+test("migration leaves an empty device untouched and never moves the people list", () => {
+  const st = fake({ "astromed-people": '[{"id":"p1","name":"Ada"}]' });
+  const s = Store.create(st);
+  assert.equal(s.hasLegacyData(), false);
+  assert.equal(s.migrateLegacy("p2"), 0);
+  assert.equal(st.getItem("astromed-people"), '[{"id":"p1","name":"Ada"}]');
+});
+
+test("peek at another person's record, and remove only that person", () => {
+  const st = fake();
+  const s = Store.create(st);
+  s.setActive("a");
+  s.set("astromed-x", "a");
+  s.setActive("b");
+  s.set("astromed-x", "b");
+  assert.equal(s.getFor("a", "astromed-x"), "a");
+  assert.equal(s.removePerson("a"), 1);
+  assert.equal(s.getFor("a", "astromed-x", null), null);
+  s.setActive("b");
+  assert.equal(s.get("astromed-x"), "b");
+  s.setActive("a");
+  assert.equal(s.get("astromed-x", null), null);
+});

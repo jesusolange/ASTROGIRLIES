@@ -26,7 +26,8 @@ const account = (function (root) {
   if (typeof window === "undefined") return api;
 
   const store = root.AstroMedStore && root.AstroMedStore.store;
-  const LS = { session: "am-session", lastRemote: "am-last-remote", dirty: "am-dirty" };
+  // Each bookkeeping key belongs to the active person, so a shared device never mixes accounts.
+  const LS = { session: "am-session", lastRemote: "am-last-remote", dirty: "am-dirty", pending: "am-session-pending" };
   const lsGet = (k) => { try { return root.localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { root.localStorage.setItem(k, v); } catch (e) { /* storage blocked */ } };
   const lsDel = (k) => { try { root.localStorage.removeItem(k); } catch (e) { /* storage blocked */ } };
@@ -37,7 +38,12 @@ const account = (function (root) {
   let timer = 0;
   const listeners = [];
   const setStatus = (s) => { status = s; listeners.forEach((fn) => fn()); };
-  const session = () => { try { return JSON.parse(lsGet(LS.session)); } catch (e) { return null; } };
+  const activeId = () => (store && typeof store.active === "function" ? store.active() : null);
+  const keyFor = (base) => `${base}:${activeId()}`;
+  const session = () => {
+    if (!activeId()) return null;
+    try { return JSON.parse(lsGet(keyFor(LS.session))); } catch (e) { return null; }
+  };
 
   function accountStatus() {
     const s = session();
@@ -72,35 +78,38 @@ const account = (function (root) {
   async function finishLogin(token) {
     const r = await call("/api/auth/verify", "POST", { token });
     if (r.status !== 200) throw new Error(r.data.error || "Sign-in failed.");
-    lsSet(LS.session, JSON.stringify({ token: r.data.session, email: r.data.email }));
-    lsDel(LS.lastRemote);
+    const saved = JSON.stringify({ token: r.data.session, email: r.data.email });
+    if (activeId()) lsSet(keyFor(LS.session), saved);
+    else lsSet(LS.pending, saved);
+    if (activeId()) lsDel(keyFor(LS.lastRemote));
     await sync();
   }
 
   async function signOut() {
     try { await call("/api/auth/logout", "POST"); } catch (e) { /* offline: the session expires on its own */ }
-    [LS.session, LS.lastRemote, LS.dirty].forEach(lsDel);
+    if (!activeId()) return;
+    [keyFor(LS.session), keyFor(LS.lastRemote), keyFor(LS.dirty)].forEach(lsDel);
     setStatus("");
   }
 
   async function sync() {
-    if (!session() || running || !store) return;
+    if (!activeId() || !session() || running || !store) return;
     running = true;
     try {
       setStatus("Syncing...");
       for (let attempt = 0; attempt < 3; attempt++) {
         const got = await call("/api/sync", "GET");
-        if (got.status === 401) { [LS.session, LS.lastRemote].forEach(lsDel); setStatus("Signed out. Sign in again to sync."); return; }
+        if (got.status === 401) { [keyFor(LS.session), keyFor(LS.lastRemote)].forEach(lsDel); setStatus("Signed out. Sign in again to sync."); return; }
         if (got.status !== 200) throw new Error(got.data.error || "Sync failed.");
         const snap = got.data.snapshot;
         const remote = snap ? { updatedAt: snap.updatedAt } : null;
-        const lastRaw = lsGet(LS.lastRemote);
+        const lastRaw = lsGet(keyFor(LS.lastRemote));
         const last = lastRaw === null ? null : Number(lastRaw);
-        const action = decide({ dirty: lsGet(LS.dirty) === "1", modifiedAt: store.getModified() }, remote, last);
+        const action = decide({ dirty: lsGet(keyFor(LS.dirty)) === "1", modifiedAt: store.getModified() }, remote, last);
         if (action === "pull") {
           applying = true;
           try { store.importAll(JSON.stringify(snap.data), { modifiedAt: snap.updatedAt }); } finally { applying = false; }
-          lsSet(LS.lastRemote, String(snap.updatedAt)); lsDel(LS.dirty);
+          lsSet(keyFor(LS.lastRemote), String(snap.updatedAt)); lsDel(keyFor(LS.dirty));
           setStatus("Synced. Reloading..."); setTimeout(() => root.location.reload(), 600);
           return;
         }
@@ -108,7 +117,7 @@ const account = (function (root) {
           const put = await call("/api/sync", "PUT", { snapshot: store.exportAll(), baseUpdatedAt: remote ? remote.updatedAt : null });
           if (put.status === 409) continue; // server copy changed meanwhile: decide again
           if (put.status !== 200) throw new Error(put.data.error || "Sync failed.");
-          lsSet(LS.lastRemote, String(put.data.updatedAt)); lsDel(LS.dirty);
+          lsSet(keyFor(LS.lastRemote), String(put.data.updatedAt)); lsDel(keyFor(LS.dirty));
         }
         setStatus("Synced " + new Date().toLocaleTimeString());
         return;
@@ -119,13 +128,32 @@ const account = (function (root) {
     } finally { running = false; }
   }
 
+  let lastActive = activeId();
   if (store) {
     store.subscribe(() => {
       if (applying) return;
-      lsSet(LS.dirty, "1");
+      const id = activeId();
+      const switched = id !== lastActive;
+      lastActive = id;
+      if (!id) return;
+      if (switched) {
+        if (claimPendingSession()) { clearTimeout(timer); timer = setTimeout(sync, 500); }
+        return;
+      }
+      lsSet(keyFor(LS.dirty), "1");
       if (!session()) return;
       clearTimeout(timer); timer = setTimeout(sync, 3000);
     });
+  }
+
+  // A magic link can arrive while the device is locked; give the session to the next person who signs in.
+  function claimPendingSession() {
+    const pending = lsGet(LS.pending);
+    if (!pending || !activeId()) return false;
+    lsSet(keyFor(LS.session), pending);
+    lsDel(LS.pending);
+    lsDel(keyFor(LS.lastRemote));
+    return true;
   }
   root.addEventListener("online", () => sync());
 

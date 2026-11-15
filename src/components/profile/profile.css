@@ -270,3 +270,20 @@
   }
 
 }
+
+.pf-pin,
+.pf-remove-person {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--am-border);
+}
+
+.pf-pin p,
+.pf-remove-person p {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}

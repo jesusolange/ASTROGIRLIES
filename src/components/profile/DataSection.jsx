@@ -6,6 +6,7 @@ import { KEY } from "../../scripts/profile.js";
 import { loadDemo } from "../../scripts/demo-data.js";
 import Button from "../ui/Button.jsx";
 import SyncAccount from "./SyncAccount.jsx";
+import DeviceSection from "./DeviceSection.jsx";
 
 const store = () => window.AstroMedStore && window.AstroMedStore.store;
 
@@ -110,6 +111,8 @@ export default function DataSection() {
           <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
         </div>
       </section>
+
+      <DeviceSection />
 
       <section class="pf-block">
         <h4>Erase</h4>

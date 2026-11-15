@@ -2,6 +2,7 @@
    The profile record is the source of both; the destination in the profile decides the delay. */
 
 import { crewFor, KEY as PROFILE_KEY } from "./profile.js";
+import { personCount } from "./people.js";
 import { MISSION_TYPES } from "./risks.js";
 
 export { PROFILE_KEY };
@@ -18,7 +19,7 @@ export function crewSize(profile = profileRecord()) {
 }
 
 export function hasCrew(profile = profileRecord()) {
-  return crewSize(profile) > 1;
+  return crewSize(profile) > 1 || personCount() > 1;
 }
 
 const PLACE_BY_DRM = { leo: "iss", lunarOrbit: "moon", lunarSurface: "moon", mars: "mars" };

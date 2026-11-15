@@ -4,6 +4,8 @@ import {
   KEY, REQUIRED_ORDER, applyForm, closeDialog, dialog, fieldErrors, formValues, get,
   initialsOf, open, saveProfile
 } from "../../scripts/profile.js";
+import { personCount } from "../../scripts/people.js";
+import { route } from "../../lib/nav.js";
 import Tabs from "../ui/Tabs.jsx";
 import Button from "../ui/Button.jsx";
 import Dialog from "../ui/Dialog.jsx";
@@ -62,11 +64,15 @@ export default function ProfileDialog() {
 
   useEffect(() => {
     const profile = get();
-    if (profile && profile.name) return undefined;
+    if ((profile && profile.name) || personCount() > 0) return undefined;
     let cancelled = false;
     let timer = null;
     let poll = null;
-    const request = () => { if (!cancelled) open(true); };
+    const request = () => {
+      if (cancelled || get() || personCount() > 0) return;
+      if (route.value.area === "emergency") return;
+      open(true);
+    };
     const onCoverClosed = () => { timer = setTimeout(request, 600); };
     const waitForCover = () => {
       if (cancelled) return;
