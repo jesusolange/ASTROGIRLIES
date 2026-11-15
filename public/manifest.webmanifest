@@ -1,7 +1,7 @@
 {
   "name": "AstroMed",
   "short_name": "AstroMed",
-  "description": "Health self-monitoring for one astronaut on a long Moon or Mars mission with delayed contact with Earth.",
+  "description": "Health self-monitoring for an astronaut in low Earth orbit, at the Moon or at Mars. Crew size and the link to Earth follow the mission.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

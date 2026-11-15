@@ -1,17 +1,17 @@
 # AstroMed: rules for agents
 
-AstroMed is a NASA Space Apps submission: a health self-monitoring app for one astronaut on a long Moon or Mars
-mission with delayed or no contact with Earth. Submission closes Sunday 15 Nov 2026, 23:59 local time.
-Read `docs/tickets.md` (the decisions at the top are binding) and `docs/decisions.md` before you start.
+AstroMed is a NASA Space Apps submission: a health self-monitoring app for an astronaut on a mission in low Earth
+orbit, at the Moon or at Mars. Crew size and the link to Earth depend on the mission and are read from the profile.
+Read `docs/tickets.md` (the decisions there are binding) and `docs/decisions.md` before you start.
 
 ## 1. Product hard rules
 
-- The user is the astronaut. No doctor view. Every action first says what the astronaut can do alone. Sending a
-  report or telling the flight surgeon is allowed as an extra step, worded for the mission's link to Earth
-  (`window.AstroMedEnv.comm()`: live near Earth, a short pause at the Moon, a 6 to 44 minute round trip at Mars,
-  none during solar conjunction). See `docs/decisions.md`.
+- The user is the astronaut. No doctor view. Every action first says what the astronaut can do alone. Telling the
+  flight surgeon is allowed as a second step, worded for the mission's link to Earth through `alsoTell()` from
+  `src/scripts/mission.js`. Text about helping a crewmate is shown only when `hasCrew()` is true.
 - Every indicator ends in a concrete action the astronaut can take.
-- Every section follows Record, History, What to do.
+- Record, History, What to do is app-wide: Check records, Progress holds all history, Home says what to do. A card
+  shows its result and one action after saving, nothing more.
 - Numbers and thresholds come from a named source (NASA-STD-3001, Human Research Roadmap, a cited paper) or are
   labelled on screen as our design choice. Never invent a medical threshold or a citation. If you do not have a
   source, write `SOURCE-NEEDED:` in your report and label the value on screen as a design choice.
@@ -19,27 +19,30 @@ Read `docs/tickets.md` (the decisions at the top are binding) and `docs/decision
 - Wearable or sensor data is simulated and labelled "simulated".
 - The app is a screening and self-monitoring aid, not a medical device and not a diagnosis. Say so where a result
   could be read as a diagnosis.
-- All user-facing text is English. No emoji as icons in new UI; use the SVG symbols in `src/pages/index.astro`.
+- All user-facing text is English and professional. No emoji anywhere. No celebration. No developer notes on
+  screen. Icons come from `lucide-preact`.
 - The app must keep working with no network connection once loaded. No CDN scripts, fonts or images: bundle them.
+- Medical text is the team medic's. Do not rewrite it; move it or change who it addresses only where your task
+  says so.
+- "Not a medical device" appears once, in the footer. Sources and credits live in the Sources dialog.
 
 ## 2. Stack and layout
 
-Astro static site with Preact components (`@astrojs/preact`). Older sections are still vanilla JavaScript modules that build HTML from strings; they are being converted. pnpm only.
+Vite with `@preact/preset-vite`. One `index.html`, one root component. pnpm only.
 
 | Path | What | Owner |
 |---|---|---|
-| `src/pages/index.astro` | The page shell, sidebar, icon symbols | coordinator (ask; small edits are granted per task) |
-| `src/scripts/main.js` | Module entry and import order | coordinator (ask for one import line) |
+| `index.html`, `src/main.jsx`, `src/components/App.jsx` | Entry and root component | coordinator |
+| `src/lib/nav.js` | Hash routes | coordinator |
 | `src/scripts/storage.js`, `sync.js` | Storage and optional sync | coordinator |
-| `src/scripts/risks.js`, `src/data/**` | NASA risk model (contract) | coordinator |
+| `src/scripts/risks.js`, `src/data/hrr-risks.js` | NASA risk model (contract) | coordinator |
+| `src/data/topics.js` | Topic, check, risk and emergency card in one table (contract) | coordinator |
 | `src/styles/tokens.css` | Colour tokens (contract) | coordinator |
-| `src/scripts/sections.js` | Navigation (`AstroMedNav`), mental health, protocols, shared analysis | per task |
-| `src/scripts/<section>.js` | One module per section | per task |
-| `src/styles/<section>.css` | Styles for a new section, imported from its module | per task |
-| `public/legacy/*.js` | Prebuilt bundles without source (3D astronaut, PDF report) | per task |
-| `public/assets/**` | Images and 3D models | per task |
+| `src/components/ui/**` | Shared kit | per task |
+| `src/components/<section>/**` | Components, `cards.js` and one CSS file per section | per task |
+| `src/scripts/<section>.js` | Logic per section, with tests | per task |
+| `public/**` | Images, models, PDF bundle | per task |
 | `functions/**`, `schema.sql` | Optional Cloudflare Pages server | coordinator |
-| `test/**` | Node unit tests | whoever owns the code under test |
 | `docs/**`, `AGENTS.md`, `README.md`, `tools/**` | Docs and tooling | coordinator |
 
 Your task spec lists the paths you own. Anything else: ask first.
@@ -48,12 +51,14 @@ Your task spec lists the paths you own. Anything else: ask first.
 
 - **Storage:** read and write only through `window.AstroMedStore.store.get(key, fallback)` / `.set(key, value)`.
   Keys start with `astromed-`. Never call `localStorage` directly.
-- **Navigation:** a new section registers itself, it does not edit the navigation code:
-  `window.AstroMedNav.register({ id, label, icon, render, before })` inside a `DOMContentLoaded` handler.
-  `render(pageElement)` runs every time the section opens. `window.AstroMedNav.show(id)` opens any section;
-  `window.AstroMedNav.has(id)` says whether a section exists (other sections may register after yours).
-- **Start-up:** modules load through `src/scripts/main.js` and run before `DOMContentLoaded`. Do your DOM work in a
-  `DOMContentLoaded` handler. Do not branch on `document.readyState`.
+- **Routes:** `import { go, route, openCard, openEmergency } from "../lib/nav.js"`. Routes are URL hashes. Sections
+  do not register themselves and there is no `window.AstroMedNav`.
+- **Checks:** a section exports its deck cards from `src/components/<section>/cards.js`
+  (`export const cards = [{ id, topic, title, Component, isDone }]`). The deck finds them; no shared file is edited.
+- **Topics:** which check covers which NASA risk and which emergency card belongs to it is read from
+  `src/data/topics.js`. Never write a cross-link by hand.
+- **Mission:** `import { crewSize, hasCrew, link, alsoTell } from "./mission.js"`.
+- **Start-up:** components render from the root. No `DOMContentLoaded` handlers, no new `window.*` globals.
 - **Risk model:** `import { currentMission, rankedRisks, areaWeights, MISSION_TYPES } from "./risks.js"`.
   The chosen mission is the `missionType` field of the `astromed-profile` record.
 - **Findings:** a section exposes `findings()` returning `[{ level, title, saw, todo }]` with `level` one of
@@ -64,14 +69,13 @@ Your task spec lists the paths you own. Anything else: ask first.
 
 ## 3a. The interface is Preact components
 
-The interface is written as Preact components mounted from Astro as islands (`@astrojs/preact`). Do not build HTML
-in strings, do not write your own rendering, templating or component helper, and do not clone `<template>`
-elements. Use what Preact and Astro provide.
+The interface is written as Preact components rendered from `src/main.jsx`. Do not build HTML in strings, do not
+write your own rendering, templating or component helper, and do not clone `<template>` elements. Use what Preact
+provides.
 
-- Each section has a mount point, `src/components/sections/<Name>.astro`, listed once in
-  `src/components/Sections.astro` (coordinator-owned; ask for a new line). It contains only:
-  `<section id="<id>Page" class="am-page" hidden><NameView client:only="preact" /></section>` with
-  `import NameView from "../<section>/<Name>View.jsx";` in its frontmatter.
+- There are no mount points. A section is components under `src/components/<section>/`, each under 200 lines, one
+  component per file. Shared pieces come from `src/components/ui/`; do not write a second tab, chip, step, dialog,
+  toast or card.
 - The section itself is Preact components under `src/components/<section>/*.jsx`, each under 200 lines, one
   component per file, named after what it shows (`RiskRow.jsx`, `GcsPicker.jsx`). Shared pieces go in
   `src/components/ui/`.
@@ -84,11 +88,10 @@ elements. Use what Preact and Astro provide.
 - Styles: one CSS file per section next to its components, imported from the view (`import "./vision.css";`),
   class names prefixed with the section name, colours only through the `--am-*` tokens.
 - Text in JSX is escaped. Never use `dangerouslySetInnerHTML` with stored or typed values.
-- The section still registers its sidebar entry with `window.AstroMedNav.register({ id, label, before })` (no
-  `render`) from a `DOMContentLoaded` handler in its logic module, and keeps its one public object
-  (`window.AstroMed<Section>` with `findings()` and whatever other modules call) set from that module.
+- Charts use `chart.js`. Icons use `lucide-preact`. Term definitions use `Term` from the kit.
 - A module that still builds a section from strings is legacy. When your task touches such a section, convert it
   to components as part of the task and delete the string-building code.
+
 ## 4. Process rules
 
 - Stay inside your worktree. Scratch files go in `.tmp/` inside it.

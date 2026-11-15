@@ -20,7 +20,7 @@ Readiness weights and bands are design choices of this prototype, not NASA value
 
 ## Running it
 
-The app is built with [Astro](https://astro.build). It no longer opens by double-clicking a file: it needs the dev server, or a build served over HTTP. You need Node 22 or newer and pnpm.
+The app is built with [Vite](https://vite.dev) and [Preact](https://preactjs.com). It no longer opens by double-clicking a file: it needs the dev server, or a build served over HTTP. You need Node 22 or newer and pnpm.
 
 ```bash
 pnpm install
@@ -34,11 +34,11 @@ pnpm build      # writes dist/
 pnpm preview    # serves dist/
 ```
 
-Layout: `src/pages/index.astro` is the page, `src/scripts/` holds one module per section (entry: `main.js`), `src/styles/` the stylesheets, `public/` the images and 3D models, `functions/` the optional server.
+Layout: `index.html` is the page, `src/main.jsx` the entry, `src/components/App.jsx` the root component, `src/scripts/` holds one module per section (entry: `main.js`), `src/styles/` the stylesheets, `public/` the images and 3D models, `functions/` the optional server.
 
 ### Deploying (Cloudflare Pages)
 
-Create a Pages project from this repo (private repos work). Framework preset: Astro. Build command: `pnpm build`. Build output directory: `dist`. Then open the `*.pages.dev` URL in a private window to confirm it loads with no login.
+Create a Pages project from this repo (private repos work). Framework preset: Vite. Build command: `pnpm build`. Build output directory: `dist`. Then open the `*.pages.dev` URL in a private window to confirm it loads with no login.
 
 ### Optional accounts and sync
 

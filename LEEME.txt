@@ -1,7 +1,7 @@
 ASTROMED
 
 IMPORTANTE: la app ya NO se abre con doble clic en index.html.
-Ahora esta hecha con Astro y necesita un servidor de desarrollo o una compilacion.
+Ahora esta hecha con Vite y Preact y necesita un servidor de desarrollo o una compilacion.
 
 COMO USAR (necesitas Node 22 o superior y pnpm)
 1. pnpm install
@@ -10,7 +10,8 @@ COMO USAR (necesitas Node 22 o superior y pnpm)
    pnpm preview      -> sirve dist/ para revisarla
 
 ARCHIVOS
-  src/pages/index.astro   la pagina
+  index.html              la pagina
+  src/main.jsx            la entrada
   src/scripts/            un modulo por seccion (entrada: main.js)
   src/styles/             hojas de estilo
   public/assets/          imagenes y modelos 3D
