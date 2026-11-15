@@ -19,8 +19,8 @@ Read `docs/tickets.md` (the decisions there are binding) and `docs/decisions.md`
 - Wearable or sensor data is simulated and labelled "simulated".
 - The app is a screening and self-monitoring aid, not a medical device and not a diagnosis. Say so where a result
   could be read as a diagnosis.
-- All user-facing text is English and professional. No emoji anywhere. No celebration. No developer notes on
-  screen. Icons come from `lucide-preact`.
+- All user-facing text is English and professional. No emoji anywhere. Points, levels and badges are shown, static, on Home; no
+  celebration (no animation or pop-up when one is earned). No developer notes on screen. Icons come from `lucide-preact`.
 - The app must keep working with no network connection once loaded. No CDN scripts, fonts or images: bundle them.
 - Medical text is the team medic's. Do not rewrite it; move it or change who it addresses only where your task
   says so.

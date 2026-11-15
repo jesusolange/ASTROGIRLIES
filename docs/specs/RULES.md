@@ -17,8 +17,8 @@ Read `docs/tickets.md` (the decisions there are binding) and `docs/decisions.md`
   `src/scripts/mission.js`. Text about helping a crewmate is shown only when `hasCrew()` is true.
 - Record, History, What to do is app-wide: Check records, Progress holds all history, Home says what to do. A card
   shows its result and one action after saving, nothing more.
-- All user-facing text is English and professional. No emoji anywhere. No celebration. No developer notes on
-  screen. Icons come from `lucide-preact`.
+- All user-facing text is English and professional. No emoji anywhere. Points, levels and badges are shown, static, on Home; no
+  celebration (no animation or pop-up when one is earned). No developer notes on screen. Icons come from `lucide-preact`.
 - Medical text is the team medic's. Do not rewrite it; move it or change who it addresses only where your task
   says so.
 - "Not a medical device" appears once, in the footer. Sources and credits live in the Sources dialog.
@@ -75,6 +75,6 @@ Vite with `@preact/preset-vite`. One `index.html`, one root component. pnpm only
 | One table (`src/data/topics.js`) ties topic, check, NASA risk and emergency card. | Cross-links are generated, not hand-written. |
 | No readiness score under 50% coverage of the due areas. No pre-filled or default answers. | A green signal with no measurement behind it is the most dangerous output of a self-monitoring aid. |
 | Dependencies: `lucide-preact` (ISC), `chart.js` (MIT), `vite`, `@preact/preset-vite` (MIT). | Icons, charts, build. |
-| Professional tone: no emoji, celebration, levels or points. A streak and a completion ring stay. | Owner decision. |
+| Professional tone: no emoji or celebration. A streak, a completion ring, points, levels and badges stay, shown statically on Home. | Owner decision. |
 | Barcode lookup through Open Food Facts stays and needs the network; offline it says so. | Owner decision. |
 | The current colour palette stays. | Owner decision. |

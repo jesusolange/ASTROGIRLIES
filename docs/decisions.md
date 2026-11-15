@@ -25,3 +25,4 @@ Newest last. The product decisions at the top of `docs/tickets.md` also apply.
 | 15 Nov 2026 | Professional tone: no emoji, celebration, levels or points. A streak and a completion ring stay. | Owner decision. |
 | 15 Nov 2026 | Barcode lookup through Open Food Facts stays and needs the network; offline it says so. | Owner decision. |
 | 15 Nov 2026 | The current colour palette stays. | Owner decision. |
+| 15 Nov 2026 | Points, levels and badges stay, shown statically on Home beside the streak and completion ring (T27). This replaces "levels or points" in the professional-tone row above. The demo mission's astronaut is "Solange", shown as "Solange · Demo Astronaut" while demo data is loaded. Every profile field is required. | Owner decisions after the batch 1 review. |

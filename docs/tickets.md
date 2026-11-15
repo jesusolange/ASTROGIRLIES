@@ -30,8 +30,9 @@ These replace the earlier tickets (see git history of this file). One spec per t
 - Copy follows the mission. Every action first says what the astronaut can do alone. "Tell the flight surgeon" may
   follow as a second step, worded by the link delay. Content about helping a crewmate shows only when crew size is
   over 1.
-- Professional tone. One visual system, the current palette. No celebration, mascot, emoji, demo names or
-  developer notes ("CHECK", "SOURCE-NEEDED", "pending review", "not yet reviewed") on screen.
+- Professional tone. One visual system, the current palette. No celebration, mascot, emoji or developer notes
+  ("CHECK", "SOURCE-NEEDED", "pending review", "not yet reviewed") on screen. Points, levels and badges stay,
+  static, on Home. The only demo name is the demo mission's astronaut, "Solange · Demo Astronaut".
 - The medical text is the team medic's and is kept as written. Agents do not rewrite medical content; they move it
   and change who it addresses.
 - "Not a medical device" appears once, in the fixed footer. Sources, study references, reference tables and asset
@@ -83,8 +84,10 @@ These replace the earlier tickets (see git history of this file). One spec per t
   sign). T35's "one picture" item is withdrawn.
 - The doctor's "Blood loss and shock" table moves from the vitals card into the bleeding card, text unchanged (T25).
 - Body cards use the 3D model (T31); the old organ PNGs may be deleted when nothing uses them.
-- First-run profile: name, destination, crew, start date and duration are required; age, sex, weight and height
-  stay optional, and a card that needs them links to the profile (T22, T34).
+- First-run profile: every field is required (owner, after the batch 1 review); sex keeps "Prefer not to say" as
+  an answer, and menopause is asked only for women (T29).
+- Batch 1 review: the Emergency index plan stands (10 or 11 tiles, Vital signs entry on top, bone loss and
+  anaemia as Guides in Check). Points, levels and badges are wanted.
 - Pictograph characters inside the medic's text (for example in the kidney stone flow) are icons, not words: T25
   removes them and keeps every word.
 - `cabin-air` has `topic: null`: there is no environment topic or check after T26.
