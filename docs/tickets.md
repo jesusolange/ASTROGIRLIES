@@ -54,7 +54,7 @@ These replace the earlier tickets (see git history of this file). One spec per t
   what to do.
 
 **Screens**
-- Home: streak and completion ring at the top (static, no animation of reward), what is due, "Needs attention"
+- Home: streak and completion ring at the top (a short toast or small animation when something is earned), what is due, "Needs attention"
   linking to the matching emergency card. The score shows only when at least 50% of the due areas are recorded;
   below that it says how many are recorded and lists the missing checks.
 - Intervals come from the NASA risk score of each topic for the chosen mission (as `today.js` does now), labelled

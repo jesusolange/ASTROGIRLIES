@@ -14,10 +14,6 @@ export default function CheckupPage() {
         <div class="figure-scene">
           <div class="glow"></div>
         </div>
-
-        <div class="figure-helper">
-          Click astronaut to open · Select a body system
-        </div>
       </section>
 
       <section class="checkup-panel" aria-label="Daily checkup record">
