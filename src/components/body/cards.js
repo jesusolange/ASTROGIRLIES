@@ -45,6 +45,15 @@ function raisesEmergency(values) {
   });
 }
 
+// Very low blood pressure (systolic under 90 or diastolic under 50, owner decision) points to the doctor's
+// "Blood loss and shock" table in the bleeding card.
+function lowPressure(values) {
+  const sys = Number(values && values.sys);
+  const dia = Number(values && values.dia);
+  return (values && values.sys !== "" && values.sys != null && sys < 90)
+    || (values && values.dia !== "" && values.dia != null && dia < 50);
+}
+
 function saveFor(spec) {
   return function save(values) {
     const draft = withProfileWeight(spec.part, values, getProfile());
@@ -52,9 +61,14 @@ function saveFor(spec) {
     if (outcome.error) return outcome;
     const emergency = emergencyFor(spec.topic);
     const raised = outcome.result.level === "warn" || outcome.result.level === "urgent";
-    if (emergency && raised && raisesEmergency(draft)) {
-      outcome.result.actions = [{ label: "Open the emergency card", onClick: () => openEmergency(emergency) }];
+    const actions = [];
+    if (lowPressure(draft)) {
+      actions.push({ label: "Open blood loss and shock", onClick: () => openEmergency("bleeding") });
     }
+    if (emergency && raised && raisesEmergency(draft)) {
+      actions.push({ label: "Open the emergency card", onClick: () => openEmergency(emergency) });
+    }
+    if (actions.length) outcome.result.actions = actions;
     return outcome;
   };
 }
