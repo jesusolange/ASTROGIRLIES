@@ -37,12 +37,18 @@
   flex: none;
   padding: 0;
   border: 0;
+  border-radius: var(--am-radius-small);
   background: none;
   color: var(--am-text);
   font: inherit;
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.02em;
+  transition: color 180ms ease-out, transform 150ms ease-out;
+}
+
+.tb-brand:hover .tb-mark {
+  filter: brightness(1.08);
 }
 
 .tb-mark {
@@ -75,6 +81,7 @@
   font: inherit;
   font-size: 14px;
   font-weight: 650;
+  transition: background-color 180ms ease-out, color 180ms ease-out, transform 150ms ease-out;
 }
 
 .tb-dest button:hover {
@@ -85,6 +92,10 @@
 .tb-dest button.is-active {
   background: var(--am-selected-bg);
   color: var(--am-heading);
+}
+
+.tb-dest button:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .tb-right {
@@ -111,10 +122,15 @@
   font-size: 13px;
   font-weight: 650;
   white-space: nowrap;
+  transition: background-color 180ms ease-out, transform 150ms ease-out;
 }
 
 .tb-control:hover {
   background: var(--am-surface-hover);
+}
+
+.tb-control:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .tb-chip {
@@ -146,10 +162,15 @@
   font-weight: 800;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  transition: filter 180ms ease-out, transform 150ms ease-out;
 }
 
 .tb-emergency:hover {
   filter: brightness(1.08);
+}
+
+.tb-emergency:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .tb-avatar {
@@ -211,62 +232,25 @@
 
 .tb-page {
   min-width: 0;
+  animation: tb-page-in 240ms ease-out;
 }
 
-.tb-eyebrow {
-  margin: 0 0 12px;
-  color: var(--am-text-muted);
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+@keyframes tb-page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
 }
 
-.tb-check {
-  padding: 22px;
-  background: var(--am-surface);
-  border: 1px solid var(--am-border);
-  border-radius: var(--am-radius);
-}
-
-.tb-check h2 {
-  margin: 0 0 8px;
-  color: var(--am-heading);
-  font-size: 24px;
-}
-
-.tb-lead {
-  margin: 0 0 16px;
-  color: var(--am-text-muted);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.tb-check-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
+.tb-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
   padding: 0;
-  list-style: none;
-}
-
-.tb-check-list a {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 10px 14px;
-  border: 1px solid var(--am-border);
-  border-radius: var(--am-radius-small);
-  background: var(--am-surface-2);
-  color: var(--am-text);
-  font-size: 14px;
-  font-weight: 650;
-  text-decoration: none;
-}
-
-.tb-check-list a:hover {
-  background: var(--am-surface-hover);
-  color: var(--am-heading);
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---------- footer ---------- */
@@ -291,50 +275,41 @@
 }
 
 @media (max-width: 720px) {
-  :root {
-    --tb-height: 58px;
-  }
+  :root { --tb-height: 58px; }
 
   .tb {
     gap: 8px;
     padding: 0 10px;
   }
 
-  .tb-brand-text {
+  .tb-brand-text,
+  .tb-dest,
+  .tb-theme-label,
+  .tb-chip-full,
+  .tb-profile-copy {
     display: none;
   }
 
-  .tb-dest {
-    display: none;
-  }
+  .tb-chip-day { display: inline; }
 
-  .tb-right {
-    gap: 6px;
-  }
+  .tb-right { gap: 6px; }
 
-  .tb-control {
-    padding: 0 10px;
-  }
-
-  .tb-theme-label {
-    display: none;
-  }
-
-  .tb-chip-full {
-    display: none;
-  }
-
-  .tb-chip-day {
-    display: inline;
-  }
+  .tb-control { padding: 0 10px; }
 
   .tb-profile {
-    max-width: 120px;
-    padding-right: 8px;
+    flex: none;
+    width: 44px;
+    min-width: 44px;
+    max-width: none;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
   }
 
-  .tb-profile-copy strong {
-    font-size: 11px;
+  .tb-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
   }
 
   .tb-main {
@@ -367,7 +342,10 @@
     font: inherit;
     font-size: 12px;
     font-weight: 650;
+    transition: background-color 180ms ease-out, color 180ms ease-out, transform 150ms ease-out;
   }
+
+  .tb-tabs button:active { transform: translateY(1px) scale(0.98); }
 
   .tb-tabs button.is-active {
     background: var(--am-selected-bg);
@@ -376,7 +354,24 @@
 }
 
 @media (max-width: 430px) {
-  .tb-emergency-label {
-    display: none;
+  .tb-emergency-label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-page { animation: none; }
+
+  .tb-brand,
+  .tb-dest button,
+  .tb-control,
+  .tb-emergency,
+  .tb-tabs button {
+    transition: none;
+  }
+
+  .tb-dest button:active,
+  .tb-control:active,
+  .tb-emergency:active,
+  .tb-tabs button:active {
+    transform: none;
   }
 }

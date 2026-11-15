@@ -60,7 +60,6 @@ export default function CheckView() {
   return (
     <div class="ck-wrap">
       <header class="ck-head">
-        <h1>Check</h1>
         <p>One card at a time. Save records it for today.</p>
       </header>
 

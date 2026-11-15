@@ -28,7 +28,6 @@ export default function Home() {
   return (
     <div class="home">
       <div class="home-heading">
-        <h1>Home</h1>
         <p>Your readiness for this mission, the checks due today and what to do next.</p>
       </div>
 

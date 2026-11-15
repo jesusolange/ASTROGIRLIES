@@ -6,40 +6,44 @@ import { checkForTopic, ratingOf } from "../../scripts/home.js";
 import { openCard } from "../../lib/nav.js";
 import SourceLink from "../ui/SourceLink.jsx";
 
-function Rating({ label, side, missing }) {
-  if (!side) return <div class="home-rate"><span>{label}</span><b class="home-chip home-none">{missing}</b></div>;
+const MISSING = { ops: "Not rated for this mission", lth: "Not rated" };
+
+function RateCell({ side, missing }) {
+  if (!side) return <b class="home-chip home-none">{missing}</b>;
   return (
-    <div class="home-rate">
-      <span>{label}</span>
+    <>
       <b class={`home-chip home-${side.colour || "none"}`}>{side.l} {"\u00d7"} {side.c}</b>
       {side.disposition ? <em>{side.disposition}</em> : null}
-    </div>
+    </>
   );
 }
 
 function Watch({ risk }) {
-  if (!risk.monitored) return <span class="home-unwatched">Not monitored yet</span>;
   const topic = topicFor(risk.id);
-  const check = topic ? checkForTopic(topic.id) : null;
+  const check = risk.monitored && topic ? checkForTopic(topic.id) : null;
   if (!check) return <span class="home-unwatched">Not monitored yet</span>;
-  return <button type="button" class="home-link" onClick={() => openCard(check.route)}>{topic.label}</button>;
+  return <button type="button" class="home-watch-btn" onClick={() => openCard(check.route)}>Open check</button>;
 }
 
 function RiskRow({ risk, rank }) {
   return (
     <li class="home-risk">
-      <div class="home-risk-rank" aria-hidden="true">{rank}</div>
       <div class="home-risk-main">
-        <b>{risk.short}</b>
-        <p>{risk.title}</p>
-        <div class="home-risk-meta">
-          <SourceLink href={risk.url}>NASA source</SourceLink>
-          <span>last published {risk.published || "date not given"}</span>
+        <span class="home-risk-rank" aria-hidden="true">{rank}</span>
+        <div class="home-risk-copy">
+          <b>{risk.short}</b>
+          <p class="home-risk-name">{risk.title}</p>
+          <p class="home-risk-meta">
+            <span>Last published {risk.published || "date not given"}</span>
+            <SourceLink href={risk.url}>NASA source</SourceLink>
+          </p>
         </div>
       </div>
-      <div class="home-risk-ratings">
-        <Rating label="In mission" side={risk.ops} missing="Not rated for this mission" />
-        <Rating label="Long-term health" side={risk.lth} missing="Not rated" />
+      <div class="home-rates">
+        <span class="home-rates-label">In mission</span>
+        <span class="home-rates-cell"><RateCell side={risk.ops} missing={MISSING.ops} /></span>
+        <span class="home-rates-label">Long-term health</span>
+        <span class="home-rates-cell"><RateCell side={risk.lth} missing={MISSING.lth} /></span>
       </div>
       <div class="home-risk-watch"><Watch risk={risk} /></div>
     </li>
@@ -127,8 +131,6 @@ export default function ScoreDialog({ open, onClose, readiness }) {
         <ol class="home-risks">
           {risks.map((risk, index) => <RiskRow key={risk.id} risk={risk} rank={index + 1} />)}
         </ol>
-
-        <p class="home-note">This is a screening and self-monitoring aid, not a medical device and not a diagnosis. A rating is not a prediction for you.</p>
       </div>
     </dialog>
   );

@@ -81,21 +81,22 @@ const LAST_KEY = {
   mental: "mental", nutrition: "nutrition"
 };
 
-const TOPIC_CHECK = {
-  bones: { label: "Bone check", route: "overview" },
-  kidneys: { label: "Kidney check", route: "overview" },
-  sleep: { label: "Sleep check", route: "overview" },
-  heart: { label: "Heart check", route: "overview" },
-  exercise: { label: "Log an exercise session", route: "twin" },
-  environment: { label: "Cabin conditions check", route: "environment" },
-  immune: { label: "Immune watch check", route: "immune" },
-  radiation: { label: "Log your radiation dose", route: "radiation" },
-  mental: { label: "Mental health check-in", route: "mental" },
-  nutrition: { label: "Log breakfast, lunch and dinner", route: "nutrition" },
-  vision: { label: "Vision self-check", route: "vision" }
+// The route is the topic id: the Check deck resolves a topic id to that topic's cards.
+const TOPIC_LABEL = {
+  bones: "Bone check",
+  kidneys: "Kidney check",
+  sleep: "Sleep check",
+  heart: "Heart check",
+  exercise: "Log an exercise session",
+  environment: "Cabin conditions check",
+  immune: "Immune watch check",
+  radiation: "Log your radiation dose",
+  mental: "Mental health check-in",
+  nutrition: "Log breakfast, lunch and dinner",
+  vision: "Vision self-check"
 };
 
-const VO2_CHECK = { label: "VO\u2082max test", route: "twin" };
+const VO2_CHECK = { label: "VO\u2082max test", route: "vo2max" };
 
 // The Vision results store a full timestamp; the queue works in local days like the other checks.
 function localDay(iso) {
@@ -114,12 +115,13 @@ function lastFor(area) {
 export const ratingOf = (area) => (area && area.risk && area.risk.ops ? `${area.risk.ops.l}\u00d7${area.risk.ops.c}` : "not rated");
 
 export function checkForTopic(topicId) {
-  return TOPIC_CHECK[topicId] || null;
+  const label = TOPIC_LABEL[topicId];
+  return label ? { label, route: topicId } : null;
 }
 
 export function buildQueue(readiness) {
   const items = readiness.areas.map((area) => {
-    const check = TOPIC_CHECK[area.key];
+    const check = checkForTopic(area.key);
     if (!check) return null;
     const last = lastFor(area);
     const interval = intervalFor(area.score);

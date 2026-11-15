@@ -104,10 +104,19 @@ export default function DataSection() {
       <section class="pf-block">
         <h4>Back up and restore</h4>
         <p>Back up your data to one file, or restore it on another device. Restoring replaces the data saved in this browser.</p>
-        <div class="pf-actions">
-          <Button variant="soft" onClick={exportAll}>Export my data</Button>
-          <Button variant="soft" onClick={() => fileInput.current && fileInput.current.click()}>Import data</Button>
-          <Button variant="soft" onClick={exportCsv}>Export measurements as CSV</Button>
+        <div class="pf-exports">
+          <div class="pf-export">
+            <Button variant="soft" onClick={exportAll}>Export my data</Button>
+            <p>A full backup of every record that Import can restore.</p>
+          </div>
+          <div class="pf-export">
+            <Button variant="soft" onClick={exportCsv}>Export measurements as CSV</Button>
+            <p>A spreadsheet of the measurements only.</p>
+          </div>
+          <div class="pf-export">
+            <Button variant="soft" onClick={() => fileInput.current && fileInput.current.click()}>Import data</Button>
+            <p>Restores a backup made with Export my data.</p>
+          </div>
           <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
         </div>
       </section>

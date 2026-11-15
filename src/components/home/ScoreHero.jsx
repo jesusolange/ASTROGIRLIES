@@ -1,4 +1,6 @@
+import { Info } from "lucide-preact";
 import { COVERAGE_MIN } from "../../scripts/readiness.js";
+import Button from "../ui/Button.jsx";
 
 export default function ScoreHero({ readiness, onExplain }) {
   const scored = readiness.status === "scored";
@@ -14,7 +16,10 @@ export default function ScoreHero({ readiness, onExplain }) {
         <h2>{scored ? band.title : `Not enough data: ${coverage}`}</h2>
         {scored ? <p class="home-coverage">from {coverage}</p> : null}
         <p>{scored ? band.advice : `A score appears only when at least ${Math.round(COVERAGE_MIN * 100)}% of the due areas are recorded.`}</p>
-        <button type="button" class="home-link" onClick={onExplain}>How this score is made</button>
+        <Button variant="soft" className="home-explain" onClick={onExplain}>
+          <Info size={16} aria-hidden="true" />
+          How this score is made
+        </Button>
       </div>
       <div class="home-hero-mission">
         <small>Mission type</small>

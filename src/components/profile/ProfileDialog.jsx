@@ -25,12 +25,26 @@ const FORM_TABS = [
 
 const ALL_TABS = [...FORM_TABS, { id: "data", label: "Data" }, { id: "sources", label: "Sources" }];
 
+const FIELD_TAB = {
+  name: "you", age: "you", sex: "you", meno: "you",
+  missionType: "mission", crew: "mission", startDate: "mission", total: "mission",
+  weight: "body", height: "body"
+};
+
+const CLOSE_MS = 240;
+
+function reducedMotion() {
+  return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export default function ProfileDialog() {
   const [stored] = useStored(KEY, null);
   const [form, setForm] = useState(() => formValues(null));
   const [errors, setErrors] = useState({});
   const [first, setFirst] = useState(false);
   const [tab, setTab] = useState("you");
+  const [pending, setPending] = useState(null);
+  const [closing, setClosing] = useState(false);
   const fields = useRef({});
   const state = dialog.value;
 
@@ -52,6 +66,7 @@ export default function ProfileDialog() {
 
   useEffect(() => {
     if (!state.open) return;
+    setClosing(false);
     setForm(formValues(get()));
     setErrors({});
     setFirst(state.first);
@@ -61,6 +76,23 @@ export default function ProfileDialog() {
   useEffect(() => {
     if (state.open && state.section) setTab(state.section);
   }, [state.section]);
+
+  useEffect(() => {
+    if (!pending) return;
+    const node = fields.current[pending];
+    if (!node) return;
+    node.focus();
+    setPending(null);
+  }, [pending, tab]);
+
+  useEffect(() => {
+    if (!closing) return undefined;
+    const timer = setTimeout(() => {
+      setClosing(false);
+      closeDialog();
+    }, CLOSE_MS);
+    return () => clearTimeout(timer);
+  }, [closing]);
 
   useEffect(() => {
     const profile = get();
@@ -93,14 +125,20 @@ export default function ProfileDialog() {
     };
   }, []);
 
+  function requestClose() {
+    if (first || !state.open || closing) return;
+    if (reducedMotion()) closeDialog();
+    else setClosing(true);
+  }
+
   function submit(event) {
     event.preventDefault();
     const found = fieldErrors(form);
     setErrors(found);
     const firstInvalid = REQUIRED_ORDER.find((key) => found[key]);
     if (firstInvalid) {
-      const node = fields.current[firstInvalid];
-      if (node) node.focus();
+      setTab(FIELD_TAB[firstInvalid] || "you");
+      setPending(firstInvalid);
       return;
     }
     saveProfile(applyForm(form, stored || {}));
@@ -109,12 +147,16 @@ export default function ProfileDialog() {
   const tabs = first ? FORM_TABS : ALL_TABS;
   const onForm = FORM_TABS.some((item) => item.id === tab);
   const title = first ? "Welcome, astronaut" : "Astronaut profile";
+  const classes = ["pf-dialog"];
+  if (first) classes.push("pf-first");
+  if (state.open && !closing) classes.push("is-open");
+  if (closing) classes.push("is-closing");
   const footer = (
     <>
       {onForm
         ? <Button type="submit" form="pf-form">Save profile</Button>
-        : <Button variant="soft" onClick={closeDialog}>Done</Button>}
-      {first || !onForm ? null : <Button variant="soft" onClick={closeDialog}>Cancel</Button>}
+        : <Button variant="soft" onClick={requestClose}>Done</Button>}
+      {first || !onForm ? null : <Button variant="soft" onClick={requestClose}>Cancel</Button>}
     </>
   );
 
@@ -122,9 +164,9 @@ export default function ProfileDialog() {
     <>
       <Dialog
         open={state.open}
-        onClose={first ? () => {} : closeDialog}
+        onClose={requestClose}
         title={title}
-        className={`pf-dialog${first ? " pf-first" : ""}`}
+        className={classes.join(" ")}
         footer={footer}
       >
         <div class="pf-summary">
@@ -137,7 +179,7 @@ export default function ProfileDialog() {
         <div class="pf-body">
           {onForm ? (
             <form id="pf-form" class="pf-form" noValidate onSubmit={submit}>
-              <ProfileFields form={form} errors={errors} update={update} bind={bind} />
+              <ProfileFields form={form} errors={errors} update={update} bind={bind} tab={tab} />
             </form>
           ) : tab === "data" ? (
             <DataSection />

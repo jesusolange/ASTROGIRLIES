@@ -15,6 +15,7 @@ function Ring({ done, due }) {
           class="home-ring-fill"
           cx="50" cy="50" r={R}
           stroke-dasharray={`${CIRC * share} ${CIRC}`}
+          style={{ "--home-arc": `${CIRC * share}` }}
           transform="rotate(-90 50 50)"
         />
       </svg>
