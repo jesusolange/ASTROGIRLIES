@@ -1,4 +1,5 @@
 import { alsoTell } from "../../scripts/mission.js";
+import AiImage from "../ui/AiImage.jsx";
 import Steps from "../ui/Steps.jsx";
 import RichText from "./RichText.jsx";
 
@@ -7,7 +8,7 @@ function Images({ block }) {
     <>
       <div class={`emg-dg${block.one ? " one" : ""}`}>
         {block.images.map((image) => (
-          <img class="emg-img" src={image.src} alt={image.alt} loading="lazy" key={image.src} />
+          <AiImage imgClass="emg-img" src={image.src} alt={image.alt} ai={image.ai} key={image.src} />
         ))}
       </div>
       {block.legend ? (
@@ -25,7 +26,7 @@ function ImageList({ block }) {
   return (
     <>
       <div class="emg-dg">
-        <img class="emg-img" src={block.image.src} alt={block.image.alt} loading="lazy" />
+        <AiImage imgClass="emg-img" src={block.image.src} alt={block.image.alt} ai={block.image.ai} />
         <div>
           <ul class="emg-list-plain">
             {block.items.map((item) => <li key={item}><RichText text={item} /></li>)}

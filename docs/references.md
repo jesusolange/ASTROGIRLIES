@@ -24,8 +24,8 @@ Each figure was chosen against the sections that will show it. The section owner
 | Recovery position | Emergencies: a person who is breathing but not awake | A person on their side with the airway open |
 | ARED, CEVIS and T2 exercise equipment | Exercise & Recovery | The three exercise machines used on the station |
 
-The Amsler grid is drawn in `src/components/vision/GridTest.jsx`; no image is needed. The exercise
-equipment illustrations already exist in `public/assets/exercise/` and were not re-sourced here.
+The Amsler grid is drawn in `src/components/vision/GridTest.jsx`; no image is needed. The ARED, CEVIS
+and T2 illustrations are AI-generated; they are recorded in the AI-generated illustrations table below.
 Protocols has no figure of its own: it lists saved results and builds the PDF report, so it uses the
 same organ figures as Daily Checkup.
 
@@ -95,6 +95,22 @@ map was fetched directly from the Scientific Visualization Studio. The same rows
 | `public/icons/icon-512.png` | AstroMed app icon, 512 px | AstroGirlies team | Project |
 | `public/favicon.svg` | AstroMed favicon | AstroGirlies team | Project |
 
+### AI-generated illustrations
+
+These pictures were generated with an image model for this project. The app marks them on screen with
+an "AI-generated" badge, and their alt text ends in "(AI-generated illustration)".
+
+| File | Title | Author | Licence |
+|---|---|---|---|
+| `public/assets/emergency/chest.jpg` | Chest: needle point and chest drain point | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/emergency/drain.jpg` | Chest drain: tip at the top for air, low for fluid | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/emergency/belly-rovsing.jpg` | Abdomen with the McBurney, Lanz and Blumberg points | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/emergency/belly-murphy.jpg` | Abdomen with the Murphy point | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/emergency/dermatome.jpg` | Body map: front and back, skin areas by nerve level | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/ARED.png` (also `public/assets/exercise/ared.png`) | ARED resistance machine in use | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/T2.png` (also `public/assets/exercise/t2.png`) | T2 treadmill in use | AstroGirlies team | AI-generated illustration, made for this project |
+| `public/assets/CEVIS.png` (also `public/assets/exercise/cevis.png`) | CEVIS exercise bike in use | AstroGirlies team | AI-generated illustration, made for this project |
+
 
 ## Fonts and libraries
 
@@ -119,12 +135,6 @@ request. Library versions are from `package.json`; all are MIT.
   clear licence marks the common sites on a whole skeleton. The plain skeleton and a closed-fracture
   illustration were sourced instead; a later task can place markers on the skeleton.
 - **Amsler grid.** No image needed: it is drawn in code in `src/components/vision/GridTest.jsx`.
-- **Five emergency guide photographs** (`chest.jpg`, `drain.jpg`, `belly-rovsing.jpg`,
-  `belly-murphy.jpg`, `dermatome.jpg` in commit `1e536a5`). The commit states no origin or licence.
-  T14 copies them to `public/assets/emergency/`; their source still needs to be recorded by the owner.
-- **Exercise equipment illustrations** (`public/assets/exercise/ared.png`, `cevis.png`, `t2.png`).
-  They are generated illustrations with no stated source or licence. They were not re-sourced here
-  because this task owns only the medical figures; the Exercise owner should replace or credit them.
 - **Organ illustrations formerly in `public/assets/`** (`heart.png`, `lungs.png`, `kidneys.png`,
   `brain.png`, `skeleton.png`, `muscles.png`, `liver.png`, `pulse.png`). Removed in batch 3: the body cards
   use the 3D model instead.

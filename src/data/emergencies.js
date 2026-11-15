@@ -93,8 +93,8 @@ export const CARDS = [
     blocks: [
       { type: "stage", n: 1, layout: "compare", title: "Check for a collapsed lung (pneumothorax)", diagram: [
         { type: "images", images: [
-          { src: "/assets/emergency/chest.jpg", alt: "Chest with the needle point and the chest drain point" },
-          { src: "/assets/emergency/drain.jpg", alt: "Chest drain: tip at the top for air, low for fluid" },
+          { src: "/assets/emergency/chest.jpg", alt: "Chest with the needle point and the chest drain point", ai: true },
+          { src: "/assets/emergency/drain.jpg", alt: "Chest drain: tip at the top for air, low for fluid", ai: true },
         ], legend: [
           { tone: "bad", text: "1. Needle: ICR 2–3, mid-clavicular line" },
           { tone: "ok", text: "2. Chest drain: ICR 4–5, mid or anterior axillary line" },
@@ -235,7 +235,7 @@ export const CARDS = [
     sourceIds: ["team-doctor-notes"],
     blocks: [
       { type: "stage", n: 1, title: "Sharp pain, lower right belly?", ask: "Also ask: nausea, diarrhoea, fever?",
-        diagram: [{ type: "images", one: true, images: [{ src: "/assets/emergency/belly-rovsing.jpg", alt: "Abdomen with McBurney, Lanz and Blumberg points" }] }],
+        diagram: [{ type: "images", one: true, images: [{ src: "/assets/emergency/belly-rovsing.jpg", alt: "Abdomen with McBurney, Lanz and Blumberg points", ai: true }] }],
         look: [
           "McBurney: press on the outer third of the line from the right hip bone (ASIS) to the navel. Pain = positive.", "Lanz: press on the right third of the line between the two hip bones (ASIS). Pain = positive.",
           "Blumberg: press the LOWER LEFT belly for one minute, then let go fast. Pain on the other side = positive. It can also mean peritonitis.", "Ultrasound: thick wall of the appendix, or fluid around it",
@@ -244,7 +244,7 @@ export const CARDS = [
           "Pain medicine: Metamizole",
         ], note: "The same problem can be a diverticulitis. The treatment is the same.", no: "If all signs are negative, go to step 2." },
       { type: "stage", n: 2, title: "Pain under the right ribs? Murphy's sign",
-        diagram: [{ type: "images", one: true, images: [{ src: "/assets/emergency/belly-murphy.jpg", alt: "Abdomen with the Murphy point" }] }],
+        diagram: [{ type: "images", one: true, images: [{ src: "/assets/emergency/belly-murphy.jpg", alt: "Abdomen with the Murphy point", ai: true }] }],
         look: [
           "Murphy's sign: press deep under the right ribs while the person breathes in. Sharp pain and they stop breathing in = positive.", "Ultrasound: thick wall of the gallbladder and a stone in the duct (cholecystitis)",
         ], todo: ["No food (fasting)", "Antispasmodic, for example Butylscopolamine", "Pain medicine, for example Metamizole"] },
@@ -269,7 +269,7 @@ export const CARDS = [
         { type: "infectionTable", table: INFECTION },
       ] },
       { type: "panel", title: "Virus waking up (Zoster or Simplex)", blocks: [
-        { type: "imageList", image: { src: "/assets/emergency/dermatome.jpg", alt: "Body map: front and back, skin areas by nerve level" }, items: [
+        { type: "imageList", image: { src: "/assets/emergency/dermatome.jpg", alt: "Body map: front and back, skin areas by nerve level", ai: true }, items: [
           "Zoster: small blisters, usually on one side and inside one dermatome (one body band).", "Simplex: usually on the lips or in the genital area.",
         ], note: "Simplified map. A dermatome is the skin area of one nerve root." },
       ] },

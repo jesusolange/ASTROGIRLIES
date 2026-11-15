@@ -1,4 +1,6 @@
 // The three machines as large pictures. Choosing one selects it and reveals its fields below.
+import AiImage from "../ui/AiImage.jsx";
+
 export default function DeviceChooser({ devices, value, onChange }) {
   return (
     <div class="exr-chooser" role="group" aria-label="Training machine">
@@ -10,7 +12,7 @@ export default function DeviceChooser({ devices, value, onChange }) {
           aria-pressed={value === device.type ? "true" : "false"}
           onClick={() => onChange(device.type)}
         >
-          <img src={device.image} alt={device.alt} loading="lazy" decoding="async" />
+          <AiImage src={device.image} alt={device.alt} ai={device.ai} />
           <span class="exr-device-name">{device.title}</span>
           <small>{device.subtitle}</small>
         </button>

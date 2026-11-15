@@ -392,3 +392,31 @@
   font-size: var(--am-fs-xs);
   font-weight: 700;
 }
+
+/* ---------- AI-image badge ---------- */
+
+.am-ai-image {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.am-ai-image > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.am-ai-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 3px 9px;
+  color: var(--am-on-strong);
+  background: var(--am-heading-strong);
+  border-radius: 999px;
+  font-size: var(--am-fs-xs);
+  font-weight: 650;
+  line-height: 1.4;
+  pointer-events: none;
+}

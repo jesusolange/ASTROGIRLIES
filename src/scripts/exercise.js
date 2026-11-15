@@ -25,6 +25,7 @@ export const DEVICES = [
     subtitle: "Resistance Training",
     image: "/assets/ARED.png",
     alt: "Astronaut performing resistance training",
+    ai: true,
     fields: [
       { label: "Movement", key: "movement", type: "select", required: true, options: MOVEMENTS },
       number("Duration (min)", "minutes", true, 1, 300),
@@ -40,6 +41,7 @@ export const DEVICES = [
     subtitle: "Treadmill Running",
     image: "/assets/T2.png",
     alt: "Astronaut running on a treadmill",
+    ai: true,
     fields: [
       number("Duration (min)", "minutes", true, 1, 300),
       number("Distance (km)", "distance", false, 0, 100),
@@ -55,6 +57,7 @@ export const DEVICES = [
     subtitle: "Cycling Training",
     image: "/assets/CEVIS.png",
     alt: "Astronaut using the cycling system",
+    ai: true,
     fields: [
       number("Duration (min)", "minutes", true, 1, 300),
       number("Cadence (RPM)", "cadence", false, 0, 250),
