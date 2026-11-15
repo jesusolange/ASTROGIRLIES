@@ -1,8 +1,12 @@
 /* Body checks. Colours come from tokens.css only. */
 
+.ck-wrap:has(.body-card) {
+  max-width: 1180px;
+}
+
 .body-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(180px, 220px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 440px);
   gap: 18px;
   align-items: start;
 }
@@ -39,8 +43,9 @@
   min-width: 0;
 }
 
-.body-fields input {
+.body-fields input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -145,7 +150,8 @@
 
 .body-gauge-normal-num {
   position: absolute;
-  top: -17px;
+  top: -16px;
+  line-height: 1;
   transform: translateX(-50%);
   color: var(--am-text-muted);
   font-size: var(--am-fs-xs);

@@ -11,32 +11,34 @@
 .ntr-add { display: grid; gap: 12px; }
 .ntr-mealbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .ntr-mealbar .ui-chips { margin: 0; }
-.ntr-water { margin-top: 0; }
+.ntr-mealbar .ui-chip-mark { display: none; }
+.ntr-water { margin-top: 0; align-self: center; }
 
 .ntr-form { display: grid; gap: 10px; padding: 14px; background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius); }
 .ntr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+.ntr-row:has(.ntr-calc) { align-items: start; }
 .ntr-field { display: grid; gap: 5px; min-width: 0; color: var(--am-text); font-size: var(--am-fs-xs); }
 .ntr-field > span:first-child,
 .ntr-field > label:first-child { color: var(--am-text-muted); font-weight: 600; }
-.ntr-field input,
+.ntr-field input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 .ntr-field select {
-  width: 100%; min-height: 44px; box-sizing: border-box; padding: 10px 12px;
+  width: 100%; height: 44px; min-height: 44px; box-sizing: border-box; padding: 10px 12px;
   color: var(--am-field-text); background: var(--am-bg-raised);
   border: 1px solid var(--am-field-border); border-radius: var(--am-radius-small); font: inherit; font-size: var(--am-fs-sm);
 }
 .ntr-code { display: flex; align-items: stretch; gap: 8px; }
-.ntr-code input { flex: 1; height: 44px; }
-.ntr-code .ntr-scan-btn { margin-top: 0; flex: none; height: 44px; padding: 0 12px; }
+.ntr-code input { flex: 1; }
 .ntr-found {
   display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px;
   background: var(--am-ok-bg); border: 1px solid var(--am-ok); border-radius: var(--am-radius-small);
 }
 .ntr-found b { flex: 1; font-size: var(--am-fs-sm); }
 .ntr-edit { min-height: 44px; padding: 0 8px; color: var(--am-text-muted); background: none; border: 0; font: inherit; font-size: var(--am-fs-xs); cursor: pointer; }
-.ntr-calc { display: grid; gap: 2px; padding: 10px 12px; background: var(--am-info-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius-small); color: var(--am-text-muted); }
+.ntr-calc { display: grid; gap: 2px; margin: 0; padding: 10px 12px; background: var(--am-info-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius-small); color: var(--am-text-muted); }
 .ntr-calc b { font-size: var(--am-fs-lg); color: var(--am-accent); }
 .ntr-calc small { font-size: var(--am-fs-xs); }
 .ntr-more summary, .ntr-settings summary { cursor: pointer; color: var(--am-heading); font-weight: 600; min-height: 32px; }
+.ntr-more summary { font-size: var(--am-fs-md); }
 .ntr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 10px 0; }
 .ntr-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .ntr-form-actions .ui-btn { margin-top: 0; }
@@ -47,11 +49,14 @@
 
 .ntr-foods { display: grid; gap: 10px; }
 .ntr-search {
-  display: flex; align-items: center; gap: 8px; padding: 0 12px; min-height: 44px;
+  display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 44px; min-height: 44px;
   background: var(--am-bg-raised); border: 1px solid var(--am-field-border); border-radius: var(--am-radius-small);
   color: var(--am-text-muted);
 }
-.ntr-search input { flex: 1; min-width: 0; background: none; border: 0; color: var(--am-field-text); font: inherit; font-size: var(--am-fs-sm); }
+.ntr-search input[type="search"]:not([type="checkbox"]):not([type="radio"]) {
+  flex: 1; min-width: 0; height: 100%; padding: 0; background: none; border: 0; border-radius: 0;
+  color: var(--am-field-text); font: inherit; font-size: var(--am-fs-sm);
+}
 .ntr-search input:focus-visible { outline: none; }
 .ntr-search:focus-within { outline: 3px solid var(--am-focus); outline-offset: 2px; }
 .ntr-food-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -150,27 +155,6 @@
 .ntr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .ntr-actions .ui-btn { margin-top: 0; }
 .ntr-hint { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
-
-/* ---------- Camera scan ---------- */
-
-.ntr-scan { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: var(--am-overlay); }
-.ntr-scan-card { position: relative; width: min(92vw, 460px); display: grid; gap: 12px; justify-items: center; color: var(--am-text); }
-.ntr-scan-card video { width: 100%; max-height: 60vh; border-radius: var(--am-radius); background: var(--am-bg-raised); object-fit: cover; }
-.ntr-scan-frame { position: absolute; top: 18%; left: 12%; right: 12%; height: 28%; border: 3px solid var(--am-accent); border-radius: var(--am-radius-small); pointer-events: none; }
-
-@media (max-width: 640px) {
-  .ntr-scan { place-items: stretch; }
-  .ntr-scan-card {
-    width: 100vw;
-    height: 100dvh;
-    max-height: none;
-    box-sizing: border-box;
-    align-content: center;
-    padding: calc(16px + env(safe-area-inset-top, 0px)) 14px calc(16px + env(safe-area-inset-bottom, 0px));
-    background: var(--am-bg-raised);
-  }
-  .ntr-scan-card video { max-height: 55dvh; }
-}
 
 @media (max-width: 860px) {
   .ntr-targets { grid-template-columns: 1fr; }

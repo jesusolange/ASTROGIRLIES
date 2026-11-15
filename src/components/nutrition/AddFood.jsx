@@ -1,12 +1,11 @@
-// Add one food: search Saved foods, look up a barcode, or type the values from the label.
-// Offline, the camera scan is disabled and one line explains why; manual entry and import still work.
+// Add one food: search Saved foods, look up a typed or scanned barcode, or type the values from the label.
+// Offline, the barcode lookup says so; manual entry and import still work.
 import { useEffect, useId, useState } from "preact/hooks";
-import { Camera, GlassWater, Plus } from "lucide-preact";
+import { GlassWater, Plus } from "lucide-preact";
 import { FIELDS, MEALS, UNITS, basisText, buildEntry, factor, isoDay, libraryItem, lookupFood, unitLabel } from "../../scripts/nutrition.js";
 import Chips from "../ui/Chips.jsx";
 import Button from "../ui/Button.jsx";
 import MyFoods from "./MyFoods.jsx";
-import ScanDialog from "./ScanDialog.jsx";
 
 const MEAL_OPTIONS = MEALS.map((meal) => ({ id: meal, label: meal }));
 const EXTRA = [
@@ -14,12 +13,6 @@ const EXTRA = [
   ["sodium", "Salt as sodium (mg)"], ["veg", "Vegetables (g)"], ["fluid", "Fluid (mL)"], ["iron", "Iron (mg)"]
 ];
 const newDraft = () => ({ amount: 100, unit: "g", name: "", code: "", kcal: "", editName: false, found: false });
-
-function canScan() {
-  return typeof window !== "undefined" && "BarcodeDetector" in window
-    && typeof navigator !== "undefined" && navigator.mediaDevices
-    && typeof navigator.mediaDevices.getUserMedia === "function";
-}
 
 function autoMeal() {
   const hour = new Date().getHours();
@@ -29,7 +22,6 @@ function autoMeal() {
 export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }) {
   const [draft, setDraft] = useState(newDraft);
   const [note, setNote] = useState("");
-  const [scanning, setScanning] = useState(false);
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine !== false);
   const codeId = useId();
 
@@ -68,14 +60,6 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
     }
   };
 
-  const startScan = () => {
-    if (!canScan()) {
-      setNote("This browser cannot scan barcodes with the camera. Type the barcode, or fill in the food by hand.");
-      return;
-    }
-    setScanning(true);
-  };
-
   const pickFood = (food) => {
     setMeal(meal || autoMeal());
     setDraft({ ...newDraft(), ...food, amount: food.unit === "portion" ? 1 : 100, found: true });
@@ -101,7 +85,6 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
 
   const eaten = Math.round((Number(draft.kcal) || 0) * factor(draft));
   const hasName = Boolean(draft.found) && !draft.editName;
-  const scanSupported = canScan();
 
   return (
     <div class="ntr-add">
@@ -139,9 +122,6 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
                 onBlur={(event) => runLookup(event.currentTarget.value)}
                 onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); runLookup(event.currentTarget.value); } }}
               />
-              <Button className="ntr-scan-btn" aria-label="Scan barcode with the camera" onClick={startScan}>
-                <Camera size={20} aria-hidden="true" />
-              </Button>
             </span>
           </div>
           {hasName ? (
@@ -155,7 +135,6 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
             </label>
           )}
         </div>
-        {!scanSupported ? <p class="ntr-note">This browser cannot scan barcodes with the camera. Type the barcode, or fill in the food by hand.</p> : null}
         {!online ? <p class="ntr-note">Barcode lookup needs a connection. Enter the food by hand or import a food list.</p> : null}
         <p class="ntr-note" aria-live="polite">{note}</p>
 
@@ -185,14 +164,6 @@ export default function AddFood({ lib, meal, setMeal, onAdd, onWater, onImport }
       </form>
 
       <MyFoods lib={lib} onPick={pickFood} onImport={onImport} />
-
-      {scanning ? (
-        <ScanDialog
-          onClose={() => setScanning(false)}
-          onCode={async (code) => { setScanning(false); await runLookup(code); }}
-          onError={() => { setScanning(false); setNote("The camera is not available. Type the barcode, or fill in the food by hand."); }}
-        />
-      ) : null}
     </div>
   );
 }
