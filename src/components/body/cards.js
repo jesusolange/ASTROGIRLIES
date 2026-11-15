@@ -34,13 +34,25 @@ function componentFor(spec) {
   };
 }
 
+// Blood pressure alone only ever shows "Watch" with its action, never an emergency card (owner decision).
+const NO_EMERGENCY = new Set(["sys", "dia"]);
+
+function raisesEmergency(values) {
+  return Object.entries(values || {}).some(([key, value]) => {
+    if (NO_EMERGENCY.has(key) || value === "" || value == null) return false;
+    const rule = ruleFor(key, Number(value));
+    return Boolean(rule && (rule.level === "review" || rule.level === "alert"));
+  });
+}
+
 function saveFor(spec) {
   return function save(values) {
     const draft = withProfileWeight(spec.part, values, getProfile());
     const outcome = saveCard(spec.part, draft, { ruleFor });
     if (outcome.error) return outcome;
     const emergency = emergencyFor(spec.topic);
-    if (emergency && (outcome.result.level === "warn" || outcome.result.level === "urgent")) {
+    const raised = outcome.result.level === "warn" || outcome.result.level === "urgent";
+    if (emergency && raised && raisesEmergency(draft)) {
       outcome.result.actions = [{ label: "Open the emergency card", onClick: () => openEmergency(emergency) }];
     }
     return outcome;

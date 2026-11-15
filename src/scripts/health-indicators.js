@@ -24,21 +24,19 @@ export const SCALES = {
     ticks: [70, 90, 120, 140, 180, 200],
     zones: [
       { to: 90, level: "review" },
-      { to: 120, level: "normal" },
-      { to: 181, level: "review" },
-      { to: Infinity, level: "alert" }
+      { to: 180, level: "normal" },
+      { to: Infinity, level: "review" }
     ]
   },
   dia: {
     min: 40,
     max: 140,
     unit: "mmHg",
-    ticks: [40, 60, 80, 90, 120, 140],
+    ticks: [40, 60, 80, 110, 140],
     zones: [
       { to: 60, level: "review" },
-      { to: 80, level: "normal" },
-      { to: 121, level: "review" },
-      { to: Infinity, level: "alert" }
+      { to: 110, level: "normal" },
+      { to: Infinity, level: "review" }
     ]
   },
   hrv: {

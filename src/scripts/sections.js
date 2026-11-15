@@ -66,14 +66,14 @@ const METRIC_RULES = {
   hr: v => v < 60 ? R("review", "Heart rate below 60 bpm.", "Rest, hydrate and note any dizziness or fatigue. If you are not a trained athlete or feel unwell, measure again after 10 minutes and stay seated until you feel steady." + tell())
     : v > 100 ? R("review", "Heart rate above 100 bpm.", "Rest 5–10 minutes, breathe slowly and measure again. If it stays high or you have chest discomfort, sit down, avoid exertion and measure every 10 minutes." + tell())
     : R("ok", "Heart rate within the reference band.", "Keep your routine and measure at a similar time each day."),
+  // Warning from 180 systolic or 110 diastolic: grade 3 hypertension in the 2018 ESC/ESH guideline. Owner
+  // decision: below that counts as fine, and blood pressure alone never raises an urgent level.
   sys: v => v < 90 ? R("review", "Systolic pressure is low.", "Hydrate, stand up slowly and note any dizziness or fainting.")
-    : v < 120 ? R("ok", "Systolic pressure within the reference band.", "Keep up exercise and hydration.")
-    : v <= 180 ? R("review", "Systolic pressure above the reference.", "Re-measure after 5 minutes of rest, limit salt and keep a record of repeated high readings.")
-    : R("alert", "Systolic pressure very high.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion and note headache, vision changes or chest pain." + tell()),
+    : v < 180 ? R("ok", "Systolic pressure below the 180 mmHg warning line.", "Keep up exercise and hydration.")
+    : R("review", "Systolic pressure is 180 mmHg or more.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion, limit salt, and note headache, vision changes or chest pain." + tell()),
   dia: v => v < 60 ? R("review", "Diastolic pressure is low.", "Hydrate and note any dizziness.")
-    : v < 80 ? R("ok", "Diastolic pressure within the reference band.", "Keep up exercise and hydration.")
-    : v <= 120 ? R("review", "Diastolic pressure above the reference.", "Re-measure after rest and keep a record of repeated high readings.")
-    : R("alert", "Diastolic pressure very high.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion and record the reading." + tell()),
+    : v < 110 ? R("ok", "Diastolic pressure below the 110 mmHg warning line.", "Keep up exercise and hydration.")
+    : R("review", "Diastolic pressure is 110 mmHg or more.", "Sit down, stay calm and re-measure after 5 minutes. Avoid exertion and record the reading." + tell()),
   resp: v => v < 12 || v >= 19 ? R("review", "Breathing rate outside the reference band.", "Measure again at rest, check cabin air and CO₂ alerts, and report shortness of breath.")
     : R("ok", "Breathing rate within the reference band.", "Keep the routine."),
   spo2: v => v < 92 ? R("alert", "Oxygen saturation is low.", "Check your sensor, sit down and breathe slowly. Re-measure; if it stays low, stop activity and keep the cabin air clean." + tell())
