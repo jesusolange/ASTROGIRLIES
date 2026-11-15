@@ -1,0 +1,10 @@
+.am-planet-canvas,
+.am-planet-fallback {
+  display: block;
+  object-fit: contain;
+}
+
+.am-planet-canvas[hidden],
+.am-planet-fallback[hidden] {
+  display: none;
+}

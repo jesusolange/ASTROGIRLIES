@@ -68,6 +68,25 @@ confirmed before submission.
 | Human Brain | AH | Sketchfab (URL to confirm) | CC BY 4.0 |
 | Human Heart | TinkerLane Studio | Sketchfab (URL to confirm) | CC BY 4.0 |
 
+## Planet textures
+
+The cover globe is textured with public-domain NASA and NASA/USGS imagery. Each map is an
+equirectangular colour map, bundled in `public/assets/planets/` and loaded from the app, never from
+the network. The credit lines below are the ones the source pages ask for.
+
+| File | Title | Author | Source page | Licence | Licence URL | Accessed | Change |
+|---|---|---|---|---|---|---|---|
+| `earth.jpg` | Blue Marble: land surface, shallow water and shaded topography | NASA Visible Earth; Reto Stöckli and Robert Simmon, NASA Goddard Space Flight Center | https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/ | Public domain (NASA) | https://www.nasa.gov/nasa-brand-center/images-and-media/ | 2026-11-15 | Downscaled from 21600 by 10800 pixels to 1920 by 960 and saved as JPEG. |
+| `moon.jpg` | CGI Moon Kit: LROC color map | NASA Scientific Visualization Studio; Ernie Wright | https://svs.gsfc.nasa.gov/4720 | Public domain (NASA) | https://www.nasa.gov/nasa-brand-center/images-and-media/ | 2026-11-15 | Downscaled to 2048 by 1024 and saved as JPEG. |
+| `mars.jpg` | Mars Viking MDIM21 color mosaic | NASA, Jet Propulsion Laboratory and USGS Astrogeology | https://astrogeology.usgs.gov/search/details/Mars/Viking/MDIM21/Mars_Viking_MDIM21_ClrMosaic_global_232m/cub | Public domain (NASA/USGS) | https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits | 2026-11-15 | Downscaled from 21339 by 10670 pixels to 1920 by 960 and saved as JPEG. |
+
+The Earth and Mars files are 1920-pixel renditions of the same public-domain originals, fetched from
+Wikimedia Commons (`File:Land shallow topo 2048.jpg` and `File:Mars Viking MDIM21 ClrMosaic 1km.jpg`)
+because the NASA and USGS download hosts did not complete the transfer from this network. The Moon
+map was fetched directly from the Scientific Visualization Studio. The same rows are exported from
+`src/scripts/planet.js` and listed in the Sources dialog under "Planet textures". The three SVG
+drawings below remain as the fallback when WebGL or the texture is unavailable.
+
 ## Authored by the team
 
 | File | Title | Author | Licence |

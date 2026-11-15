@@ -4,18 +4,9 @@ import { KEY as PROFILE_KEY, missionDayFor, open as openProfile, totalFor } from
 import { openEmergency } from "../../lib/nav.js";
 import { activeSignal, enter, lock, peopleSignal, signIn } from "../../scripts/people.js";
 import SignIn from "../crew/SignIn.jsx";
+import Planet from "../planet/Planet.jsx";
+import { bodyFor, labelFor } from "../../scripts/planet.js";
 import "../crew/crew.css";
-
-const PLANET = {
-  leo: { file: "earth.svg", label: "Earth" },
-  lunarOrbit: { file: "moon.svg", label: "Moon" },
-  lunarSurface: { file: "moon.svg", label: "Moon" },
-  mars: { file: "mars.svg", label: "Mars" }
-};
-
-export function planetFor(mission) {
-  return PLANET[mission && mission.drm] || PLANET.mars;
-}
 
 const store = () => (typeof window !== "undefined" && window.AstroMedStore && window.AstroMedStore.store) || null;
 
@@ -52,7 +43,7 @@ export default function Cover({ onClosed }) {
   const selected = people.find((person) => person.id === selectedId) || null;
   const profile = profileFor(selected ? selected.id : null);
   const mission = missionType(profile && profile.missionType);
-  const planet = planetFor(mission);
+  const body = bodyFor(mission);
   const facts = profile ? factsFor(profile, mission) : [];
 
   useEffect(() => {
@@ -134,7 +125,7 @@ export default function Cover({ onClosed }) {
       aria-labelledby="amc-title"
       onClick={() => close()}
     >
-      <img class="amc-planet" src={`/assets/cover/${planet.file}`} alt="" aria-hidden="true" />
+      <Planet body={body} class="amc-planet" />
       <div class="amc-scrim" aria-hidden="true" />
       <div class="amc-in" onClick={(event) => event.stopPropagation()}>
         <p class="amc-kicker">NASA Space Apps 2026</p>
@@ -177,7 +168,7 @@ export default function Cover({ onClosed }) {
         </form>
 
         <p class="amc-note">Your records stay on this device unless you choose to sign in.</p>
-        <p class="amc-place">{planet.label}</p>
+        <p class="amc-place">{labelFor(body)}</p>
       </div>
 
     </div>

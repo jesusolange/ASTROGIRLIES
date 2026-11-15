@@ -2,6 +2,7 @@ import { useEffect, useRef } from "preact/hooks";
 import { SOURCES } from "../../data/sources.js";
 import { FIGURES } from "../../data/figures.js";
 import { REF } from "../../scripts/radiation.js";
+import { TEXTURES as PLANET_TEXTURES } from "../../scripts/planet.js";
 import { MODELS, PLACE_IMAGES } from "./models.js";
 import SourceEntry from "./SourceEntry.jsx";
 import "./sources.css";
@@ -85,6 +86,19 @@ export default function SourcesList({ focusId = null }) {
               entry={model}
               focused={model.id === focusId}
               bind={bind(model.id)}
+            />
+          ))}
+        </ul>
+      </Section>
+
+      <Section title="Planet textures" id="planets">
+        <ul class="sources-items">
+          {Object.values(PLANET_TEXTURES).map((texture) => (
+            <SourceEntry
+              key={texture.id}
+              entry={texture}
+              focused={texture.id === focusId}
+              bind={bind(texture.id)}
             />
           ))}
         </ul>
