@@ -45,6 +45,8 @@ These replace the earlier tickets (see git history of this file). One spec per t
   (key `E`), theme, profile. On phone the three destinations are a bottom tab bar.
 - Routes are URL hashes: `#/home`, `#/check`, `#/check/<card id>`, `#/progress`, `#/emergency`,
   `#/emergency/<card id>`. Back and forward work everywhere.
+- From Environment, the cabin readings stay as a "Cabin conditions" check card (T33) and the "Keep in mind at
+  <place>" notes move to the profile's Mission section (T29). Its pickers and demo fill are deleted.
 - Deleted as pages: Overview, Readiness, Missions, Settings, Environment, Mission risks, Daily Checkup, Protocols
   (becomes the report export on Progress). The "Next destination" card is deleted.
 - Record, History, What to do is app-wide, not per section: Check records, Progress holds all history, Home says
