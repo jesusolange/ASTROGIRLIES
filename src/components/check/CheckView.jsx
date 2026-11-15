@@ -4,7 +4,7 @@ import { go, openCard, route } from "../../lib/nav.js";
 import CheckCard from "../ui/CheckCard.jsx";
 import Icon from "../ui/Icon.jsx";
 import {
-  allCards, deckProgress, dueCards, findCard, guideCards, orderCards, recordedCards
+  allCards, cardsForTopic, deckProgress, dueCards, findCard, guideCards, orderCards, recordedCards
 } from "./deck.js";
 import "../ui/ui.css";
 import "./check.css";
@@ -26,6 +26,11 @@ export default function CheckView() {
 
   const routeId = route.value.id;
   const opened = routeId ? findCard(cards, routeId) : null;
+  // #/check/<topic id> runs that topic's cards, due ones first, then returns to the deck.
+  const topicCards = !opened && routeId ? cardsForTopic(routeId, cards) : [];
+  const topicDue = topicCards.filter((card) => due.includes(card));
+  const scoped = topicCards.length > 0;
+  const queue = scoped ? topicDue : due;
   const active = opened || (activeId ? findCard(cards, activeId) : null);
 
   useEffect(() => {
@@ -33,13 +38,14 @@ export default function CheckView() {
   }, [routeId]);
 
   useEffect(() => {
-    if (routeId || activeId || !due.length) return;
-    setActiveId(due[0].id);
-  }, [routeId, activeId, due]);
+    if (opened || activeId || !queue.length) return;
+    if (routeId && !scoped) return;
+    setActiveId(queue[0].id);
+  }, [routeId, opened, scoped, activeId, queue]);
 
   function finish() {
     setActiveId(null);
-    if (routeId) go("#/check");
+    if (opened || (scoped && topicDue.length <= 1)) go("#/check");
   }
 
   if (opened) {
@@ -77,6 +83,7 @@ export default function CheckView() {
             {recorded.map((card) => (
               <li key={card.id}>
                 <button type="button" class="ck-done-link" onClick={() => openCard(card.id)}>{card.title}</button>
+                {typeof card.summary === "function" && card.summary() ? <span class="ck-done-summary"> {card.summary()}</span> : null}
               </li>
             ))}
           </ul>

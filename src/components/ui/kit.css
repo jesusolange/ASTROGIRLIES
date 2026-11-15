@@ -336,6 +336,12 @@
   color: var(--am-text);
 }
 
+.ui-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .ui-card-foot {
   display: flex;
   justify-content: flex-end;

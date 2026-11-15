@@ -4,8 +4,11 @@
 // Card module shape (src/components/<section>/cards.js):
 //   { id, topic, title, reference, illustration,
 //     Component({ form, onSaved })   // renders the fields; form = { values, set, errorFor, fieldRef }
-//     save(values) -> { error: { field, message } } | { result: { level, saw, todo, toast? }, undo }
-//     isDone() -> boolean }
+//     save(values) -> { error: { field, message } } | { result, undo }
+//     isDone() -> boolean,
+//     summary() -> string   // optional: what was recorded today, shown in "Done for today" }
+// result = { level, saw, todo, toast?, actions?: [{ label, onClick, variant? }], body?: node }
+//   level null hides the badge; body replaces saw and todo; actions render as buttons under the result.
 // A card may also save by itself and call onSaved(result, undo).
 import "./kit.css";
 import { useId, useRef, useState } from "preact/hooks";
@@ -88,9 +91,20 @@ export default function CheckCard({ card, onDone }) {
 
       {result ? (
         <div class="ui-card-result" role="status">
-          <LevelBadge level={result.level} />
-          <p class="ui-card-saw">{result.saw}</p>
-          <p class="ui-card-todo"><b>Do this:</b> {result.todo}</p>
+          {result.level ? <LevelBadge level={result.level} /> : null}
+          {result.body ? result.body : (
+            <>
+              {result.saw ? <p class="ui-card-saw">{result.saw}</p> : null}
+              {result.todo ? <p class="ui-card-todo"><b>Do this:</b> {result.todo}</p> : null}
+            </>
+          )}
+          {result.actions && result.actions.length ? (
+            <div class="ui-card-actions">
+              {result.actions.map((action) => (
+                <Button key={action.label} variant={action.variant || "primary"} onClick={action.onClick}>{action.label}</Button>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : (
         <div class="ui-card-body">
