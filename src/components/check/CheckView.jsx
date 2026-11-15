@@ -39,7 +39,6 @@ export default function CheckView() {
 
   useEffect(() => {
     if (opened || activeId || !queue.length) return;
-    if (routeId && !scoped) return;
     setActiveId(queue[0].id);
   }, [routeId, opened, scoped, activeId, queue]);
 
@@ -73,13 +72,16 @@ export default function CheckView() {
           <span class="ck-stack-layer ck-stack-one" aria-hidden="true" />
           <CheckCard card={active} onDone={finish} />
         </div>
-      ) : progress.total > 0 && due.length === 0 ? (
+      ) : progress.total > 0 && queue.length === 0 ? (
         <section class="ck-done">
           <Icon name="checkmark" size={22} />
           <h2>Done for today</h2>
-          <p>{recorded.length === progress.total ? "Every check is recorded for today." : "All checks due today are recorded."}</p>
+          <p>{scoped ? "These checks are recorded for today." : recorded.length === progress.total ? "Every check is recorded for today." : "All checks due today are recorded."}</p>
+          {scoped && due.length ? (
+            <p><button type="button" class="ck-done-link" onClick={() => go("#/check")}>Continue with the other checks due today</button></p>
+          ) : null}
           <ul class="ck-done-list">
-            {recorded.map((card) => (
+            {(scoped ? recorded.filter((card) => topicCards.includes(card)) : recorded).map((card) => (
               <li key={card.id}>
                 <button type="button" class="ck-done-link" onClick={() => openCard(card.id)}>{card.title}</button>
                 {typeof card.summary === "function" && card.summary() ? <span class="ck-done-summary"> {card.summary()}</span> : null}

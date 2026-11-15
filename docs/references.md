@@ -111,6 +111,6 @@ request. Library versions are from `package.json`; all are MIT.
 - **Exercise equipment illustrations** (`public/assets/exercise/ared.png`, `cevis.png`, `t2.png`).
   They are generated illustrations with no stated source or licence. They were not re-sourced here
   because this task owns only the medical figures; the Exercise owner should replace or credit them.
-- **Organ illustrations already in `public/assets/`** (`heart.png`, `lungs.png`, `kidneys.png`,
-  `brain.png`, `skeleton.png`, `muscles.png`). Their origin is not documented. The new figures above
-  are cleared replacements; the old files should be removed when the sections are rewired.
+- **Organ illustrations formerly in `public/assets/`** (`heart.png`, `lungs.png`, `kidneys.png`,
+  `brain.png`, `skeleton.png`, `muscles.png`, `liver.png`, `pulse.png`). Removed in batch 3: the body cards
+  use the 3D model instead.
