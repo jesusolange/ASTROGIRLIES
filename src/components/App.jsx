@@ -4,7 +4,7 @@ import TopBar from "./shell/TopBar.jsx";
 import Destinations from "./shell/Destinations.jsx";
 import AreaView from "./shell/AreaView.jsx";
 import Footer from "./shell/Footer.jsx";
-import Toasts from "./shell/Toasts.jsx";
+import Toasts from "./ui/Toast.jsx";
 import ProfileDialog from "./profile/ProfileDialog.jsx";
 import "./shell/shell.css";
 

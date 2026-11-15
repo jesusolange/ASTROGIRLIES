@@ -47,7 +47,14 @@ export function go(path) {
 export const openCard = (id) => go(id ? `#/check/${id}` : "#/check");
 export const openEmergency = (id) => go(id ? `#/emergency/${id}` : "#/emergency");
 
+// Temporary bridge for modules that still call window.AstroMedNav; removed as batch 3 converts them.
+const LEGACY_PATH = { today: "#/home", emergencies: "#/emergency", progress: "#/progress", protocols: "#/progress" };
+export function showLegacy(id) {
+  go(LEGACY_PATH[id] || (id === "overview" ? "#/check/checkup" : `#/check/${id}`));
+}
+
 if (typeof window !== "undefined") {
+  window.AstroMedNav = { show: showLegacy, has };
   const canonical = () => pathFor(window.location.hash);
   if (window.location.hash !== canonical()) window.history.replaceState(null, "", canonical());
   window.addEventListener("hashchange", () => {
