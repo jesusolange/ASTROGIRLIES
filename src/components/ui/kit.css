@@ -106,9 +106,10 @@
 }
 
 .ui-term {
+  position: relative;
   display: inline;
-  margin: 0;
-  padding: 0;
+  margin: -15px;
+  padding: 15px;
   color: inherit;
   background: none;
   border: 0;
@@ -270,24 +271,24 @@
   color: var(--am-text);
 }
 
-.ui-card-row {
+.ui-card-main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
 
+.ui-card-main.has-aside {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+}
+
 .ui-card-aside {
   min-width: 0;
-  padding: 16px;
-  background: var(--am-surface);
-  border: 1px solid var(--am-border);
-  border-radius: var(--am-radius);
 }
 
 @media (max-width: 900px) {
-  .ui-card-row {
-    grid-template-columns: 1fr;
+  .ui-card-main.has-aside {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -333,4 +334,61 @@
   .ui-toast {
     animation: none;
   }
+}
+
+/* ---------- Keyboard shortcuts list ---------- */
+
+.ui-keys {
+  display: grid;
+  gap: 10px;
+}
+
+.ui-keys-title {
+  margin: 0;
+  color: var(--am-heading);
+  font-size: var(--am-fs-md);
+}
+
+.ui-keys-note {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-sm);
+  line-height: 1.55;
+}
+
+.ui-key-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.ui-key-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.ui-key-row dt {
+  min-width: 52px;
+}
+
+.ui-key-row dd {
+  margin: 0;
+  color: var(--am-text);
+  font-size: var(--am-fs-sm);
+}
+
+.ui-key-row kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 28px;
+  padding: 2px 8px;
+  color: var(--am-text);
+  background: color-mix(in srgb, var(--am-text) 8%, transparent);
+  border: 1px solid var(--am-border-strong);
+  border-radius: var(--am-radius-small);
+  font: inherit;
+  font-size: var(--am-fs-xs);
+  font-weight: 700;
 }

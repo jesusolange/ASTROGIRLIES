@@ -27,7 +27,8 @@
 .ui-search-input {
   flex: 1;
   min-width: 0;
-  padding: 10px 0;
+  min-height: 44px;
+  padding: 12px 0;
   color: var(--am-text);
   background: none;
   border: 0;

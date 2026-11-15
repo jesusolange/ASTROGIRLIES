@@ -48,7 +48,7 @@ export const openCard = (id) => go(id ? `#/check/${id}` : "#/check");
 export const openEmergency = (id) => go(id ? `#/emergency/${id}` : "#/emergency");
 
 // Temporary bridge for modules that still call window.AstroMedNav; removed as batch 3 converts them.
-const LEGACY_PATH = { today: "#/home", emergencies: "#/emergency", progress: "#/progress", protocols: "#/progress" };
+const LEGACY_PATH = { today: "#/home", emergencies: "#/emergency", progress: "#/progress" };
 export function showLegacy(id) {
   go(LEGACY_PATH[id] || (id === "overview" ? "#/check/checkup" : `#/check/${id}`));
 }

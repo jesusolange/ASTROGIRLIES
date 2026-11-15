@@ -35,16 +35,7 @@ async function openReport() {
       console.error("report", error);
     }
   }
-  const pdf = window.AstroMedPDF;
-  if (!pdf || typeof pdf.build !== "function") {
-    toast("The report is not available yet.");
-    return;
-  }
-  const report = pdf.build();
-  const link = document.createElement("a");
-  link.href = report.url;
-  link.download = report.filename;
-  link.click();
+  toast("The report is not available yet.");
 }
 
 export default function ProgressView() {

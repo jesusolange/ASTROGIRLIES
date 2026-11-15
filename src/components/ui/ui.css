@@ -1,11 +1,6 @@
 /* Shared interface components. Colours come only from tokens.css. */
 
-/* ---------- Focus and scrollbars ---------- */
-
-:where(button, a, input, select, textarea, [tabindex]):focus-visible {
-  outline: 3px solid var(--am-focus);
-  outline-offset: 2px;
-}
+/* ---------- Scrollbars ---------- */
 
 * {
   scrollbar-width: thin;
@@ -25,6 +20,14 @@
   background: var(--am-border-strong);
   border: 2px solid var(--am-bg);
   border-radius: 999px;
+}
+
+/* Controls shrink inside a narrow column instead of forcing their default width. */
+input,
+select,
+textarea {
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* ---------- Panel ---------- */
@@ -239,8 +242,10 @@
 .ui-source {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 44px;
   min-height: 44px;
-  padding: 0 2px;
+  padding: 0 6px;
   color: var(--am-accent);
   background: none;
   border: 0;

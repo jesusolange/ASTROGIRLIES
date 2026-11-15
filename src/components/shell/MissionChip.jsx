@@ -18,6 +18,7 @@ export default function MissionChip() {
       <button
         type="button"
         class="tb-control tb-chip"
+        aria-label="Set your mission in the profile"
         title="Set your mission in the profile"
         onClick={() => open(false, "mission")}
       >
@@ -37,6 +38,7 @@ export default function MissionChip() {
     <button
       type="button"
       class="tb-control tb-chip"
+      aria-label={`Mission profile: ${full}`}
       title="Open your mission profile"
       onClick={() => open(false, "mission")}
     >

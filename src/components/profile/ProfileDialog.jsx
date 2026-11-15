@@ -10,6 +10,7 @@ import Tabs from "../ui/Tabs.jsx";
 import Button from "../ui/Button.jsx";
 import Dialog from "../ui/Dialog.jsx";
 import SourcesList from "../sources/SourcesList.jsx";
+import KeyboardList from "../ui/KeyboardList.jsx";
 import SourcesDialog from "../sources/SourcesDialog.jsx";
 import ProfileAvatar from "./ProfileAvatar.jsx";
 import ProfileFields from "./ProfileFields.jsx";
@@ -23,7 +24,7 @@ const FORM_TABS = [
   { id: "body", label: "Body" }
 ];
 
-const ALL_TABS = [...FORM_TABS, { id: "data", label: "Data" }, { id: "sources", label: "Sources" }];
+const ALL_TABS = [...FORM_TABS, { id: "data", label: "Data" }, { id: "keyboard", label: "Keyboard" }, { id: "sources", label: "Sources" }];
 
 const FIELD_TAB = {
   name: "you", age: "you", sex: "you", meno: "you",
@@ -176,13 +177,21 @@ export default function ProfileDialog() {
 
         <Tabs tabs={tabs} value={tab} onChange={setTab} label="Profile sections" idBase="pf" />
 
-        <div class="pf-body">
+        <div
+          class="pf-body"
+          role="tabpanel"
+          id={`pf-panel-${tab}`}
+          aria-labelledby={`pf-tab-${tab}`}
+          tabIndex={0}
+        >
           {onForm ? (
             <form id="pf-form" class="pf-form" noValidate onSubmit={submit}>
               <ProfileFields form={form} errors={errors} update={update} bind={bind} tab={tab} />
             </form>
           ) : tab === "data" ? (
             <DataSection />
+          ) : tab === "keyboard" ? (
+            <KeyboardList />
           ) : (
             <div class="pf-sources"><SourcesList /></div>
           )}

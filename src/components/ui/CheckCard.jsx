@@ -15,7 +15,7 @@
 //   level null hides the badge; body replaces saw and todo; actions render as buttons under the result.
 // A card may also save by itself and call onSaved(result, undo).
 import "./kit.css";
-import { useId, useRef, useState } from "preact/hooks";
+import { useEffect, useId, useRef, useState } from "preact/hooks";
 import Button from "./Button.jsx";
 import { FieldTooltipContext } from "./Field.jsx";
 import LevelBadge from "./LevelBadge.jsx";
@@ -32,9 +32,14 @@ export default function CheckCard({ card, onDone }) {
   const [leaving, setLeaving] = useState(false);
   const refs = useRef({});
   const timer = useRef(null);
+  const resultRef = useRef(null);
 
   const Component = card.Component;
   const guide = Boolean(card.reference);
+
+  useEffect(() => {
+    if (result && resultRef.current) resultRef.current.focus();
+  }, [result]);
 
   function nativeField(name) {
     const field = refs.current[name];
@@ -100,7 +105,39 @@ export default function CheckCard({ card, onDone }) {
   }
 
   const Aside = card.Aside;
-  const article = (
+  const body = result ? (
+    <div class="ui-card-result" role="status" tabIndex={-1} ref={resultRef}>
+      {result.level ? <LevelBadge level={result.level} /> : null}
+      {result.body ? result.body : (
+        <>
+          {result.saw ? <p class="ui-card-saw">{result.saw}</p> : null}
+          {result.todo ? <p class="ui-card-todo"><b>Do this:</b> {result.todo}</p> : null}
+        </>
+      )}
+      {result.actions && result.actions.length ? (
+        <div class="ui-card-actions">
+          {result.actions.map((action) => (
+            <Button
+              key={action.label}
+              variant={action.variant || "primary"}
+              onClick={() => {
+                onDone?.(card);
+                action.onClick?.();
+              }}
+            >{action.label}</Button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  ) : (
+    <div class="ui-card-body">
+      <FieldTooltipContext.Provider value={true}>
+        <Component form={form} onSaved={showResult} onDone={next} />
+      </FieldTooltipContext.Provider>
+    </div>
+  );
+
+  return (
     <article class={`ui-card ${leaving ? "is-leaving" : ""}`.trim()} aria-labelledby={titleId}>
       <header class="ui-card-head">
         <h2 class="ui-card-title" id={titleId}>{card.title}</h2>
@@ -113,37 +150,14 @@ export default function CheckCard({ card, onDone }) {
         ) : null}
       </header>
 
-      {result ? (
-        <div class="ui-card-result" role="status">
-          {result.level ? <LevelBadge level={result.level} /> : null}
-          {result.body ? result.body : (
-            <>
-              {result.saw ? <p class="ui-card-saw">{result.saw}</p> : null}
-              {result.todo ? <p class="ui-card-todo"><b>Do this:</b> {result.todo}</p> : null}
-            </>
-          )}
-          {result.actions && result.actions.length ? (
-            <div class="ui-card-actions">
-              {result.actions.map((action) => (
-                <Button
-                  key={action.label}
-                  variant={action.variant || "primary"}
-                  onClick={() => {
-                    onDone?.(card);
-                    action.onClick?.();
-                  }}
-                >{action.label}</Button>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : (
-        <div class="ui-card-body">
-          <FieldTooltipContext.Provider value={true}>
-            <Component form={form} onSaved={showResult} onDone={next} />
-          </FieldTooltipContext.Provider>
-        </div>
-      )}
+      <div class={`ui-card-main ${Aside ? "has-aside" : ""}`.trim()}>
+        {body}
+        {Aside ? (
+          <aside class="ui-card-aside" aria-label={`${card.title}: overview`}>
+            <Aside form={form} result={result} />
+          </aside>
+        ) : null}
+      </div>
 
       <footer class="ui-card-foot">
         {result ? (
@@ -155,15 +169,5 @@ export default function CheckCard({ card, onDone }) {
         ) : null}
       </footer>
     </article>
-  );
-
-  if (!Aside) return article;
-  return (
-    <div class={`ui-card-row ${leaving ? "is-leaving" : ""}`.trim()}>
-      {article}
-      <aside class="ui-card-aside" aria-label={`${card.title}: overview`}>
-        <Aside form={form} result={result} />
-      </aside>
-    </div>
   );
 }

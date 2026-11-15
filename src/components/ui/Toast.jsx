@@ -1,12 +1,12 @@
-// The one toast region: bottom centre, role="status". A toast with undo keeps its button for eight
-// seconds; clicking it removes the toast and runs the undo.
+// The one toast region: bottom centre, announced by screen readers. A toast with undo keeps its
+// button for eight seconds; clicking it removes the toast and runs the undo.
 import "./kit.css";
 import "./ui.css";
 import { dismissToast, toasts } from "../../lib/ui.js";
 
 export default function Toasts() {
   return (
-    <div class="ui-toasts" role="status">
+    <div class="ui-toasts" role="status" aria-live="polite" aria-atomic="false">
       {toasts.value.map((item) => (
         <div class="ui-toast" key={item.id}>
           <span class="ui-toast-text">{item.text}</span>
@@ -19,7 +19,7 @@ export default function Toasts() {
                 item.undo();
               }}
             >
-              Undo
+              {item.undoLabel || "Undo"}
             </button>
           ) : null}
         </div>

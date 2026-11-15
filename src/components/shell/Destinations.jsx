@@ -3,9 +3,9 @@ import { go, route } from "../../lib/nav.js";
 import "./shell.css";
 
 const DESTINATIONS = [
-  { area: "home", label: "Home", Icon: House },
-  { area: "check", label: "Check", Icon: ClipboardCheck },
-  { area: "progress", label: "Progress", Icon: ChartLine },
+  { area: "home", label: "Home", key: "H", Icon: House },
+  { area: "check", label: "Check", key: "C", Icon: ClipboardCheck },
+  { area: "progress", label: "Progress", key: "P", Icon: ChartLine },
 ];
 
 export default function Destinations({ variant = "bar" }) {
@@ -14,7 +14,7 @@ export default function Destinations({ variant = "bar" }) {
 
   return (
     <nav class={tabs ? "tb-tabs" : "tb-dest"} aria-label={tabs ? "Main destinations" : "Destinations"}>
-      {DESTINATIONS.map(({ area, label, Icon }) => {
+      {DESTINATIONS.map(({ area, label, key, Icon }) => {
         const active = current === area;
         return (
           <button
@@ -22,6 +22,7 @@ export default function Destinations({ variant = "bar" }) {
             key={area}
             class={active ? "is-active" : ""}
             aria-current={active ? "page" : undefined}
+            aria-keyshortcuts={key}
             onClick={() => go(area)}
           >
             <Icon size={tabs ? 22 : 18} aria-hidden="true" />
