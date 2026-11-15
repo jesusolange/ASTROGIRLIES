@@ -19,10 +19,15 @@ These replace the earlier tickets (see git history of this file). One spec per t
 | 1 | T21 T22 T23 T24 T25 | Vite and Preact only; mission fields; mission-worded copy; no false reassurance; 11 emergency cards |
 | 2 | T26 T27 T28 T29 T30 | Top bar with three destinations; Home; shared kit and deck frame; profile and cover; 3D repair |
 | 3 | T31 T32 T33 T34 T35 | Every check as cards in the deck; Emergency screen rebuilt |
-| 4 | T36 T37 T38 T39 | Progress with charts; formal report; one stylesheet system; phone and keyboard pass |
+| 4 | T36 T37 T38 T39 T43 | Progress with charts; formal report; one stylesheet system; phone and keyboard pass; several crew members on one device |
 | last | T40 | Demo mission walk-through, dead code removed, offline check |
 
 ## Decisions these tickets rest on
+
+**Added 15 Nov, owner decision**
+- One device can hold several crew members. The cover is the sign-in: pick your name, enter your PIN. Each
+  person's records are separate and are shared only by that person's own export or report. There is still no
+  crew or doctor view. The PIN is privacy on a shared device, not encryption (T43).
 
 **Product**
 - The mission is set only in the profile: destination, crew size, start date, duration in days. The link to Earth is
