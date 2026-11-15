@@ -2,24 +2,44 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useStored } from "../../lib/use-stored.js";
 import { MISSION_TYPES } from "../../scripts/risks.js";
 import {
-  KEY, applyForm, closeDialog, dayLabelFor, dialog, formValues, get, markSkipped, open, saveProfile
+  KEY, REQUIRED_ORDER, applyForm, closeDialog, dayLabelFor, dialog, fieldErrors, formValues, get, open, saveProfile
 } from "../../scripts/profile.js";
 import Field from "../ui/Field.jsx";
 import Button from "../ui/Button.jsx";
 import "../ui/ui.css";
 import "./profile.css";
 
-const DESTINATIONS = ["Moon", "Mars", "Low Earth orbit"];
+const FIELD_ID = {
+  name: "pf-name",
+  missionType: "pf-missionType",
+  crew: "pf-crew",
+  startDate: "pf-startDate",
+  total: "pf-total"
+};
 
 export default function ProfileDialog() {
   const [stored] = useStored(KEY, null);
   const [form, setForm] = useState(() => formValues(null));
+  const [errors, setErrors] = useState({});
   const [first, setFirst] = useState(false);
   const dialogRef = useRef(null);
+  const fields = useRef({});
   const state = dialog.value;
 
+  function bind(field) {
+    return (node) => { fields.current[field] = node; };
+  }
+
   function update(key) {
-    return (event) => setForm((current) => ({ ...current, [key]: event.currentTarget.value }));
+    return (event) => {
+      const value = event.currentTarget.value;
+      setForm((current) => {
+        const next = { ...current, [key]: value };
+        if (key === "sex" && value !== "f") next.meno = "";
+        return next;
+      });
+      setErrors((current) => (current[key] ? { ...current, [key]: undefined } : current));
+    };
   }
 
   useEffect(() => {
@@ -27,6 +47,7 @@ export default function ProfileDialog() {
     if (!element) return;
     if (state.open && !element.open) {
       setForm(formValues(get()));
+      setErrors({});
       setFirst(state.first);
       element.showModal();
     } else if (!state.open && element.open) {
@@ -36,7 +57,7 @@ export default function ProfileDialog() {
 
   useEffect(() => {
     const profile = get();
-    if (profile && (profile.name || profile.skipped)) return undefined;
+    if (profile && profile.name) return undefined;
     let cancelled = false;
     let timer = null;
     const request = () => { if (!cancelled) open(true); };
@@ -99,11 +120,18 @@ export default function ProfileDialog() {
 
   function submit(event) {
     event.preventDefault();
+    const found = fieldErrors(form);
+    setErrors(found);
+    const firstInvalid = REQUIRED_ORDER.find((key) => found[key]);
+    if (firstInvalid) {
+      const node = fields.current[firstInvalid];
+      if (node) node.focus();
+      return;
+    }
     saveProfile(applyForm(form, stored || {}));
   }
 
   function cancel() {
-    if (first) markSkipped();
     closeDialog();
   }
 
@@ -112,60 +140,98 @@ export default function ProfileDialog() {
       ref={dialogRef}
       class="pf-dialog"
       aria-label="Astronaut profile"
+      onCancel={(event) => { if (first) event.preventDefault(); }}
       onClose={() => { if (dialog.value.open) closeDialog(); }}
-      onClick={(event) => { if (event.target === dialogRef.current) closeDialog(); }}
+      onClick={(event) => { if (event.target === dialogRef.current && !first) cancel(); }}
     >
       <div class="env-pop-card pf-card">
         <h3>{first ? "Welcome, astronaut" : "Astronaut profile"}</h3>
-        <p class="pf-sub">Saved on this device only. Your name shows in the app and the PDF report. The mission day goes up by itself every day.</p>
-        <form class="pf-grid" onSubmit={submit}>
-          <Field label="Name" id="pf-name" className="pf-f pf-wide">
-            <input id="pf-name" name="name" type="text" maxLength={40} required placeholder="e.g. Solange Quijano" value={form.name} onInput={update("name")} />
-          </Field>
-          <Field label="Today is mission day" id="pf-day" className="pf-f">
-            <input id="pf-day" name="day" type="number" min="1" max="2000" step="1" required value={form.day} onInput={update("day")} />
-          </Field>
-          <Field label="Mission length (days)" id="pf-total" className="pf-f">
-            <input id="pf-total" name="total" type="number" min="1" max="3000" step="1" required value={form.total} onInput={update("total")} />
-          </Field>
-          <Field label="Mission type" id="pf-mission" className="pf-f pf-wide">
-            <select id="pf-mission" name="missionType" value={form.missionType} onChange={update("missionType")}>
-              {MISSION_TYPES.map((mission) => <option key={mission.id} value={mission.id}>{mission.label}</option>)}
-            </select>
-          </Field>
-          <Field label="Destination" id="pf-destination" className="pf-f">
-            <input id="pf-destination" name="destination" type="text" maxLength={40} list="pf-destinations" placeholder="e.g. Mars" value={form.destination} onInput={update("destination")} />
-          </Field>
-          <Field label="Age (years)" id="pf-age" className="pf-f">
-            <input id="pf-age" name="age" type="number" min="18" max="80" step="1" value={form.age} onInput={update("age")} />
-          </Field>
-          <Field label="Sex used for energy calculation" id="pf-sex" className="pf-f">
-            <select id="pf-sex" name="sex" value={form.sex} onChange={update("sex")}>
-              <option value="f">Female</option>
-              <option value="m">Male</option>
-              <option value="x">Prefer not to say</option>
-            </select>
-          </Field>
-          <Field label="Menopause (women)" id="pf-meno" className="pf-f">
-            <select id="pf-meno" name="meno" value={form.meno} onChange={update("meno")}>
-              <option value="">Not set</option>
-              <option value="pre">Not yet</option>
-              <option value="post">Yes, after</option>
-            </select>
-          </Field>
-          <Field label="Weight (kg)" id="pf-weight" className="pf-f">
-            <input id="pf-weight" name="weight" type="number" min="30" max="200" step="0.1" value={form.weight} onInput={update("weight")} />
-          </Field>
-          <Field label="Height (cm)" id="pf-height" className="pf-f">
-            <input id="pf-height" name="height" type="number" min="100" max="230" step="0.5" value={form.height} onInput={update("height")} />
-          </Field>
-          <datalist id="pf-destinations">
-            {DESTINATIONS.map((name) => <option key={name} value={name} />)}
-          </datalist>
+        <p class="pf-sub">Saved on this device only. Your name and mission show in the app and the report. The mission day goes up by itself every day.</p>
+        <form class="pf-grid" noValidate onSubmit={submit}>
+          <fieldset class="pf-group">
+            <legend>You</legend>
+            <div class="pf-fields">
+              <Field label="Name" id="pf-name" className="pf-f pf-wide" error={errors.name}>
+                <input
+                  id="pf-name" name="name" type="text" maxLength={40} required autocomplete="name"
+                  placeholder="Your name" value={form.name} onInput={update("name")} ref={bind("name")}
+                  aria-invalid={Boolean(errors.name)}
+                />
+              </Field>
+              <Field label="Age (years)" id="pf-age" className="pf-f" help="Optional">
+                <input id="pf-age" name="age" type="number" min="18" max="80" step="1" value={form.age} onInput={update("age")} />
+              </Field>
+              <Field label="Sex used for energy calculation" id="pf-sex" className="pf-f" help="Optional">
+                <select id="pf-sex" name="sex" value={form.sex} onChange={update("sex")}>
+                  <option value="f">Female</option>
+                  <option value="m">Male</option>
+                  <option value="x">Prefer not to say</option>
+                </select>
+              </Field>
+              {form.sex === "f" ? (
+                <Field label="Menopause" id="pf-meno" className="pf-f" help="Optional">
+                  <select id="pf-meno" name="meno" value={form.meno} onChange={update("meno")}>
+                    <option value="">Not set</option>
+                    <option value="pre">Not yet</option>
+                    <option value="post">After menopause</option>
+                  </select>
+                </Field>
+              ) : null}
+            </div>
+          </fieldset>
+
+          <fieldset class="pf-group">
+            <legend>Mission</legend>
+            <div class="pf-fields">
+              <Field label="Destination" id="pf-missionType" className="pf-f pf-wide" error={errors.missionType}>
+                <select
+                  id="pf-missionType" name="missionType" required value={form.missionType}
+                  onChange={update("missionType")} ref={bind("missionType")}
+                  aria-invalid={Boolean(errors.missionType)}
+                >
+                  {MISSION_TYPES.map((mission) => <option key={mission.id} value={mission.id}>{mission.label}</option>)}
+                </select>
+              </Field>
+              <Field label="Crew size" id="pf-crew" className="pf-f" help="Including you" error={errors.crew}>
+                <input
+                  id="pf-crew" name="crew" type="number" min="1" max="99" step="1" inputMode="numeric" required
+                  value={form.crew} onInput={update("crew")} ref={bind("crew")}
+                  aria-invalid={Boolean(errors.crew)}
+                />
+              </Field>
+              <Field label="Mission start date" id="pf-startDate" className="pf-f" error={errors.startDate}>
+                <input
+                  id="pf-startDate" name="startDate" type="date" required
+                  value={form.startDate} onChange={update("startDate")} ref={bind("startDate")}
+                  aria-invalid={Boolean(errors.startDate)}
+                />
+              </Field>
+              <Field label="Mission length (days)" id="pf-total" className="pf-f" error={errors.total}>
+                <input
+                  id="pf-total" name="total" type="number" min="1" max="3000" step="1" required
+                  value={form.total} onInput={update("total")} ref={bind("total")}
+                  aria-invalid={Boolean(errors.total)}
+                />
+              </Field>
+            </div>
+          </fieldset>
+
+          <fieldset class="pf-group">
+            <legend>Body</legend>
+            <div class="pf-fields">
+              <Field label="Weight (kg)" id="pf-weight" className="pf-f" help="Optional">
+                <input id="pf-weight" name="weight" type="number" min="30" max="200" step="0.1" value={form.weight} onInput={update("weight")} />
+              </Field>
+              <Field label="Height (cm)" id="pf-height" className="pf-f" help="Optional">
+                <input id="pf-height" name="height" type="number" min="100" max="230" step="0.5" value={form.height} onInput={update("height")} />
+              </Field>
+            </div>
+          </fieldset>
+
           <p class="pf-note pf-wide">Age, sex used for energy calculation, weight and height are optional. Nutrition uses them to set your food goals.</p>
           <div class="pf-actions pf-wide">
             <Button type="submit">Save profile</Button>
-            <Button variant="soft" onClick={cancel}>{first ? "Later" : "Cancel"}</Button>
+            {first ? null : <Button variant="soft" onClick={cancel}>Cancel</Button>}
           </div>
         </form>
       </div>
