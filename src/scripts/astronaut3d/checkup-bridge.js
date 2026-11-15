@@ -1,19 +1,18 @@
 import { effect } from "@preact/signals";
 import { currentStep, select } from "../checkup-flow.js";
-import { focus, mount } from "./index.js";
+import { focus, mount, unmount } from "./index.js";
 
 const TO_PART = { hand: "body" };
 const TO_STEP = { body: "hand" };
 
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.querySelector("#checkupPage .figure-scene");
-  if (!container) return;
+// Mounts the 3D astronaut into the old checkup page while it is open and follows the checkup step.
+// Returns the clean-up to run when the page closes.
+export function attachCheckup3d(container) {
+  if (!container) return () => {};
   const shown = mount(container, { onSelect: (part) => select(TO_STEP[part] || part) });
-  if (!shown) return;
-  const flat = document.getElementById("figureWrap");
-  if (flat) flat.style.display = "none";
+  if (!shown) return () => {};
   let first = true;
-  effect(() => {
+  const stop = effect(() => {
     const step = currentStep.value;
     if (first) {
       first = false;
@@ -21,4 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     focus(step ? TO_PART[step] || step : null);
   });
-});
+  return () => {
+    stop();
+    unmount();
+  };
+}

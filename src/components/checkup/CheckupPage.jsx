@@ -1,6 +1,10 @@
+import { useEffect, useRef } from "preact/hooks";
 import CheckupPanel from "./CheckupPanel.jsx";
+import { attachCheckup3d } from "../../scripts/astronaut3d/checkup-bridge.js";
 
 export default function CheckupPage() {
+  const scene = useRef(null);
+  useEffect(() => attachCheckup3d(scene.current), []);
   return (
     <div id="checkupPage" class="content-grid">
       <section class="twin-card">
@@ -11,7 +15,7 @@ export default function CheckupPage() {
           </div>
         </div>
 
-        <div class="figure-scene">
+        <div class="figure-scene" ref={scene}>
           <div class="glow"></div>
         </div>
       </section>

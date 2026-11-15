@@ -23,5 +23,4 @@ import "./theme.js";
 import "./home.js";
 import "./vision.js";
 import "./emergencies.js";
-import "./astronaut3d/checkup-bridge.js";
 import "./offline.js";
