@@ -90,7 +90,7 @@ These replace the earlier tickets (see git history of this file). One spec per t
   anaemia as Guides in Check). Points, levels and badges are wanted.
 - Pictograph characters inside the medic's text (for example in the kidney stone flow) are icons, not words: T25
   removes them and keeps every word.
-- `cabin-air` has `topic: null`: there is no environment topic or check after T26.
+- `cabin-air` has `topic: "environment"`: the Cabin conditions card (T33) is that topic's check (owner change).
 ## Already on name15 before batch 1
 
 Reuse these; do not rebuild them. Today has the 50% coverage rule, Vision in the due list, and urgent findings

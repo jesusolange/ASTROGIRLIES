@@ -72,6 +72,27 @@ export function show(id) {
 // come from SECTIONS above, so this changes nothing on the sidebar.
 export function register() {}
 
+// Hash routes: #/home, #/check, #/check/<id>, #/progress, #/emergency, #/emergency/<id>.
+const AREAS = ["home", "check", "progress", "emergency"];
+const OLD_SECTION = { home: "today", check: "overview", progress: "progress", emergency: "emergencies" };
+
+export function parseRoute(hash) {
+  const [area, id] = String(hash || "").replace(/^#\/?/, "").split("/");
+  return AREAS.includes(area) ? { area, id: id || null } : { area: "home", id: null };
+}
+
+export const route = signal(typeof location === "undefined" ? parseRoute("") : parseRoute(location.hash));
+
+export function go(path) {
+  route.value = parseRoute(path);
+  if (typeof location !== "undefined" && location.hash !== path) history.pushState(null, "", path);
+  const { area, id } = route.value;
+  show(area === "check" && id && has(id) ? id : OLD_SECTION[area]);
+}
+
+export const openCard = (id) => go(id ? `#/check/${id}` : "#/check");
+export const openEmergency = (id) => go(id ? `#/emergency/${id}` : "#/emergency");
+
 if (typeof window !== "undefined") {
   window.AstroMedNav = { show, has, current, register, apply };
   window.addEventListener("hashchange", () => {

@@ -105,8 +105,19 @@ export function crew() { return crewFor(get()); }
 export function name() { const p = get(); return (p && p.name) || ""; }
 export function dayLabel() { return dayLabelFor(get()); }
 
-export function open(first) {
-  dialog.value = { open: true, first: Boolean(first) };
+export function open(first, section = "you") {
+  dialog.value = { open: true, first: Boolean(first), section };
+}
+
+export function initialsOf(fullName) {
+  return String(fullName || "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
+}
+
+// What the top bar shows for the profile: name, initials, demo flag and sync state.
+export function barState() {
+  const p = get();
+  const n = name();
+  return { name: n, initials: initialsOf(n), demo: Boolean(p && p.demo), sync: null };
 }
 export function closeDialog() {
   dialog.value = { open: false, first: false };
