@@ -68,7 +68,7 @@
   min-height: 44px;
   margin-top: 16px;
   padding: 12px 22px;
-  color: var(--am-text);
+  color: var(--am-btn-primary-text);
   background: var(--am-accent-strong);
   border: 0;
   border-radius: 12px;
