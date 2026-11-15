@@ -73,23 +73,13 @@ export default function MeasurementForm({ part, records, saveRecords }) {
                 aria-label={`${field.label} in ${field.unit}`}
                 onInput={(event) => update(field.key, event.currentTarget.value)}
               />
-              <input
-                type="range"
-                class="che-field-slider"
-                min={field.min}
-                max={field.max}
-                step={field.step}
-                value={text === "" ? field.min : text}
-                aria-label={`${field.label} slider in ${field.unit}`}
-                onInput={(event) => update(field.key, event.currentTarget.value)}
-              />
               <small class="che-field-help">Range {field.min} to {field.max} {field.unit}</small>
             </div>
           );
         })}
       </div>
 
-      <IndicatorList fields={system.fields} values={draft} profile={profile} />
+      <IndicatorList fields={system.fields} values={draft} profile={profile} onChange={update} />
 
       <div class="che-buttons">
         <Button className="che-save" onClick={save}>Save measurements</Button>

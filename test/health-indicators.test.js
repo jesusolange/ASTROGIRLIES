@@ -1,7 +1,7 @@
 "use strict";
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { ntxRange, scaleFor, bandFor, position } = require("../src/scripts/health-indicators.js");
+const { ntxRange, scaleFor, bandFor, position, valueFromPosition } = require("../src/scripts/health-indicators.js");
 
 test("N-telopeptide ranges follow the profile's sex and menopause state", () => {
   assert.deepEqual(
@@ -64,4 +64,21 @@ test("other scales are returned unchanged", () => {
   assert.equal(hr.unit, "bpm");
   assert.equal(hr.zones.length, 3);
   assert.equal(scaleFor("not-a-metric"), null);
+});
+
+test("a position on the track becomes a value at the gauge's ends", () => {
+  const scale = scaleFor("hr");
+  assert.equal(valueFromPosition(0, scale, 1), 30);
+  assert.equal(valueFromPosition(100, scale, 1), 160);
+  assert.equal(valueFromPosition(50, scale, 1), 95);
+  assert.equal(valueFromPosition(-20, scale, 1), 30);
+  assert.equal(valueFromPosition(180, scale, 1), 160);
+});
+
+test("the value snapped from a position follows the field's step", () => {
+  assert.equal(valueFromPosition(22, { min: 0, max: 100 }, 5), 20);
+  assert.equal(valueFromPosition(23, { min: 0, max: 100 }, 5), 25);
+  assert.equal(valueFromPosition(50, scaleFor("bodyTemp"), 0.1), 37.5);
+  assert.equal(valueFromPosition(33.3, scaleFor("weightKg"), 0.1), 79.9);
+  assert.equal(valueFromPosition(50, null, 1), null);
 });

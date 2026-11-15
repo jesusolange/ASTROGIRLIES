@@ -262,6 +262,16 @@ export function position(value, scale) {
   return clampPercent((100 * (value - scale.min)) / (scale.max - scale.min));
 }
 
+export function valueFromPosition(percent, scale, step = 1) {
+  if (!scale) return null;
+  const bounded = Math.max(0, Math.min(100, Number(percent) || 0));
+  const raw = scale.min + (bounded / 100) * (scale.max - scale.min);
+  const size = Number(step) > 0 ? Number(step) : 1;
+  const snapped = scale.min + Math.round((raw - scale.min) / size) * size;
+  const clamped = Math.max(scale.min, Math.min(scale.max, snapped));
+  return Math.round(clamped * 1e6) / 1e6;
+}
+
 export function bandFor(scale, value) {
   if (value == null || !Number.isFinite(Number(value))) {
     return { level: "neutral", text: "No value entered yet" };

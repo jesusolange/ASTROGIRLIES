@@ -54,7 +54,6 @@
 .che-field-label { font-size: 12px; font-weight: 650; color: var(--am-text); }
 .che-field-label small { font-weight: 500; color: var(--am-text-muted); }
 .che-field input { width: 100%; box-sizing: border-box; }
-.che-field-slider { padding: 0; accent-color: var(--am-accent); cursor: pointer; }
 .che-field-help { font-size: 10px; color: var(--am-text-muted); }
 
 /* ---------- gauges ---------- */
@@ -77,6 +76,10 @@
 .che-gauge-track {
   position: relative; height: 10px; border-radius: 999px; background: var(--am-track);
   cursor: default; user-select: none;
+}
+.che-gauge-track.is-interactive { cursor: pointer; touch-action: none; }
+.che-gauge-track.is-interactive:focus-visible {
+  outline: 2px solid var(--am-accent); outline-offset: 4px;
 }
 .che-gauge-bar { position: absolute; inset: 0; border-radius: 999px; opacity: 0.9; }
 .che-gauge-mark {
