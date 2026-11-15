@@ -1,0 +1,90 @@
+/* Progress: history, charts and the week comparison. Colours come only from the tokens. */
+
+.pg { display: grid; gap: 4px; min-width: 0; }
+.pg > *, .pg-groups, .pg-group, .pg-charts, .pg-chart { min-width: 0; }
+.pg-intro { margin-bottom: 18px; }
+.pg-intro p { margin: 0; max-width: 74ch; color: var(--am-text-muted); font-size: var(--am-fs-sm); }
+
+.pg-toolbar-panel { padding: 16px 18px; }
+.pg-toolbar { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-end; justify-content: space-between; min-width: 0; }
+.pg-filter { margin: 0; min-width: 0; }
+.pg-range { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; min-width: 0; }
+.pg-range .ui-chips { margin: 0; }
+.pg-report { margin-top: 0; }
+
+.pg-groups { display: grid; gap: 22px; }
+.pg-group-title { margin: 0 0 10px; color: var(--am-heading); font-size: var(--am-fs-sm); text-transform: uppercase; letter-spacing: .06em; }
+.pg-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.pg-chart { min-width: 0; padding: 14px; background: color-mix(in srgb, var(--am-surface-2) 70%, transparent); border: 1px solid var(--am-border); border-radius: var(--am-radius-small); }
+.pg-chart header { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pg-chart h5 { margin: 0; color: var(--am-text); font-size: var(--am-fs-sm); font-weight: 700; }
+.pg-chart header span { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+.pg-chart-head { display: flex; align-items: center; gap: 8px; }
+.pg-expand { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 2px 9px; color: var(--am-text); background: color-mix(in srgb, var(--am-text) 6%, transparent); border: 1px solid var(--am-border); border-radius: 999px; font: inherit; font-size: var(--am-fs-xs); font-weight: 700; cursor: pointer; }
+.pg-expand:hover { background: var(--am-surface-hover); }
+.pg-chart-canvas { position: relative; width: 100%; max-width: 100%; height: 210px; }
+.pg-chart-canvas-lg { height: min(70vh, 640px); }
+.pg-chart-canvas canvas { max-width: 100%; }
+.pg-chart-empty { display: grid; place-items: center; height: 210px; color: var(--am-text-muted); font-size: var(--am-fs-sm); border: 1px dashed var(--am-border); border-radius: var(--am-radius-small); }
+
+.pg-empty-note { margin: 0; color: var(--am-text-muted); font-size: var(--am-fs-sm); }
+
+.pg-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.pg-card { display: grid; gap: 4px; padding: 14px 16px; background: var(--am-surface-2); border: 1px solid var(--am-border-strong); border-radius: var(--am-radius-small); }
+.pg-card span { color: var(--am-text-muted); font-size: var(--am-fs-xs); text-transform: uppercase; letter-spacing: .05em; }
+.pg-card b { color: var(--am-text); font-size: var(--am-fs-lg); }
+.pg-card small { color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.4; }
+.pg-card-ok { border-color: var(--am-ok); }
+.pg-card-review { border-color: var(--am-warn); }
+.pg-card-alert, .pg-card-urgent { border-color: var(--am-danger); }
+.pg-card-info { border-color: var(--am-info); }
+
+.pg-table-wrap { width: 100%; max-width: 100%; overflow-x: auto; }
+.pg-table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: var(--am-fs-xs); }
+.pg-table th, .pg-table td { padding: 9px 10px; border-bottom: 1px solid var(--am-border); text-align: left; vertical-align: middle; }
+.pg-table th { color: var(--am-text-muted); font-size: var(--am-fs-xs); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.pg-table tbody tr:hover { background: var(--am-surface-hover); }
+.pg-date b { display: block; color: var(--am-text); font-weight: 650; white-space: nowrap; }
+.pg-date small { display: block; margin-top: 2px; color: var(--am-text-muted); font-size: var(--am-fs-xs); white-space: nowrap; }
+.pg-value { color: var(--am-text); font-variant-numeric: tabular-nums; }
+.pg-row-actions { width: 84px; text-align: right; }
+.pg-delete { min-height: 34px; padding: 6px 12px; color: var(--am-danger-soft); background: var(--am-danger-bg); border: 1px solid var(--am-danger); border-radius: 999px; font: inherit; font-size: var(--am-fs-xs); font-weight: 700; cursor: pointer; }
+.pg-delete:hover { filter: brightness(1.15); }
+
+.pg-week { min-width: 520px; }
+.pg-change { font-weight: 700; white-space: nowrap; }
+.pg-change.pg-up { color: var(--am-info); }
+.pg-change.pg-down { color: var(--am-warn); }
+.pg-change.pg-flat { color: var(--am-text-muted); }
+
+.pg-history { display: grid; gap: 12px; }
+.pg-table-crop { max-height: 360px; overflow: hidden; }
+.pg-more { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.pg-more small { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+.pg-more-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 8px 16px; color: var(--am-text); background: color-mix(in srgb, var(--am-text) 10%, transparent); border: 1px solid var(--am-border); border-radius: 999px; font: inherit; font-size: var(--am-fs-xs); font-weight: 700; cursor: pointer; }
+.pg-more-btn:hover { background: var(--am-surface-hover); }
+
+.ui-dialog.pg-dialog-lg { width: 92vw; max-width: 92vw; height: 88vh; max-height: 90vh; }
+.pg-dialog-lg .ui-dialog-body { display: grid; grid-template-rows: auto minmax(0, 1fr); box-sizing: border-box; height: 100%; }
+.pg-dialog-lg .ui-dialog-content { min-height: 0; overflow: auto; padding: 10px 4px 4px; }
+
+.pg-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .pg-charts { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .pg-toolbar { align-items: stretch; }
+  .pg-range { justify-content: space-between; }
+  .pg-chart-canvas, .pg-chart-empty { height: 190px; }
+  .pg-table, .pg-week { min-width: 0; }
+  .pg-table th, .pg-table td { padding: 8px 6px; }
+  .pg-date b, .pg-date small { white-space: normal; }
+  .pg-row-actions { width: 66px; }
+  .ui-dialog.pg-dialog-lg { width: 94vw; max-width: 94vw; height: 90vh; max-height: 92vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-delete, .pg-more-btn, .pg-table tbody tr { transition: none; }
+}

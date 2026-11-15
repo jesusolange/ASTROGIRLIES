@@ -1,0 +1,212 @@
+/* Sign-in and people pieces over the cover and in the profile. Colours come from tokens.css. */
+
+.amc-signin {
+  display: block;
+}
+
+.amcr {
+  width: min(34rem, 100%);
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--am-border);
+}
+
+.amc-signin .amcr {
+  width: 100%;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.amcr-title {
+  margin: 0 0 12px;
+  color: var(--am-stage-text);
+  font-size: var(--am-fs-lg);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.amcr-empty {
+  margin: 0;
+  color: var(--am-stage-text-muted);
+  font-size: var(--am-fs-md);
+}
+
+.amcr-people {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.amcr-person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 16px;
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  background: var(--am-surface);
+  color: var(--am-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.amcr-person:hover {
+  background: var(--am-surface-hover);
+}
+
+.amcr-person.is-selected {
+  border-color: var(--am-accent);
+  background: var(--am-surface-active);
+}
+
+.amcr-initials {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--am-accent);
+  color: var(--am-on-accent);
+  font-size: var(--am-fs-md);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.amcr-name {
+  flex: 1;
+  font-size: var(--am-fs-lg);
+  font-weight: 700;
+}
+
+.amcr-lock {
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.amcr-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.amcr-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--am-stage-text);
+  font: inherit;
+  font-size: var(--am-fs-sm);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  text-underline-offset: 0.2em;
+}
+
+.amcr-link:hover {
+  text-decoration: underline;
+}
+
+.amcr-pin {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.amcr-pin-label {
+  color: var(--am-stage-text-muted);
+  font-size: var(--am-fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.amcr-pin-input,
+.amcr-remove-input {
+  width: min(14rem, 100%);
+  min-height: 48px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  background: var(--am-field-bg);
+  color: var(--am-text);
+  font: inherit;
+  font-size: var(--am-fs-lg);
+  letter-spacing: 0.35em;
+}
+
+.amcr-remove-input {
+  font-size: var(--am-fs-md);
+  letter-spacing: normal;
+}
+
+.amcr-pin-input:focus-visible,
+.amcr-remove-input:focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 2px;
+}
+
+.amcr-pin-input[aria-invalid="true"],
+.amcr-remove-input[aria-invalid="true"] {
+  border-color: var(--am-danger);
+}
+
+.amcr-pin-error,
+.amcr-remove-error {
+  color: var(--am-danger-soft);
+  font-size: var(--am-fs-sm);
+  font-weight: 700;
+}
+
+.amc-go:disabled {
+  opacity: var(--am-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.amcr-remove {
+  display: grid;
+  gap: 10px;
+}
+
+.amcr-remove p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.amcr-remove-label {
+  font-size: var(--am-fs-sm);
+  font-weight: 700;
+  color: var(--am-stage-text-muted);
+}
+
+.amcr-remove-input {
+  border-color: var(--am-field-border);
+  background: var(--am-field-bg);
+  color: var(--am-field-text);
+}
+
+.amcr-remove-error {
+  color: var(--am-danger);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .amcr-person:active {
+    transform: scale(0.99);
+  }
+}
+
+@media (max-width: 720px) {
+  .amcr-person {
+    min-height: 56px;
+  }
+}

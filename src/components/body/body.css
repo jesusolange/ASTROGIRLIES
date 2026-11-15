@@ -1,0 +1,276 @@
+/* Body checks. Colours come from tokens.css only. */
+
+.ck-wrap:has(.body-card) {
+  max-width: 1180px;
+}
+
+.body-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 440px);
+  gap: 18px;
+  align-items: start;
+}
+
+.body-card-main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.body-lead {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-sm);
+  line-height: 1.6;
+}
+
+.body-profile-weight {
+  margin: 0;
+  color: var(--am-text);
+  font-size: var(--am-fs-xs);
+  line-height: 1.5;
+}
+
+/* ---------- number fields ---------- */
+
+.body-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.body-fields .ui-field {
+  min-width: 0;
+}
+
+.body-fields input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* ---------- gauges ---------- */
+
+.body-gauges {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  background: var(--am-field-bg);
+}
+
+.body-gauges-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.body-gauges-head h3 {
+  margin: 0;
+  color: var(--am-heading);
+  font-size: var(--am-fs-sm);
+}
+
+.body-gauges-head span {
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  text-align: right;
+}
+
+.body-gauge-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.body-gauge-name {
+  color: var(--am-text);
+  font-size: var(--am-fs-xs);
+  font-weight: 650;
+}
+
+.body-gauge-value {
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.body-band-normal .body-gauge-value {
+  color: var(--am-ok);
+}
+
+.body-band-review .body-gauge-value {
+  color: var(--am-warn);
+}
+
+.body-band-alert .body-gauge-value {
+  color: var(--am-danger);
+}
+
+.body-gauge-track {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--am-track);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.body-gauge-track:focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 4px;
+}
+
+.body-gauge-bar {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.body-gauge-mark {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 20px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--am-text);
+  box-shadow: 0 0 0 1px var(--am-bg);
+  pointer-events: none;
+}
+
+.body-gauge-normal-num {
+  position: absolute;
+  top: -16px;
+  line-height: 1;
+  transform: translateX(-50%);
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.body-gauge-ends {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.body-gauge-band {
+  margin: 4px 0 0;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  line-height: 1.5;
+}
+
+.body-band-review .body-gauge-band {
+  color: var(--am-warn);
+}
+
+.body-band-alert .body-gauge-band {
+  color: var(--am-danger);
+}
+
+.body-gauge-foot {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  line-height: 1.5;
+}
+
+/* ---------- device instructions ---------- */
+
+.body-devices {
+  display: grid;
+  gap: 8px;
+}
+
+.body-device {
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  background: var(--am-field-bg);
+}
+
+.body-device-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--am-text);
+  font-size: var(--am-fs-sm);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.body-device-summary::marker {
+  color: var(--am-text-muted);
+}
+
+.body-device-use {
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  font-weight: 500;
+}
+
+.body-device .ui-steps {
+  padding: 0 12px;
+}
+
+.body-device-note {
+  margin: 8px 12px 12px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  line-height: 1.5;
+}
+
+/* ---------- 3D illustration ---------- */
+
+.body-figure {
+  position: relative;
+  min-height: 380px;
+  height: 100%;
+  overflow: hidden;
+  background: var(--am-stage-bg);
+  border: 1px solid var(--am-stage-border);
+  border-radius: var(--am-radius);
+}
+
+/* ---------- phone ---------- */
+
+@media (max-width: 700px) {
+  .body-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .body-figure {
+    display: none;
+  }
+
+  .body-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .body-gauges-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .body-gauges-head span {
+    text-align: left;
+  }
+}

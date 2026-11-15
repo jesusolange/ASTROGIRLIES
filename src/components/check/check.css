@@ -1,0 +1,176 @@
+/* The Check deck frame. Colours come from tokens.css only. */
+
+.ck-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 0 24px;
+}
+
+/* A card with its visuals beside it takes most of the screen width. */
+.ck-wrap:has(.ui-card-aside) {
+  max-width: 1320px;
+}
+
+.ck-head h1 {
+  margin: 0 0 6px;
+  color: var(--am-heading);
+  font-size: var(--am-fs-lg);
+  letter-spacing: -0.4px;
+}
+
+.ck-head p {
+  margin: 0 0 16px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-sm);
+  line-height: 1.6;
+}
+
+.ck-count {
+  margin: 0 0 12px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  font-weight: 650;
+}
+
+.ck-stack {
+  position: relative;
+  margin-bottom: 26px;
+}
+
+.ck-stack .ui-card {
+  position: relative;
+  z-index: 2;
+}
+
+.ck-stack-layer {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -8px;
+  z-index: 1;
+  height: 24px;
+  background: var(--am-surface);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+}
+
+.ck-stack-two {
+  left: 22px;
+  right: 22px;
+  bottom: -16px;
+  opacity: 0.55;
+}
+
+.ck-done {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin-bottom: 22px;
+  padding: 20px 22px;
+  color: var(--am-text);
+  background: color-mix(in srgb, var(--am-text) 5%, transparent);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+}
+
+.ck-done h2 {
+  margin: 0;
+  color: var(--am-heading);
+  font-size: var(--am-fs-lg);
+}
+
+.ck-done p {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-sm);
+  line-height: 1.6;
+}
+
+.ck-done-list,
+.ck-guide-list {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ck-done-link {
+  min-height: 44px;
+  padding: 10px 2px;
+  color: var(--am-text);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--am-border);
+  font: inherit;
+  font-size: var(--am-fs-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ck-done-link:hover {
+  color: var(--am-accent);
+}
+
+.ck-guides h2 {
+  margin: 0 0 4px;
+  color: var(--am-heading);
+  font-size: var(--am-fs-md);
+}
+
+.ck-guides-note {
+  margin: 0 0 10px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  line-height: 1.55;
+}
+
+.ck-guide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  color: var(--am-text);
+  background: color-mix(in srgb, var(--am-text) 6%, transparent);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  font: inherit;
+  font-size: var(--am-fs-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ck-guide:hover {
+  background: var(--am-surface-hover);
+  border-color: var(--am-border-strong);
+}
+
+.ck-guide-title {
+  font-weight: 650;
+}
+
+.ck-back {
+  margin-bottom: 12px;
+}
+
+.ck-back-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--am-accent);
+  background: none;
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  font: inherit;
+  font-size: var(--am-fs-sm);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.ck-back-btn:hover {
+  background: var(--am-surface-hover);
+}

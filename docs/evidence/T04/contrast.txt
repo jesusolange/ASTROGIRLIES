@@ -1,0 +1,82 @@
+
+Dark theme (text minimum 4.5, UI minimum 3)
+  PASS 17.08:1  --am-text on --am-bg
+  PASS 9.49:1  --am-text-muted on --am-bg
+  PASS 11.87:1  --am-heading on --am-bg
+  PASS 12.95:1  --am-accent on --am-bg
+  PASS 15.81:1  --am-text on --am-bg-raised
+  PASS 8.79:1  --am-text-muted on --am-bg-raised
+  PASS 10.98:1  --am-heading on --am-bg-raised
+  PASS 11.98:1  --am-accent on --am-bg-raised
+  PASS 14.27:1  --am-text on --am-surface
+  PASS 7.93:1  --am-text-muted on --am-surface
+  PASS 9.92:1  --am-heading on --am-surface
+  PASS 10.82:1  --am-accent on --am-surface
+  PASS 12.01:1  --am-text on --am-surface-2
+  PASS 6.68:1  --am-text-muted on --am-surface-2
+  PASS 8.35:1  --am-heading on --am-surface-2
+  PASS 9.11:1  --am-accent on --am-surface-2
+  PASS 8.46:1  --am-ok on --am-surface
+  PASS 10.47:1  --am-warn on --am-surface
+  PASS 5.80:1  --am-danger on --am-surface
+  PASS 7.12:1  --am-ok on --am-surface-2
+  PASS 8.81:1  --am-warn on --am-surface-2
+  PASS 4.89:1  --am-danger on --am-surface-2
+  PASS 5.61:1  --am-btn-primary-text on --am-btn-primary-bg
+  PASS 13.45:1  --am-btn-soft-text on --am-btn-soft-bg
+  PASS 15.06:1  --am-field-text on --am-field-bg
+  PASS 8.37:1  --am-field-placeholder on --am-field-bg
+  PASS 10.41:1  --am-warn-soft on --am-warn-bg
+  PASS 9.36:1  --am-danger-soft on --am-danger-bg
+  PASS 10.51:1  --am-ok-soft on --am-ok-bg
+  PASS 15.71:1  --am-stage-text on --am-stage-base
+  PASS 12.24:1  --am-stage-text-muted on --am-stage-base
+
+Dark theme (text minimum 4.5, UI minimum 3)
+  PASS 4.58:1  --am-border-strong on --am-surface
+  PASS 5.49:1  --am-border-strong on --am-bg
+  PASS 4.84:1  --am-field-border on --am-field-bg
+  PASS 10.82:1  --am-selected-border on --am-surface
+  PASS 10.21:1  --am-focus on --am-bg
+
+Light theme (text minimum 4.5, UI minimum 3)
+  PASS 13.54:1  --am-text on --am-bg
+  PASS 6.01:1  --am-text-muted on --am-bg
+  PASS 12.14:1  --am-heading on --am-bg
+  PASS 5.72:1  --am-accent on --am-bg
+  PASS 14.66:1  --am-text on --am-bg-raised
+  PASS 6.51:1  --am-text-muted on --am-bg-raised
+  PASS 13.15:1  --am-heading on --am-bg-raised
+  PASS 6.20:1  --am-accent on --am-bg-raised
+  PASS 14.66:1  --am-text on --am-surface
+  PASS 6.51:1  --am-text-muted on --am-surface
+  PASS 13.15:1  --am-heading on --am-surface
+  PASS 6.20:1  --am-accent on --am-surface
+  PASS 12.79:1  --am-text on --am-surface-2
+  PASS 5.68:1  --am-text-muted on --am-surface-2
+  PASS 11.47:1  --am-heading on --am-surface-2
+  PASS 5.41:1  --am-accent on --am-surface-2
+  PASS 5.32:1  --am-ok on --am-surface
+  PASS 5.93:1  --am-warn on --am-surface
+  PASS 6.54:1  --am-danger on --am-surface
+  PASS 4.64:1  --am-ok on --am-surface-2
+  PASS 5.17:1  --am-warn on --am-surface-2
+  PASS 5.70:1  --am-danger on --am-surface-2
+  PASS 6.20:1  --am-btn-primary-text on --am-btn-primary-bg
+  PASS 6.80:1  --am-btn-soft-text on --am-btn-soft-bg
+  PASS 14.66:1  --am-field-text on --am-field-bg
+  PASS 4.63:1  --am-field-placeholder on --am-field-bg
+  PASS 6.40:1  --am-warn-soft on --am-warn-bg
+  PASS 6.33:1  --am-danger-soft on --am-danger-bg
+  PASS 4.69:1  --am-ok-soft on --am-ok-bg
+  PASS 15.71:1  --am-stage-text on --am-stage-base
+  PASS 12.24:1  --am-stage-text-muted on --am-stage-base
+
+Light theme (text minimum 4.5, UI minimum 3)
+  PASS 4.10:1  --am-border-strong on --am-surface
+  PASS 3.79:1  --am-border-strong on --am-bg
+  PASS 4.10:1  --am-field-border on --am-field-bg
+  PASS 6.20:1  --am-selected-border on --am-surface
+  PASS 5.72:1  --am-focus on --am-bg
+
+All token pairs pass.

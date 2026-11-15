@@ -1,0 +1,156 @@
+/* Vision cards. Colours come from tokens.css only. */
+
+.vision :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 2px;
+}
+
+.vs-fine { margin: 10px 0 0; color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.55; }
+.vs-hint { margin: 8px 0 0; color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.5; }
+.vs-note { margin: 10px 0 0; color: var(--am-warn); font-size: var(--am-fs-xs); line-height: 1.5; }
+.vs-chosen { margin: 10px 0 0; color: var(--am-accent); font-size: var(--am-fs-sm); font-weight: 650; }
+
+/* ---------- figure opener ---------- */
+
+.vs-figure-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  color: var(--am-accent);
+  background: none;
+  border: 1px solid var(--am-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: var(--am-fs-sm);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.vs-figure-link:hover {
+  background: var(--am-surface-hover);
+  border-color: var(--am-border-strong);
+}
+
+/* ---------- calibration ---------- */
+
+.vs-cal { display: grid; justify-items: start; gap: 12px; }
+.vs-cal .ui-steps { width: 100%; }
+.vs-cal-scroll { max-width: 100%; padding-bottom: 4px; overflow-x: auto; }
+.vs-cal-bar {
+  height: 34px;
+  box-sizing: border-box;
+  background: var(--am-field-bg);
+  border: 2px solid var(--am-accent);
+  border-radius: var(--am-radius-small);
+}
+.vs-cal .ui-field { width: 100%; }
+.vs-cal input[type="range"] { width: 100%; accent-color: var(--am-accent); }
+.vs-cal-read { margin: 0; color: var(--am-text); font-size: var(--am-fs-sm); font-variant-numeric: tabular-nums; }
+
+/* ---------- Amsler grid ---------- */
+
+.vs-grid-block { display: grid; justify-items: start; gap: 4px; }
+.vs-grid-wrap {
+  width: max-content;
+  margin-top: 6px;
+  padding: 8px;
+  background: var(--am-bg-raised);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+}
+.vs-grid {
+  position: relative;
+  width: var(--vs-size, 350px);
+  height: var(--vs-size, 350px);
+  background-color: var(--am-surface);
+  background-image:
+    repeating-linear-gradient(to right, var(--am-border-strong) 0 1px, transparent 1px var(--vs-cell, 17.5px)),
+    repeating-linear-gradient(to bottom, var(--am-border-strong) 0 1px, transparent 1px var(--vs-cell, 17.5px));
+}
+.vs-grid:focus-visible { outline: 3px solid var(--am-focus); outline-offset: 3px; }
+.vs-grid-cells {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(20, var(--vs-cell, 17.5px));
+  grid-template-rows: repeat(20, var(--vs-cell, 17.5px));
+}
+.vs-cell {
+  width: var(--vs-cell, 17.5px);
+  height: var(--vs-cell, 17.5px);
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: crosshair;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.vs-cell:hover { background: var(--am-surface-2); }
+.vs-cell.marked { background: color-mix(in srgb, var(--am-danger) 45%, transparent); }
+.vs-cell.is-cursor { box-shadow: inset 0 0 0 2px var(--am-accent); }
+.vs-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--am-danger);
+  pointer-events: none;
+}
+
+/* ---------- near-vision chart ---------- */
+
+.vs-chart {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  width: 100%;
+  max-width: 100%;
+  margin: 10px 0 0;
+  padding: 10px;
+  overflow-x: auto;
+  background: var(--am-bg-raised);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+}
+.vs-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--am-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.vs-line:hover { background: var(--am-surface-2); }
+.vs-line.on { border-color: var(--am-accent); background: var(--am-selected-bg); }
+.vs-line-opts { display: flex; align-items: center; gap: var(--vs-gap, 10px); }
+.vs-opt { flex: none; width: var(--vs-opt, 16px); height: var(--vs-opt, 16px); fill: var(--am-text); }
+.vs-line-lab { color: var(--am-text); font-size: var(--am-fs-xs); font-weight: 700; white-space: nowrap; }
+.vs-line-lab small { display: block; color: var(--am-text-muted); font-size: var(--am-fs-xs); font-weight: 500; }
+.vs-cannot { width: auto; justify-content: flex-start; margin-top: 8px; border: 1px dashed var(--am-border-strong); }
+
+/* ---------- chips ---------- */
+
+.vision .ui-chip.is-selected {
+  color: var(--am-btn-primary-text);
+  background: var(--am-btn-primary-bg);
+  border-color: var(--am-btn-primary-bg);
+}
+.vision .ui-chip.is-selected:hover { background: var(--am-btn-primary-hover); }
+.vs-field-focus { border-radius: var(--am-radius-small); }
+.vs-field-focus:focus-visible { outline: 3px solid var(--am-focus); outline-offset: 2px; }
+.vs-symptoms .ui-chips { margin: 0; }

@@ -1,0 +1,113 @@
+/* Radiation: the dose card and its result. Colours come only from the --am-* tokens. */
+
+.rd-lead {
+  margin: 0 0 16px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-sm);
+  line-height: 1.6;
+}
+
+.rd-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.rd-card .ui-field { margin-bottom: 12px; }
+.rd-card .ui-field input,
+.rd-card .ui-field select { width: 100%; box-sizing: border-box; }
+
+.rd-note {
+  margin: 0 0 10px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  line-height: 1.55;
+}
+
+.rd-cabin,
+.rd-storm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+  padding: 12px 14px;
+  background: var(--am-field-bg);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+}
+
+.rd-cabin .rd-note,
+.rd-storm .rd-note { flex: 1 1 220px; margin: 0; }
+
+.rd-details {
+  margin: 12px 0;
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius-small);
+  padding: 10px 14px;
+  background: var(--am-field-bg);
+}
+
+.rd-details summary {
+  cursor: pointer;
+  color: var(--am-heading);
+  font-size: var(--am-fs-sm);
+  font-weight: 600;
+}
+
+.rd-details .ui-steps { margin-top: 10px; }
+
+.rd-result { display: grid; gap: 8px; width: 100%; }
+
+.rd-gauge {
+  position: relative;
+  height: 16px;
+  background: var(--am-track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rd-fill { height: 100%; border-radius: 999px; background: var(--am-accent); transition: width 300ms ease; }
+.rd-gauge.ok .rd-fill { background: var(--am-ok); }
+.rd-gauge.review .rd-fill { background: var(--am-warn); }
+.rd-gauge.alert .rd-fill { background: var(--am-danger); }
+
+.rd-gauge i {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 22px;
+  background: var(--am-border-strong);
+}
+
+.rd-scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+}
+
+.rd-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 6px 0;
+}
+
+.rd-kpis div { display: grid; gap: 1px; }
+.rd-kpis dt { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+.rd-kpis dd { margin: 0; color: var(--am-text); font-size: var(--am-fs-sm); font-weight: 700; }
+
+.rd-level { margin: 4px 0 0; font-size: var(--am-fs-sm); color: var(--am-text); }
+.rd-level.rd-ok { color: var(--am-ok); }
+.rd-level.rd-review { color: var(--am-warn); }
+.rd-level.rd-alert { color: var(--am-danger); }
+
+@media (max-width: 520px) {
+  .rd-row { grid-template-columns: 1fr; }
+  .rd-kpis { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-fill { transition: none; }
+}

@@ -1,0 +1,93 @@
+/* Cabin conditions: the reading form and its result. Colours come only from the --am-* tokens. */
+
+.env-aside {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.env-aside img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--am-radius-small);
+  border: 1px solid var(--am-border);
+}
+
+.env-aside-name {
+  margin: 0;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-xs);
+  font-weight: 650;
+}
+
+@media (max-width: 700px) {
+  .ui-card-aside:has(.env-aside) {
+    display: none;
+  }
+}
+
+.env-lead {
+  margin: 0 0 16px;
+  color: var(--am-text-muted);
+  font-size: var(--am-fs-sm);
+  line-height: 1.6;
+}
+
+.env-saved-note {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  color: var(--am-text);
+  background: var(--am-field-bg);
+  border: 1px solid var(--am-ok);
+  border-radius: var(--am-radius-small);
+  font-size: var(--am-fs-xs);
+  line-height: 1.55;
+}
+
+.env-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.env-grid .ui-field input { width: 100%; box-sizing: border-box; }
+
+.env-result-place {
+  margin: 0 0 10px;
+  color: var(--am-heading);
+  font-size: var(--am-fs-sm);
+  font-weight: 700;
+}
+
+.env-result-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+.env-reading {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--am-field-bg);
+  border: 1px solid var(--env-tone, var(--am-border));
+  border-radius: var(--am-radius-small);
+}
+
+.env-reading-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.env-reading b { color: var(--am-text); font-size: var(--am-fs-sm); }
+.env-reading span { color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.5; }
+.env-reading span.env-reading-todo { color: var(--am-text); font-weight: 600; }
+
+.env-ok { --env-tone: var(--am-ok); }
+.env-review { --env-tone: var(--am-warn); }
+.env-alert { --env-tone: var(--am-danger); }
+.env-info { --env-tone: var(--am-info); }
+
+@media (max-width: 560px) {
+  .env-grid { grid-template-columns: 1fr; }
+}

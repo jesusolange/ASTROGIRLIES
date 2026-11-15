@@ -1,0 +1,76 @@
+/* Exercise card. Colours come from the --am-* tokens only. */
+
+.exercise-view { display: block; }
+.exr-card { display: grid; gap: 14px; color: var(--am-text); }
+.exr-lead { margin: 0; color: var(--am-text-muted); font-size: var(--am-fs-sm); line-height: 1.6; }
+.exr-note { margin: 0; color: var(--am-text-muted); font-size: var(--am-fs-xs); line-height: 1.55; }
+
+/* ---------- Chooser ---------- */
+
+.exr-chooser { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.exr-device {
+  display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+  min-height: 44px; padding: 10px; cursor: pointer; text-align: left;
+  color: var(--am-text); background: var(--am-field-bg);
+  border: 2px solid transparent; border-radius: var(--am-radius);
+  font: inherit;
+}
+.exr-device img {
+  display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover;
+  border-radius: var(--am-radius-small); background: var(--am-bg-raised);
+}
+.exr-device-name { font-size: var(--am-fs-md); font-weight: 700; }
+.exr-device small { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+.exr-device:hover { border-color: var(--am-border-strong); }
+.exr-device.is-on { border-color: var(--am-accent); background: var(--am-selected-bg); }
+.exr-selected { margin: 0; color: var(--am-text); font-size: var(--am-fs-sm); }
+
+/* ---------- Fields ---------- */
+
+.exr-form { display: grid; gap: 12px; padding: 14px; background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius); }
+.exr-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.exr-field { display: grid; gap: 5px; min-width: 0; color: var(--am-text); font-size: var(--am-fs-xs); }
+.exr-field > span { color: var(--am-text-muted); font-weight: 600; }
+.exr-field input,
+.exr-field select {
+  width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; padding: 10px 12px;
+  color: var(--am-field-text); background: var(--am-bg-raised);
+  border: 1px solid var(--am-field-border); border-radius: var(--am-radius-small);
+  font: inherit; font-size: var(--am-fs-sm);
+}
+.exr-fields .ui-field input,
+.exr-fields .ui-field select { min-width: 0; width: 100%; }
+
+.exr-errors {
+  margin: 0; padding: 10px 14px 10px 28px; list-style: disc;
+  color: var(--am-danger); background: var(--am-danger-bg);
+  border: 1px solid var(--am-danger); border-radius: var(--am-radius-small); font-size: var(--am-fs-xs);
+}
+.exr-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.exr-form-actions .ui-btn { margin-top: 0; }
+
+/* ---------- Result ---------- */
+
+.exr-result { display: grid; gap: 8px; padding: 12px 14px; background: var(--am-bg-raised); border: 1px solid var(--am-border); border-radius: var(--am-radius); }
+.exr-result-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.exr-result-head b { color: var(--am-heading); font-size: var(--am-fs-sm); }
+.exr-result-head span { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+.exr-result p { margin: 0; color: var(--am-text); font-size: var(--am-fs-sm); line-height: 1.55; }
+.exr-result .ui-btn { margin-top: 0; width: fit-content; }
+
+/* ---------- Instructions ---------- */
+
+.exr-instructions { display: grid; gap: 2px; padding: 12px 14px; background: var(--am-field-bg); border: 1px solid var(--am-border); border-radius: var(--am-radius-small); }
+.exr-instructions-title { margin: 0 0 4px; color: var(--am-heading); font-size: var(--am-fs-md); }
+.exr-device-steps { padding: 4px 0; border-top: 1px solid var(--am-border); }
+.exr-device-steps summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--am-heading); font-weight: 600; }
+.exr-device-steps > p { margin: 2px 0 10px; color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+
+.exr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.exr-actions .ui-btn { margin-top: 0; }
+.exr-hint { color: var(--am-text-muted); font-size: var(--am-fs-xs); }
+
+@media (max-width: 640px) {
+  .exr-chooser { grid-template-columns: 1fr; }
+  .exr-fields { grid-template-columns: 1fr; }
+}

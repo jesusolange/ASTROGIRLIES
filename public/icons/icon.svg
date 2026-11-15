@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="435 240 580 580" role="img" aria-label="AstroMed">
+  <rect x="435" y="240" width="580" height="580" fill="#0a1634"/>
+  <g fill="#6fe3ff" stroke="#6fe3ff" stroke-width="12" stroke-linejoin="round">
+    <path d="M519 304 L688 367 L711 506 L565 512 Z"/>
+    <path d="M752 384 L898 376 L881 516 L753 522 Z"/>
+    <path d="M764 552 L888 556 L930 728 L784 696 Z"/>
+    <path d="M571 549 L718 562 L723 703 L529 756 Z"/>
+    <path d="M711 506 L736.5 535.5" stroke-width="14" stroke-linecap="round"/>
+    <path d="M753 522 L736.5 535.5" stroke-width="14" stroke-linecap="round"/>
+    <path d="M764 552 L736.5 535.5" stroke-width="14" stroke-linecap="round"/>
+    <path d="M718 562 L736.5 535.5" stroke-width="14" stroke-linecap="round"/>
+    <circle cx="736.5" cy="535.5" r="16"/>
+  </g>
+  <g fill="none" stroke="#0a1634" stroke-width="7" stroke-linecap="round">
+    <path d="M542.3 330.8 L691.1 489.8 M672.8 379.5 L578.5 494.4"/>
+    <path d="M769.1 400.1 L865.9 499.7 M878.7 394.1 L769.9 504.2"/>
+    <path d="M783.6 569.6 L907.0 705.6 M874.5 572.6 L799.2 681.9"/>
+    <path d="M584.6 567.3 L705.5 690.1 M701.5 577.6 L551.1 732.3"/>
+  </g>
+</svg>

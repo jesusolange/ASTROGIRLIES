@@ -1,0 +1,6 @@
+eval: Step 1 of 7
+problems (2):
+  HTTP 404: http://127.0.0.1:53538/assets/space-background.jpg
+  HTTP 404: http://127.0.0.1:53538/favicon.ico
+
+Note: both remaining 404s are pre-existing and outside T02 (style.css requests space-background.jpg; the browser requests favicon.ico). The same two appeared on the pre-change page. No request for astronaut.png, astronaut_anatomy.png or any /assets/models/*.glb failed.

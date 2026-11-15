@@ -1,0 +1,188 @@
+/* Base layer: reset, document, type scale and form controls.
+   Every colour comes from tokens.css. Section styles live beside their components. */
+
+:root {
+  /* Six text sizes for the whole app. Components reference these, never a raw px size. */
+  --am-fs-xs: 12px;
+  --am-fs-sm: 14px;
+  --am-fs-md: 16px;
+  --am-fs-lg: 20px;
+  --am-fs-xl: 26px;
+  --am-fs-display: clamp(2.4rem, 8vw, 5rem);
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--am-text);
+  background-color: var(--am-bg);
+  background-image: none;
+  background-attachment: scroll;
+  font-family: Barlow, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: var(--am-fs-md);
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+* {
+  scrollbar-color: var(--am-border-strong) transparent;
+}
+
+::selection {
+  background: var(--am-selected-bg);
+  color: var(--am-text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--am-heading-strong);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+h1,
+h2 {
+  font-size: var(--am-fs-lg);
+}
+
+h3,
+h4 {
+  font-size: var(--am-fs-md);
+}
+
+h5,
+h6 {
+  font-size: var(--am-fs-sm);
+}
+
+small {
+  font-size: var(--am-fs-xs);
+}
+
+a {
+  color: var(--am-accent);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 3px solid var(--am-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- form controls ---------- */
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+select,
+textarea {
+  width: auto;
+  padding: 9px 11px;
+  border: 1px solid var(--am-field-border);
+  border-radius: var(--am-radius-small);
+  background: var(--am-field-bg);
+  color: var(--am-field-text);
+  font: inherit;
+}
+
+input:hover:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select:hover,
+textarea:hover {
+  border-color: var(--am-selected-border);
+}
+
+input:focus:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select:focus,
+textarea:focus {
+  border-color: var(--am-focus);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--am-field-placeholder);
+  opacity: 1;
+}
+
+select option,
+select optgroup {
+  background: var(--am-bg-raised);
+  color: var(--am-field-text);
+}
+
+textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1.05em;
+  height: 1.05em;
+  margin: 0 0.4em 0 0;
+  accent-color: var(--am-accent-strong);
+  vertical-align: -0.12em;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--am-accent-strong);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled,
+button:disabled,
+[aria-disabled="true"] {
+  opacity: var(--am-disabled-opacity);
+  cursor: not-allowed;
+}
+
+input[type="file"] {
+  color: var(--am-text-muted);
+  font: inherit;
+}
+
+/* ---------- reduced motion: every animation and transition stops ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  :root:root *,
+  :root:root *::before,
+  :root:root *::after {
+    animation: none;
+    transition: none;
+    scroll-behavior: auto;
+  }
+}
