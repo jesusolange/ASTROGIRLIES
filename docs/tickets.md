@@ -10,6 +10,8 @@ These replace the earlier tickets (see git history of this file). One spec per t
 - A batch starts only after the one before it is merged into `name15` and `pnpm test`, `pnpm build` pass.
 - If time runs out, the last merged batch is the submission. Each batch leaves the app working.
 - T30 (3D repair) has no dependencies and may start with batch 1 if a sixth agent is free.
+- Evidence: workers take no screenshots. The coordinator takes them, and runs `tools/shot.mjs --strict`, once at
+  the end of each batch, into `docs/evidence/batch-<n>/`.
 
 | Batch | Tickets | What the app gains |
 |---|---|---|
