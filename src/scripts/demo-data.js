@@ -68,11 +68,15 @@ const CHECKUP_FIELDS = {
   muscles: { activity: () => [58, 9], strength: () => [25, 1.8] }
 };
 
+// Left open today so the demo can show these checks being done: the bones card and the meal card.
+const SHOWCASE_TODAY = new Set(["bones", "meals"]);
+
 function checkupRecords(now, random) {
   const records = [];
   for (let index = 0; index < DAYS; index += 1) {
     const time = at(now, index, 8).toISOString();
     Object.entries(CHECKUP_FIELDS).forEach(([part, fields]) => {
+      if (index === 0 && SHOWCASE_TODAY.has(part)) return;
       const values = {};
       Object.entries(fields).forEach(([key, pick]) => {
         const [centre, spread] = pick();
@@ -196,7 +200,7 @@ const MEALS = [
 
 function nutritionData(now, random) {
   const entries = [];
-  for (let index = 0; index < DAYS; index += 1) {
+  for (let index = SHOWCASE_TODAY.has("meals") ? 1 : 0; index < DAYS; index += 1) {
     MEALS.forEach((meal, mealIndex) => {
       const time = at(now, index, meal.hour, meal.minute).toISOString();
       const salt = (random() - 0.5) * 0.06;
@@ -261,7 +265,9 @@ const REWARD_TASKS = ["env", "checkup", "exercise", "meals", "mental"];
 function missionsData(now) {
   const auto = {};
   for (let index = DAYS - 1; index >= 0; index -= 1) {
-    auto[isoDay(at(now, index, 8))] = [...REWARD_TASKS];
+    auto[isoDay(at(now, index, 8))] = index === 0
+      ? REWARD_TASKS.filter((task) => task !== "meals" && task !== "checkup")
+      : [...REWARD_TASKS];
   }
   const vo2 = [13, 7, 0].map((daysAgo, index) => ({
     value: [42, 41, 43][index],
