@@ -3,7 +3,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { BODIES, TEXTURES, bodyFor, detailsFor, fallbackFor, labelFor, textureFor } = require("../src/scripts/planet.js");
+const { BODIES, TEXTURES, bodyFor, detailsFor, labelFor, textureFor } = require("../src/scripts/planet.js");
 
 const ROOT = path.join(__dirname, "..", "public");
 
@@ -31,29 +31,24 @@ test("a missing or unknown mission falls back to Mars", () => {
 test("a missing or unknown body falls back to Mars", () => {
   assert.equal(detailsFor("venus").id, "mars");
   assert.equal(textureFor("venus"), TEXTURES.mars.texture);
-  assert.equal(fallbackFor("venus"), TEXTURES.mars.fallback);
   assert.equal(labelFor("venus"), "Mars");
 });
 
-test("every body has a texture, a fallback and a credit", () => {
+test("every body has a texture and a credit", () => {
   for (const body of BODIES) {
     const details = detailsFor(body);
     assert.ok(details.texture.endsWith(".jpg"));
-    assert.ok(details.fallback.endsWith(".svg"));
     assert.ok(details.title && details.author && details.url && details.licence && details.change);
     assert.equal(textureFor(body), details.texture);
-    assert.equal(fallbackFor(body), details.fallback);
     assert.equal(labelFor(body), details.label);
   }
 });
 
-test("the texture and fallback files exist and stay within the size budget", () => {
+test("the texture files exist and stay within the size budget", () => {
   let total = 0;
   for (const body of BODIES) {
     const details = detailsFor(body);
-    for (const file of [details.texture, details.fallback]) {
-      assert.ok(fs.existsSync(path.join(ROOT, file.replace(/^\//, ""))), `missing ${file}`);
-    }
+    assert.ok(fs.existsSync(path.join(ROOT, details.texture.replace(/^\//, ""))), `missing ${details.texture}`);
     total += fs.statSync(path.join(ROOT, details.texture.replace(/^\//, ""))).size;
   }
   assert.ok(total < 3 * 1024 * 1024, `textures total ${total} bytes`);

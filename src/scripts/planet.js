@@ -1,4 +1,4 @@
-// Which body the cover shows, and the NASA texture and fallback drawing for it.
+// Which body the cover shows, and the NASA texture for it.
 // The mission types come from src/scripts/risks.js; the mapping is the cover's own.
 
 export const BODIES = ["earth", "moon", "mars"];
@@ -15,7 +15,6 @@ export const TEXTURES = {
     id: "earth",
     label: "Earth",
     texture: "/assets/planets/earth.jpg",
-    fallback: "/assets/cover/earth.svg",
     title: "Blue Marble: land surface, shallow water and shaded topography",
     author: "NASA Visible Earth, Reto Stöckli and Robert Simmon, NASA Goddard Space Flight Center",
     url: "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/",
@@ -27,7 +26,6 @@ export const TEXTURES = {
     id: "moon",
     label: "Moon",
     texture: "/assets/planets/moon.jpg",
-    fallback: "/assets/cover/moon.svg",
     title: "CGI Moon Kit: LROC color map",
     author: "NASA Scientific Visualization Studio, Ernie Wright",
     url: "https://svs.gsfc.nasa.gov/4720",
@@ -39,7 +37,6 @@ export const TEXTURES = {
     id: "mars",
     label: "Mars",
     texture: "/assets/planets/mars.jpg",
-    fallback: "/assets/cover/mars.svg",
     title: "Mars Viking MDIM21 color mosaic",
     author: "NASA, Jet Propulsion Laboratory and USGS Astrogeology",
     url: "https://astrogeology.usgs.gov/search/details/Mars/Viking/MDIM21/Mars_Viking_MDIM21_ClrMosaic_global_232m/cub",
@@ -66,10 +63,6 @@ export function detailsFor(body) {
 
 export function textureFor(body) {
   return detailsFor(body).texture;
-}
-
-export function fallbackFor(body) {
-  return detailsFor(body).fallback;
 }
 
 export function labelFor(body) {

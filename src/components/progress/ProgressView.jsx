@@ -5,7 +5,7 @@ import { toast } from "../../lib/ui.js";
 import Chips from "../ui/Chips.jsx";
 import Panel from "../ui/Panel.jsx";
 import Button from "../ui/Button.jsx";
-import MeasureChart from "./MeasureChart.jsx";
+import ChartCard from "./ChartCard.jsx";
 import WeeklyTable from "./WeeklyTable.jsx";
 import HistoryTable from "./HistoryTable.jsx";
 import ProgressExtras from "./ProgressExtras.jsx";
@@ -137,17 +137,13 @@ export default function ProgressView() {
                   {filter === "all" ? <h4 class="pg-group-title">{group.label}</h4> : null}
                   <div class="pg-charts">
                     {group.charts.map(({ measure, series }) => (
-                      <article class="pg-chart" key={`${filter}-${range}-${measure.id}`}>
-                        <header>
-                          <h5>{measure.label}</h5>
-                          {measure.unit ? <span>{measure.unit}</span> : null}
-                        </header>
-                        {series.values.length ? (
-                          <MeasureChart measure={measure} series={series} projection={measure.id === "radiation.cumulative" ? progress.projection : null} profile={profile} />
-                        ) : (
-                          <div class="pg-chart-empty">No records yet</div>
-                        )}
-                      </article>
+                      <ChartCard
+                        key={`${filter}-${range}-${measure.id}`}
+                        measure={measure}
+                        series={series}
+                        projection={measure.id === "radiation.cumulative" ? progress.projection : null}
+                        profile={profile}
+                      />
                     ))}
                   </div>
                 </section>

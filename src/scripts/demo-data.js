@@ -20,6 +20,7 @@ const NUTRITION_KEY = "astromed-nutrition";
 const EXERCISE_KEY = "astrotwin-exercise-sessions";
 const ENV_KEY = "astromed-env";
 const ENV_LOG_KEY = "astromed-env-log";
+const MISSIONS_KEY = "astromed-missions";
 
 const PLACE_BY_DRM = { leo: "iss", lunarOrbit: "moon", lunarSurface: "moon", mars: "mars" };
 
@@ -99,18 +100,20 @@ function mentalData(now, random) {
 
   const depression = {
     score: depScore, label: "Healthy", level: "ok", answers: depAnswers,
-    date: dayIso(2), flagged: false
+    date: dayIso(0), flagged: false
   };
   const stress = {
     score: stressScore, label: "Stable", level: "ok", answers: stressAnswers,
-    sub, date: dayIso(5), flagged: false
+    sub, date: dayIso(0), flagged: false
   };
 
   const history = [
-    { type: "depression", questionnaire: "Isolation & depression", score: depression.score, max: 27, label: depression.label, level: depression.level, answers: depression.answers, date: dayIso(2), flagged: false },
-    { type: "stress", questionnaire: "Stress & burn-out", score: stress.score, max: 66, label: stress.label, level: stress.level, answers: stress.answers, sub, date: dayIso(5), flagged: false },
-    { type: "depression", questionnaire: "Isolation & depression", score: 4, max: 27, label: "Healthy", level: "ok", answers: depAnswers, date: dayIso(9), flagged: false },
-    { type: "stress", questionnaire: "Stress & burn-out", score: 9, max: 66, label: "Stable", level: "ok", answers: stressAnswers, sub, date: dayIso(12), flagged: false }
+    { type: "depression", questionnaire: "Isolation & depression", score: depression.score, max: 27, label: depression.label, level: depression.level, answers: depression.answers, date: depression.date, flagged: false },
+    { type: "stress", questionnaire: "Stress & burn-out", score: stress.score, max: 66, label: stress.label, level: stress.level, answers: stress.answers, sub, date: stress.date, flagged: false },
+    { type: "depression", questionnaire: "Isolation & depression", score: 4, max: 27, label: "Healthy", level: "ok", answers: depAnswers, date: dayIso(4), flagged: false },
+    { type: "stress", questionnaire: "Stress & burn-out", score: 9, max: 66, label: "Stable", level: "ok", answers: stressAnswers, sub, date: dayIso(7), flagged: false },
+    { type: "depression", questionnaire: "Isolation & depression", score: 5, max: 27, label: "Healthy", level: "ok", answers: depAnswers, date: dayIso(11), flagged: false },
+    { type: "stress", questionnaire: "Stress & burn-out", score: 11, max: 66, label: "Stable", level: "ok", answers: stressAnswers, sub, date: dayIso(13), flagged: false }
   ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return {
@@ -155,6 +158,7 @@ function immuneData(now) {
   return {
     log,
     tests: [
+      { id: "demo-test-0", name: "Vitamin D (25-OH)", value: 33, unit: "ng/mL", kind: "blood", time: at(now, 0, 9).toISOString(), note: "" },
       { id: "demo-test-1", name: "Vitamin D (25-OH)", value: 32, unit: "ng/mL", kind: "blood", time: at(now, 3, 9).toISOString(), note: "" },
       { id: "demo-test-2", name: "Salivary cortisol", value: 4.2, unit: "nmol/L", kind: "saliva", time: at(now, 8, 8).toISOString(), note: "Morning sample" }
     ]
@@ -252,6 +256,20 @@ function environmentData(now, place, random) {
   };
 }
 
+const REWARD_TASKS = ["env", "checkup", "exercise", "meals", "mental"];
+
+function missionsData(now) {
+  const auto = {};
+  for (let index = DAYS - 1; index >= 0; index -= 1) {
+    auto[isoDay(at(now, index, 8))] = [...REWARD_TASKS];
+  }
+  const vo2 = [13, 7, 0].map((daysAgo, index) => ({
+    value: [42, 41, 43][index],
+    time: at(now, daysAgo, 9).toISOString()
+  }));
+  return { done: {}, auto, vo2 };
+}
+
 export function buildDemoData({ now = new Date(), seed = 7 } = {}) {
   const random = seeded(seed);
   const place = PLACE_BY_DRM[DEMO_MISSION.drm] || "mars";
@@ -286,7 +304,8 @@ export function buildDemoData({ now = new Date(), seed = 7 } = {}) {
     [NUTRITION_KEY]: nutritionData(now, random),
     [EXERCISE_KEY]: exerciseData(now, random),
     [ENV_KEY]: environment.state,
-    [ENV_LOG_KEY]: environment.log
+    [ENV_LOG_KEY]: environment.log,
+    [MISSIONS_KEY]: missionsData(now)
   };
 }
 

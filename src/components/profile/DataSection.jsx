@@ -15,7 +15,7 @@ function reloadSoon() {
 }
 
 function hasSavedData(api) {
-  return api.appKeys().some((key) => key !== "astromed-theme" && key !== "astromed-cover-day");
+  return api.appKeys().some((key) => key !== "astromed-theme");
 }
 
 export default function DataSection() {

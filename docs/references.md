@@ -84,8 +84,7 @@ The Earth and Mars files are 1920-pixel renditions of the same public-domain ori
 Wikimedia Commons (`File:Land shallow topo 2048.jpg` and `File:Mars Viking MDIM21 ClrMosaic 1km.jpg`)
 because the NASA and USGS download hosts did not complete the transfer from this network. The Moon
 map was fetched directly from the Scientific Visualization Studio. The same rows are exported from
-`src/scripts/planet.js` and listed in the Sources dialog under "Planet textures". The three SVG
-drawings below remain as the fallback when WebGL or the texture is unavailable.
+`src/scripts/planet.js` and listed in the Sources dialog under "Planet textures".
 
 ## Authored by the team
 
@@ -95,11 +94,7 @@ drawings below remain as the fallback when WebGL or the texture is unavailable.
 | `public/icons/icon-192.png` | AstroMed app icon, 192 px | AstroGirlies team | Project |
 | `public/icons/icon-512.png` | AstroMed app icon, 512 px | AstroGirlies team | Project |
 | `public/favicon.svg` | AstroMed favicon | AstroGirlies team | Project |
-| `public/assets/cover/earth.svg` | Earth for the low Earth orbit cover | AstroGirlies team | Project |
-| `public/assets/cover/moon.svg` | Moon for the lunar cover | AstroGirlies team | Project |
-| `public/assets/cover/mars.svg` | Mars for the Mars cover | AstroGirlies team | Project |
 
-The three cover backgrounds are drawn for this project as vector illustrations; no third-party image is used.
 
 ## Fonts and libraries
 

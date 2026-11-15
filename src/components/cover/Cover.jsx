@@ -128,22 +128,10 @@ export default function Cover({ onClosed }) {
       <Planet body={body} class="amc-planet" />
       <div class="amc-scrim" aria-hidden="true" />
       <div class="amc-in" onClick={(event) => event.stopPropagation()}>
-        <p class="amc-kicker">NASA Space Apps 2026</p>
-        <h1 id="amc-title">AstroMed</h1>
-        <p class="amc-purpose">Check your own health each day, and know what to do next, when Earth cannot answer in time.</p>
-
-        <form class="amc-signin" onSubmit={start}>
-          <SignIn
-            people={people}
-            selected={selected}
-            pin={pin}
-            error={error}
-            busy={busy}
-            onPick={pick}
-            onPin={(next) => { setPin(next); setError(""); }}
-            onAdd={addMember}
-            onRemoved={removed}
-          />
+        <div class="amc-left">
+          <p class="amc-kicker">NASA Space Apps 2026</p>
+          <h1 id="amc-title">AstroMed</h1>
+          <p class="amc-purpose">Check your own health each day, and know what to do next, when Earth cannot answer in time.</p>
 
           {facts.length ? (
             <dl class="amc-facts">
@@ -159,16 +147,33 @@ export default function Cover({ onClosed }) {
             </dl>
           ) : null}
 
-          <div class="amc-actions">
-            <button type="submit" class="amc-go" ref={startRef} disabled={!selected || busy}>
-              {busy ? "Checking PIN..." : "Start today's check"}
-            </button>
-            <button type="button" class="amc-emergency" onClick={emergency}>Emergency</button>
-          </div>
-        </form>
+          <p class="amc-place">{labelFor(body)}</p>
+        </div>
 
-        <p class="amc-note">Your records stay on this device unless you choose to sign in.</p>
-        <p class="amc-place">{labelFor(body)}</p>
+        <div class="amc-right">
+          <form class="amc-signin" onSubmit={start}>
+            <SignIn
+              people={people}
+              selected={selected}
+              pin={pin}
+              error={error}
+              busy={busy}
+              onPick={pick}
+              onPin={(next) => { setPin(next); setError(""); }}
+              onAdd={addMember}
+              onRemoved={removed}
+            />
+
+            <div class="amc-actions">
+              <button type="submit" class="amc-go" ref={startRef} disabled={!selected || busy}>
+                {busy ? "Checking PIN..." : "Start today's check"}
+              </button>
+              <button type="button" class="amc-emergency" onClick={emergency}>Emergency</button>
+            </div>
+          </form>
+
+          <p class="amc-note">Your records stay on this device unless you choose to sign in.</p>
+        </div>
       </div>
 
     </div>

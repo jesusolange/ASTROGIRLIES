@@ -64,7 +64,17 @@ html:has(.amc:not(.amc-out)) {
 .amc-in {
   position: relative;
   z-index: 1;
-  max-width: 44rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+  width: 100%;
+  max-width: 1120px;
+}
+
+.amc-left,
+.amc-right {
+  min-width: 0;
 }
 
 .amc-kicker {
@@ -253,6 +263,11 @@ html:has(.amc:not(.amc-out)) {
   .amc-fact {
     grid-template-columns: 1fr;
     gap: 2px;
+  }
+
+  .amc-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
   }
 
   .amc-actions {

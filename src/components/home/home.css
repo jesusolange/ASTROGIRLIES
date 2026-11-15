@@ -84,13 +84,9 @@
 .home-q-main span { color: var(--am-text-muted); font-size: 12px; }
 .home-q-main p { margin: 2px 0 0; color: var(--am-text-muted); font-size: 12px; }
 
-.home-dialog { width: min(960px, calc(100vw - 32px)); max-height: 88vh; padding: 0; color: var(--am-text); background: var(--am-surface); border: 1px solid var(--am-border-strong); border-radius: var(--am-radius); box-shadow: var(--am-shadow); }
-.home-dialog::backdrop { background: var(--am-overlay); }
-.home-dialog-body { padding: 22px; overflow-y: auto; max-height: 88vh; }
-.home-dialog-body p { max-width: 88ch; }
-.home-dialog-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-.home-dialog-head h2 { margin: 0; color: var(--am-heading); }
-.home-dialog-close { width: 40px; height: 40px; color: var(--am-text); background: var(--am-surface-2); border: 1px solid var(--am-border); border-radius: var(--am-radius-small); font-size: 20px; cursor: pointer; }
+.ui-dialog.home-score-dialog { width: min(960px, calc(100vw - 32px)); max-width: min(960px, calc(100vw - 32px)); }
+.home-score-dialog .ui-dialog-content { max-height: calc(88vh - 106px); overflow-y: auto; overflow-x: hidden; padding-inline: 4px; }
+.home-score-dialog .ui-dialog-content p { max-width: 88ch; }
 
 .home-table-wrap { overflow-x: auto; margin: 14px 0; }
 .home-table { width: 100%; border-collapse: collapse; font-size: 12px; }

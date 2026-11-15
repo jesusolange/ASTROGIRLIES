@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DAYS, DEMO_NAME, buildDemoData, loadDemo } from "../src/scripts/demo-data.js";
+import { SYSTEMS } from "../src/scripts/checkup-flow.js";
+import { FIELDS as CABIN_FIELDS } from "../src/scripts/environment.js";
+import { FILTERS, measuresOf, readProgress } from "../src/scripts/progress.js";
 
 const NOW = new Date(2026, 10, 15, 12, 0, 0);
 const data = buildDemoData({ now: NOW });
@@ -62,6 +65,73 @@ test("meals, sessions and questionnaires carry the fields the sections read", ()
   assert.ok(latest.mood.value);
   assert.equal(latest.depression.level, "ok");
   assert.equal(latest.stress.level, "ok");
+});
+
+const READER_KEYS = [
+  "astromed-profile", "astrotwin-gui-v2-records", "astromed-mental", "astromed-mental-history",
+  "astromed-vision", "astromed-immune", "astromed-radiation", "astromed-nutrition",
+  "astrotwin-exercise-sessions", "astromed-env", "astromed-env-log", "astromed-missions"
+];
+
+test("the builder fills every stored key the app reads", () => {
+  READER_KEYS.forEach((key) => {
+    const value = data[key];
+    assert.ok(value != null, `missing ${key}`);
+    if (Array.isArray(value)) assert.ok(value.length > 0, `${key} is empty`);
+    else if (typeof value === "object") assert.ok(Object.keys(value).length > 0, `${key} is empty`);
+  });
+});
+
+test("every body system carries every field it reads", () => {
+  const records = data["astrotwin-gui-v2-records"];
+  for (const [part, system] of Object.entries(SYSTEMS)) {
+    const record = records.find((entry) => entry.part === part);
+    assert.ok(record, `missing body record ${part}`);
+    system.fields.forEach((field) => {
+      assert.ok(Number.isFinite(record.values[field.key]), `${part}.${field.key} is missing`);
+    });
+  }
+});
+
+test("vision, mind, immune, nutrition and cabin records cover their cards", () => {
+  const vision = data["astromed-vision"];
+  assert.deepEqual(new Set(vision.results.map((result) => result.eye)), new Set(["left", "right"]));
+  const latestDay = vision.results.map((result) => new Date(result.date).toDateString()).sort().pop();
+  assert.equal(vision.results.filter((result) => new Date(result.date).toDateString() === latestDay).length, 2);
+
+  const mental = data["astromed-mental"];
+  assert.ok(mental.mood && mental.mood.value);
+  assert.ok(mental.depression && mental.stress);
+  const historyTypes = new Set(data["astromed-mental-history"].map((entry) => entry.type));
+  assert.deepEqual(historyTypes, new Set(["depression", "stress"]));
+
+  const immune = data["astromed-immune"];
+  assert.ok(Array.isArray(immune.log[Object.keys(immune.log).sort().pop()]));
+  assert.ok(immune.tests.length >= 2);
+
+  assert.ok(data["astromed-nutrition"].entries.every((entry) => Number.isFinite(entry.fluid)));
+  assert.ok(data["astromed-nutrition"].entries.some((entry) => entry.fluid > 0));
+
+  const readings = data["astromed-env"].readings;
+  CABIN_FIELDS.forEach((field) => assert.ok(Number.isFinite(readings[field.key]), `cabin ${field.key} is missing`));
+});
+
+test("the demo adds VO2max tests and a rewards history", () => {
+  const missions = data["astromed-missions"];
+  assert.equal(missions.vo2.length, 3);
+  assert.equal(Object.keys(missions.auto).length, DAYS);
+  Object.values(missions.auto).forEach((tasks) => assert.deepEqual(tasks, ["env", "checkup", "exercise", "meals", "mental"]));
+});
+
+test("every Progress filter has at least one chart with demo data", () => {
+  const api = { get: (key, fallback) => (key in data ? data[key] : fallback) };
+  const progress = readProgress(api, data["astromed-profile"]);
+  const measures = measuresOf(progress.rows);
+  FILTERS.filter((filter) => filter.id !== "all").forEach((filter) => {
+    assert.ok(measures.some((measure) => measure.filter === filter.id), `${filter.label} has no chart`);
+  });
+  assert.ok(measures.some((measure) => measure.id === "exercise.vo2"), "the VO2max chart has no series");
+  assert.ok(progress.projection != null, "the radiation projection is empty");
 });
 
 test("loading needs the browser store and returns false without it", () => {

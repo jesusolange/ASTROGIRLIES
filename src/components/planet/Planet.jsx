@@ -1,6 +1,6 @@
 // The destination globe on the cover: a three.js sphere textured with NASA imagery.
-// Without WebGL, or when the texture cannot load, the hand-drawn SVG for the body shows instead.
-import { useEffect, useRef, useState } from "preact/hooks";
+// Without WebGL, or when the texture cannot load, the globe area stays empty in place.
+import { useEffect, useRef } from "preact/hooks";
 import {
   AmbientLight,
   DirectionalLight,
@@ -41,26 +41,17 @@ function prefersReducedMotion() {
 
 export default function Planet({ body = "mars", class: extra = "" }) {
   const canvasRef = useRef(null);
-  const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
   const details = detailsFor(body);
   const canvasClass = `am-planet-canvas ${extra}`.trim();
-  const fallbackClass = `am-planet-fallback ${extra}`.trim();
 
   useEffect(() => {
-    setFailed(false);
-    setReady(false);
     const canvas = canvasRef.current;
-    if (!canvas || !hasWebGL()) {
-      setFailed(true);
-      return undefined;
-    }
+    if (!canvas || !hasWebGL()) return undefined;
 
     let renderer;
     try {
       renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true });
     } catch (error) {
-      setFailed(true);
       return undefined;
     }
 
@@ -121,16 +112,11 @@ export default function Planet({ body = "mars", class: extra = "" }) {
         texture = loaded;
         material.map = loaded;
         material.needsUpdate = true;
-        setReady(true);
         resize();
         if (!prefersReducedMotion()) frame = requestAnimationFrame(tick);
       },
       undefined,
-      () => {
-        if (stopped) return;
-        setFailed(true);
-        setReady(false);
-      },
+      undefined,
     );
 
     const observer = typeof ResizeObserver === "function" ? new ResizeObserver(resize) : null;
@@ -149,10 +135,5 @@ export default function Planet({ body = "mars", class: extra = "" }) {
     };
   }, [details.texture]);
 
-  return (
-    <>
-      <img class={fallbackClass} src={details.fallback} alt="" aria-hidden="true" hidden={ready && !failed} />
-      <canvas key={details.texture} class={canvasClass} ref={canvasRef} aria-hidden="true" hidden={failed || !ready} />
-    </>
-  );
+  return <canvas key={details.texture} class={canvasClass} ref={canvasRef} aria-hidden="true" />;
 }

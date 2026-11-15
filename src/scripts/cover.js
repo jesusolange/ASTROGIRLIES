@@ -4,21 +4,13 @@ import { h, render } from "preact";
 import { effect } from "@preact/signals";
 import Cover from "../components/cover/Cover.jsx";
 import { route } from "../lib/nav.js";
-import { isoDay } from "./profile.js";
-import { IDLE_MS, activeSignal, loadPeople, lock, peopleSignal } from "./people.js";
-
-export const COVER_DAY_KEY = "astromed-cover-day";
+import { IDLE_MS, activeSignal, loadPeople, lock } from "./people.js";
 
 const store = () => (typeof window !== "undefined" && window.AstroMedStore && window.AstroMedStore.store) || null;
 
 let host = null;
 let idleTimer = null;
 let hiddenAt = 0;
-
-function signInNeeded() {
-  const people = peopleSignal.value;
-  return people.length !== 1 || Boolean(people[0].pinHash);
-}
 
 function openCover() {
   if (host) return;
@@ -47,15 +39,7 @@ function armIdle() {
 
 function start() {
   loadPeople();
-  const api = store();
-  if (!api) return;
-  if (signInNeeded()) {
-    openCover();
-    return;
-  }
-  const today = isoDay(new Date());
-  if (api.get(COVER_DAY_KEY, null) === today) return;
-  api.set(COVER_DAY_KEY, today);
+  if (!store()) return;
   openCover();
 }
 

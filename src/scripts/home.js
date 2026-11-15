@@ -42,44 +42,49 @@ function lastMealsDay() {
   return Object.keys(byDay).filter((d) => ["Breakfast", "Lunch", "Dinner"].every((m) => byDay[d].has(m))).sort().pop() || null;
 }
 
-// Last day a check was completed, as YYYY-MM-DD, or null.
-export function lastDoneFor(key) {
-  if (!key) return null;
-  if (key.startsWith("overview:")) {
-    const part = key.slice("overview:".length);
-    const recs = rd("astrotwin-gui-v2-records", []);
-    return latestDay((Array.isArray(recs) ? recs : []).filter((r) => r && r.part === part), "time");
-  }
-  switch (key) {
+const latestOf = (days) => days.filter(Boolean).sort().pop() || null;
+
+// A topic's body cards write to the shared measurement record, one part per card.
+const CHECKUP_PARTS = {
+  bones: ["bones"], kidneys: ["kidneys"], sleep: ["brain"], heart: ["heart", "lungs"],
+  immune: ["hand"], exercise: ["muscles"]
+};
+function bodyDayFor(topic) {
+  const parts = CHECKUP_PARTS[topic];
+  if (!parts) return null;
+  const records = rd("astrotwin-gui-v2-records", []);
+  return latestDay((Array.isArray(records) ? records : []).filter((record) => record && parts.includes(record.part)), "time");
+}
+
+// Last day a topic's check was completed, as YYYY-MM-DD, or null.
+export function lastDoneFor(topic) {
+  if (!topic) return null;
+  const body = bodyDayFor(topic);
+  switch (topic) {
     case "nutrition": return lastMealsDay();
-    case "twin": return latestDay(rd("astrotwin-exercise-sessions", []), "date");
+    case "exercise":
+      return latestOf([body, latestDay(rd("astrotwin-exercise-sessions", []), "date")]);
     case "mental": {
       const m = rd("astromed-mental", {}) || {};
-      return ["mood", "depression", "stress"].map((k) => (m[k] ? dayOfTime(m[k].date) : null)).filter(Boolean).sort().pop() || null;
+      return latestOf(["mood", "depression", "stress"].map((k) => (m[k] ? dayOfTime(m[k].date) : null)));
     }
     case "environment": {
       const live = rd("astromed-env", null);
-      return [latestDay(rd("astromed-env-log", []), "time"), live && live.time ? dayOfTime(live.time) : null].filter(Boolean).sort().pop() || null;
+      return latestOf([latestDay(rd("astromed-env-log", []), "time"), live && live.time ? dayOfTime(live.time) : null]);
     }
     case "immune": {
       const immune = rd("astromed-immune", {});
       const logDay = Object.keys((immune && immune.log) || {}).sort().pop() || null;
       const testDay = latestDay((immune && immune.tests) || [], "time");
-      return [logDay, testDay].filter(Boolean).sort().pop() || null;
+      return latestOf([body, logDay, testDay]);
     }
     case "radiation": {
       const entries = rd("astromed-radiation", { entries: [] }).entries || [];
-      return (Array.isArray(entries) ? entries : []).map((e) => e && e.day).filter(Boolean).sort().pop() || null;
+      return latestOf((Array.isArray(entries) ? entries : []).map((e) => e && e.day));
     }
-    default: return null;
+    default: return body;
   }
 }
-
-const LAST_KEY = {
-  bones: "overview:bones", kidneys: "overview:kidneys", sleep: "overview:brain", heart: "overview:heart",
-  exercise: "twin", environment: "environment", immune: "immune", radiation: "radiation",
-  mental: "mental", nutrition: "nutrition"
-};
 
 // The route is the topic id: the Check deck resolves a topic id to that topic's cards.
 const TOPIC_LABEL = {
@@ -109,7 +114,7 @@ function lastVisionDay() {
   return last && last.date ? localDay(last.date) : null;
 }
 function lastFor(area) {
-  return area.key === "vision" ? lastVisionDay() : lastDoneFor(LAST_KEY[area.key]);
+  return area.key === "vision" ? lastVisionDay() : lastDoneFor(area.key);
 }
 
 export const ratingOf = (area) => (area && area.risk && area.risk.ops ? `${area.risk.ops.l}\u00d7${area.risk.ops.c}` : "not rated");
@@ -126,7 +131,7 @@ export function buildQueue(readiness) {
     const last = lastFor(area);
     const interval = intervalFor(area.score);
     // A missing area always belongs in the due list; a recorded area only when its interval has passed.
-    if (area.data && !isDue(last, interval.days)) return null;
+    if (!isDue(last, interval.days)) return null;
     return { area, check, last, interval };
   }).filter(Boolean);
   const vo2 = vo2Due();
