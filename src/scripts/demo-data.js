@@ -182,19 +182,19 @@ function radiationData(now, place, random) {
 const MEALS = [
   {
     meal: "Breakfast", hour: 7, minute: 30, name: "Oats with dried fruit",
-    kcal: 560, carb: 82, prot: 20, fat: 16, fiber: 10, sodium: 380, veg: 40, fluid: 300
+    kcal: 560, carb: 82, prot: 20, fat: 16, fiber: 10, sodium: 380, veg: 40, fluid: 300, iron: 2.0
   },
   {
     meal: "Lunch", hour: 12, minute: 30, name: "Rice, beans and vegetables",
-    kcal: 760, carb: 96, prot: 32, fat: 24, fiber: 13, sodium: 720, veg: 210, fluid: 500
+    kcal: 760, carb: 96, prot: 32, fat: 24, fiber: 13, sodium: 720, veg: 210, fluid: 500, iron: 3.0
   },
   {
     meal: "Dinner", hour: 18, minute: 30, name: "Pasta with tomato and tuna",
-    kcal: 790, carb: 92, prot: 38, fat: 26, fiber: 11, sodium: 780, veg: 200, fluid: 400
+    kcal: 790, carb: 92, prot: 38, fat: 26, fiber: 11, sodium: 780, veg: 200, fluid: 400, iron: 2.2
   },
   {
     meal: "Snack", hour: 15, minute: 30, name: "Yoghurt and nuts",
-    kcal: 280, carb: 22, prot: 14, fat: 15, fiber: 4, sodium: 120, veg: 0, fluid: 150
+    kcal: 280, carb: 22, prot: 14, fat: 15, fiber: 4, sodium: 120, veg: 0, fluid: 150, iron: 0.6
   }
 ];
 
@@ -208,7 +208,7 @@ function nutritionData(now, random) {
         id: `demo-meal-${index}-${mealIndex}`, time, meal: meal.meal, name: meal.name,
         portions: 1, amount: 1, unit: "portion"
       };
-      ["kcal", "carb", "prot", "fat", "fiber", "sodium", "veg", "fluid"].forEach((key) => {
+      ["kcal", "carb", "prot", "fat", "fiber", "sodium", "veg", "fluid", "iron"].forEach((key) => {
         entry[key] = round(meal[key] * (1 + salt), 1);
       });
       entries.push(entry);
